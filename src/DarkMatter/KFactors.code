@@ -1,0 +1,82 @@
+#define  nMA 24
+#define  nE0 8
+
+double KfactorApproximate(double MAtest, double E0test)
+{
+  double KKffactor[nMA][nE0];
+  
+  // mass of A' in GeV 
+  double  MMAA[nMA] = {0.001, 0.002, 0.004, 0.006, 0.008, 0.01, 0.02, 0.3, 0.4, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0}; 
+
+  // Beam energy of electrons in GeV
+  double  EE00[nE0] = {20, 40, 60, 80, 100, 120, 140, 160}; 
+
+  double KfMA1MeV[nE0] = {0.606286, 0.605283, 0.604929, 0.60474, 0.604626, 0.604549, 0.604485, 0.604527};
+  double KfMA2MeV[nE0] = {0.837599, 0.83442, 0.833288, 0.832704, 0.832335, 0.832088, 0.831908, 0.831281};
+  double KfMA4MeV[nE0] = {0.969624, 0.960278, 0.956935, 0.955195, 0.954116, 0.95338, 0.952846, 0.952438};
+  double KfMA6MeV[nE0] = {1.04025, 1.02264, 1.01628, 1.01296, 1.0109, 1.00949, 1.00846, 1.00767};
+  double KfMA8MeV[nE0] = {1.09678, 1.06925, 1.0592, 1.05392, 1.05064, 1.04838, 1.04674, 1.04549};
+  double KfMA10MeV[nE0] = {1.14791, 1.10876, 1.09496, 1.0874, 1.08268, 1.07945, 1.07708, 1.07527};
+  double KfMA20MeV[nE0] = {1.37278, 1.27614, 1.23623, 1.21422, 1.20018, 1.19038, 1.18313, 1.17754};
+  double KfMA30MeV[nE0] = {1.54771, 1.41733, 1.3544, 1.31719, 1.29257, 1.27496, 1.26174, 1.25144};
+  double KfMA40MeV[nE0] = {1.67437, 1.53055, 1.45506, 1.40683, 1.37324, 1.34847, 1.32944, 1.31436};
+  double KfMA50MeV[nE0] = {1.77288, 1.61665, 1.53582, 1.48201, 1.44284, 1.4129, 1.38925, 1.37014};
+  double KfMA60MeV[nE0] = {1.85602, 1.68401, 1.59904, 1.54266, 1.50082, 1.46799, 1.4415, 1.4195};
+  double KfMA70MeV[nE0] = {1.92991, 1.74007, 1.64994, 1.5915, 1.5483, 1.51409, 1.486, 1.46248};
+  double KfMA80MeV[nE0] = {1.99782, 1.78938, 1.69307, 1.63207, 1.58764, 1.5526, 1.52374, 1.49944};
+  double KfMA90MeV[nE0] = {2.0617, 1.83451, 1.73141, 1.66729, 1.6213, 1.58541, 1.55599, 1.53126};
+  double KfMA100MeV[nE0] = {2.12278, 1.87693, 1.76675, 1.69911, 1.65122, 1.61423, 1.58415, 1.55903};
+  double KfMA200MeV[nE0] = {2.06543, 1.99617, 1.97534, 1.96104, 1.88813, 1.83371, 1.79096, 1.75693};
+  double KfMA300MeV[nE0] = {2.11679, 1.99508, 1.94777, 1.92431, 1.91109, 1.90242, 1.89753, 1.8933};
+  double KfMA400MeV[nE0] = {2.20752, 2.03888, 1.96707, 1.92846, 1.90484, 1.8891, 1.87848, 1.8697};
+  double KfMA500MeV[nE0] = {2.31917, 2.10361, 2.00917, 1.95564, 1.92204, 1.89876, 1.88227, 1.86935};
+  double KfMA600MeV[nE0] = {2.44447, 2.18024, 2.06445, 1.99649, 1.95258, 1.92186, 1.89907, 1.88231};
+  double KfMA700MeV[nE0] = {2.5793, 2.26485, 2.1282, 2.04634, 1.9922, 1.9539, 1.92531, 1.90398};
+  double KfMA800MeV[nE0] = {2.72069, 2.35541, 2.19782, 2.10255, 2.03836, 1.9924, 1.95799, 1.93186};
+  double KfMA900MeV[nE0] = {2.86596, 2.45069, 2.27181, 2.16346, 2.08944, 2.03584, 1.99582, 1.96446};
+  double KfMA1000MeV[nE0] = {3.01242, 2.54971, 2.34923, 2.22797, 2.14436, 2.08319, 2.03674, 2.00084};
+    
+// initialize K-factor matrix
+  for (int j = 0; j < nE0; j++) {
+    KKffactor[0][j] = KfMA1MeV[j];
+    KKffactor[1][j] = KfMA2MeV[j];
+    KKffactor[2][j] = KfMA4MeV[j];
+    KKffactor[3][j] = KfMA6MeV[j];
+    KKffactor[4][j] = KfMA8MeV[j];
+    KKffactor[5][j] = KfMA10MeV[j];
+    KKffactor[6][j] = KfMA20MeV[j];
+    KKffactor[7][j] = KfMA30MeV[j];
+    KKffactor[8][j] = KfMA40MeV[j];
+    KKffactor[9][j] = KfMA50MeV[j];
+    KKffactor[10][j] = KfMA60MeV[j];
+    KKffactor[11][j] = KfMA70MeV[j];
+    KKffactor[12][j] = KfMA80MeV[j];
+    KKffactor[13][j] = KfMA90MeV[j];
+    KKffactor[14][j] = KfMA100MeV[j];
+    KKffactor[15][j] = KfMA200MeV[j];
+    KKffactor[16][j] = KfMA300MeV[j];
+    KKffactor[17][j] = KfMA400MeV[j];
+    KKffactor[18][j] = KfMA500MeV[j];
+    KKffactor[19][j] = KfMA600MeV[j];
+    KKffactor[20][j] = KfMA700MeV[j];
+    KKffactor[21][j] = KfMA800MeV[j];
+    KKffactor[22][j] = KfMA900MeV[j];
+    KKffactor[23][j] = KfMA1000MeV[j];        
+  }
+
+  // bounds for energy E0
+  if (E0test <= EE00[0])
+    E0test = 1.005 * EE00[0]; //  Lower limit for energy
+
+  if (E0test >= EE00[nE0-1] )
+    E0test  = 0.995 * EE00[nE0-1]; // Upper limit for energy
+
+  // bounds for mass of Dark state MA
+  if (MAtest <= MMAA[0])
+    MAtest = 1.005 * MMAA[0]; //  Lower limit for mass
+
+  if (MAtest >= MMAA[nMA-1] )
+    MAtest  = 0.995 * MMAA[nMA-1]; // Upper limit for mass
+    
+  return BilinearInterpolation<nE0> (MAtest, E0test, MMAA, EE00, KKffactor, nMA, 1);
+}

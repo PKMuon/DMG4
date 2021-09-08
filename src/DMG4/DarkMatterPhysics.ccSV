@@ -1,0 +1,186 @@
+#include "DarkMatterPhysics.hh"
+
+#include "DarkMatter.hh"
+#include "DarkPhotons.hh"
+#include "DarkZ.hh"
+#include "ALP.hh"
+#include "DarkPhotonsAnnihilation.hh"
+#include "DarkScalarsAnnihilation.hh"
+#include "DarkScalars.hh"
+#include "DarkPseudoScalars.hh"
+#include "DarkAxials.hh"
+
+#include "DMProcessDMBrem.hh"
+#include "DMProcessPrimakoffALP.hh"
+#include "DMProcessAnnihilation.hh"
+
+#include "DMParticleAPrime.hh"
+#include "DMParticleXBoson.hh"
+#include "DMParticleZPrime.hh"
+#include "DMParticleALP.hh"
+#include "DMParticleScalar.hh"
+#include "DMParticleXScalar.hh"
+#include "DMParticlePseudoScalar.hh"
+#include "DMParticleXPseudoScalar.hh"
+#include "DMParticleAxial.hh"
+
+#include "G4Electron.hh"
+#include "G4Positron.hh"
+#include "G4Gamma.hh"
+#include "G4MuonMinus.hh"
+#include "G4MuonPlus.hh"
+
+#include "G4BuilderType.hh"
+#include "G4SystemOfUnits.hh"
+
+
+// BiasSigmaFactor Invisible mode Vector EThresh=35
+// 900.  9.e12
+// 16.7  8.e8
+//  2.   3.5e7
+
+// BiasSigmaFactor Invisible mode Scalar EThresh=35
+// 16.7  2.3e9
+
+// BiasSigmaFactor Visible mode Vector EThresh=18
+// 16.7  3.4e8
+
+DarkMatterPhysics::DarkMatterPhysics() 
+: G4VPhysicsConstructor("DarkMatterPhysics")
+{
+  SetPhysicsType(bUnknown);
+  //fMessenger = new DarkMatterPhysicsMessenger();
+
+  G4double BiasSigmaFactor0 = 9.e8;
+
+  G4double EThresh = 35.; // for sensitivity calculations invisible mode
+  //G4double EThresh = 18.; // for sensitivity calculations visible mode
+  //G4double EThresh = 1.; // for shape studies
+  //G4double EThresh = 2000.; // to turn off A emissions
+
+  double DummyMass=0.0167; // will be overriden!
+  myDarkMatter = new DarkPhotons(DummyMass, EThresh); // Initialize by default for Pb with eps=0.0001
+  //myDarkMatter = new DarkScalars(DummyMass, EThresh); // Initialize by default for Pb with eps=0.0001
+  //myDarkMatter = new DarkPseudoScalars(DummyMass, EThresh); // Initialize by default for Pb with eps=0.0001
+  //myDarkMatter = new DarkAxials(DummyMass, EThresh); // Initialize by default for Pb with eps=0.0001
+
+  // Below is the code for the visible mode
+
+  //G4double Epsilon = 0.0009; // benchmark value 0.000316
+
+  //myDarkMatter = new DarkPhotons(DummyMass, EThresh, 1., 184., 74., 19.25, Epsilon, 2); // Initialize for W
+  //myDarkMatter = new DarkScalars(DummyMass, EThresh, 1., 184., 74., 19.25, Epsilon, 2); // Initialize for W
+  //myDarkMatter = new DarkPhotons(DummyMass, EThresh, 1., 207., 84., 11.35, Epsilon, 2); // Initialize for Pb
+  //myDarkMatter = new DarkPseudoScalars(DummyMass, EThresh, 1., 207., 84., 11.35, Epsilon, 2); // Initialize for Pb
+  //myDarkMatter = new ALP(DummyMass, EThresh, 1., 207., 84., 11.35, Epsilon, 2); // Initialize for Pb
+  //myDarkMatter = new DarkZ(DummyMass, EThresh, 1., 207., 84., 11.35, Epsilon, 1); // Initialize for Pb
+
+  // End of code for the visible mode
+
+  BiasSigmaFactor = BiasSigmaFactor0 * 0.0001 * 0.0001 / (myDarkMatter->Getepsil()*myDarkMatter->Getepsil());
+
+}
+
+
+DarkMatterPhysics::~DarkMatterPhysics()
+{
+  if(myDarkMatter) delete myDarkMatter;
+}
+
+
+void DarkMatterPhysics::ConstructParticle()
+{
+  // This call to particle definition must be first or at least go before
+  // Physics::ConstructProcess()
+  DMParticleAPrime::Definition();
+  DMParticleXBoson::Definition();
+  DMParticleZPrime::Definition();
+  DMParticleALP::Definition();
+  DMParticleScalar::Definition();
+  DMParticleXScalar::Definition();
+  DMParticlePseudoScalar::Definition();
+  DMParticleXPseudoScalar::Definition();
+  DMParticleAxial::Definition();
+}
+
+
+void DarkMatterPhysics::ConstructProcess()
+{
+  // Which DM particle?
+  G4ParticleDefinition* theDMParticlePtr = 0;
+  if(myDarkMatter->GetParentPDGID() == 11) {
+    if(myDarkMatter->GetDMType() == 1) {
+      theDMParticlePtr = DMParticleAPrime::Definition();
+      if(myDarkMatter->Decay()) theDMParticlePtr = DMParticleXBoson::Definition();
+    }
+    if(myDarkMatter->GetDMType() == 2) {
+      theDMParticlePtr = DMParticleScalar::Definition();
+      if(myDarkMatter->Decay()) theDMParticlePtr = DMParticleXScalar::Definition();
+    }
+    if(myDarkMatter->GetDMType() == 3) {
+      theDMParticlePtr = DMParticleAxial::Definition();
+      //if(myDarkMatter->Decay()) theDMParticlePtr = DMParticleXAxial::Definition();
+    }
+    if(myDarkMatter->GetDMType() == 4) {
+      theDMParticlePtr = DMParticlePseudoScalar::Definition();
+      if(myDarkMatter->Decay()) theDMParticlePtr = DMParticleXPseudoScalar::Definition();
+    }
+  }
+  if(myDarkMatter->GetParentPDGID() == -11) { // Annihilation: only vector and scalar for the moment
+    if(myDarkMatter->GetDMType() == 1) {
+      theDMParticlePtr = DMParticleAPrime::Definition();
+    }
+    if(myDarkMatter->GetDMType() == 2) {
+      theDMParticlePtr = DMParticleScalar::Definition();
+    }
+  }
+  if(myDarkMatter->GetParentPDGID() == 13) {
+    theDMParticlePtr = DMParticleAPrime::Definition(); // Fully invisible decay (or almost)
+    if(myDarkMatter->Decay()) theDMParticlePtr = DMParticleZPrime::Definition(); // Decay to SM particles
+  }
+  if(myDarkMatter->GetParentPDGID() == 22) {
+    theDMParticlePtr = DMParticleALP::Definition();
+  }
+
+  if(!theDMParticlePtr) {G4cout << "DarkMatterPhysics::ConstructProcess: did not manage to determine the DM particle type, exiting" << G4endl; exit(1);}
+
+  myDarkMatter->SetMA(theDMParticlePtr->GetPDGMass()/GeV);
+  myDarkMatter->PrepareTable();
+
+  G4PhysicsListHelper * phLHelper = G4PhysicsListHelper::GetPhysicsListHelper();
+
+  phLHelper->DumpOrdingParameterTable();
+
+  // if one need to (re-)associate certain process with a particle, note
+  // the following snippet
+  //G4ProcessManager * pMgr = Mocktron::Definition()->GetProcessManager();
+  //pmanager->RemoveProcess(idxt);
+  //pmanager->AddProcess(new G4MonopoleTransportation(fMpl),-1, 0, 0);
+
+  // ... here one can set up the model parameters from external config
+  //     sources, internal attributes previously set by messengers, etc
+
+  // ... here the processes asociated with new physics should be registered
+  //     as follows
+  
+  if(myDarkMatter->GetParentPDGID() == 11) {
+    phLHelper->RegisterProcess( new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
+                                G4Electron::ElectronDefinition() );
+    phLHelper->RegisterProcess( new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
+                                G4Positron::PositronDefinition() );
+  }
+  if(myDarkMatter->GetParentPDGID() == -11) {
+    phLHelper->RegisterProcess( new DMProcessAnnihilation(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
+                                G4Positron::PositronDefinition() );
+  }
+  if(myDarkMatter->GetParentPDGID() == 13) {
+    phLHelper->RegisterProcess( new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
+                                G4MuonMinus::MuonMinusDefinition() );
+    phLHelper->RegisterProcess( new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
+                                G4MuonPlus::MuonPlusDefinition() );
+  }
+  if(myDarkMatter->GetParentPDGID() == 22) {
+    phLHelper->RegisterProcess( new DMProcessPrimakoffALP(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
+                                G4Gamma::GammaDefinition() );
+  }
+}
