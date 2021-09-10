@@ -15,7 +15,7 @@ double BilinearInterpolation(double X, double Y, double ArgX[], double ArgY[], d
       if( X <= ArgX[i2] && X > ArgX[i2-1] && Y <= ArgY[j2] && Y > ArgY[j2-1] ) {
         ii=i2;
         jj=j2;
-        if(iprint) printf("i=%i j=%i , X=%.3f, Y=%.2f \n", ii, jj, X, Y );
+//        if(iprint) printf("i=%i j=%i , X=%.3f, Y=%.2f \n", ii, jj, X, Y );
       }
     }
   }

@@ -14,8 +14,6 @@ double parinv(double x, double a[], double f[], int n)
 //
   int k1, k2, k3;
 
-
-
   if(n < 3) {std::cerr << "parinv: insufficient number of points" << std::endl; exit(1);}
   if(x < a[0]) {
     double c = fabs(x - a[0]);
