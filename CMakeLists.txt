@@ -4,6 +4,7 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project(DMG4)
 
+# This below is to compile statements with nullptr (compilers 4.9, 6.3). At some point will not be needed?
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 #----------------------------------------------------------------------------
@@ -22,7 +23,7 @@ list(APPEND CMAKE_MODULE_PATH /afs/cern.ch/sw/lcg/external/cmaketools/1.1/module
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/modules_cmake_standalone)
 
 #----------------------------------------------------------------------------
-# Find GSL and ROOT
+# Find GSL
 #
 find_package(GSL REQUIRED)
 
