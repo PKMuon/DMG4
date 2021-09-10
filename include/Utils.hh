@@ -15,7 +15,8 @@ double BilinearInterpolation(double X, double Y, double ArgX[], double ArgY[], d
       if( X <= ArgX[i2] && X > ArgX[i2-1] && Y <= ArgY[j2] && Y > ArgY[j2-1] ) {
         ii=i2;
         jj=j2;
-//        if(iprint) printf("i=%i j=%i , X=%.3f, Y=%.2f \n", ii, jj, X, Y );
+        //if(iprint) printf("i=%i j=%i , X=%.3f, Y=%.2f \n", ii, jj, X, Y );
+	if(iprint) std::cout << "i=" << ii << " j=" << jj << " X= " << X << " Y=" << Y << std::endl;
       }
     }
   }
@@ -30,6 +31,7 @@ double BilinearInterpolation(double X, double Y, double ArgX[], double ArgY[], d
                   Func[ii-1][jj]*tangentX2*tangentY1   +
                   Func[ii][jj-1]*tangentX1*tangentY2   +
                   Func[ii][jj]*tangentX1*tangentY1;
-  if(iprint) printf("ResultBilinear=%.4f \n", Result);
+  //if(iprint) printf("ResultBilinear=%.4f \n", Result);
+  if(iprint) std::cout << "ResultBilinear=" << Result << std::endl;
   return Result;
 }
