@@ -3,7 +3,7 @@
 # https://gitlab.cern.ch/help/ci/yaml/README.md
 
 # use the default image for build (currently slc6)
-  image: slc7
+# image: slc7
 
 build:
   stage: build
@@ -14,7 +14,7 @@ build:
 
   # install the necessary build tools
   before_script:
-  #  - yum -q -y install gsl root libSM
+    - yum -q -y install libSM
 
   # build and test DMG4 and na64-tools/geant4/simulation
   script:
@@ -32,3 +32,7 @@ build:
     - echo "List of files with CR char:"
     - grep -r -lP "\r" * || true
     - cd -
+
+    - runconfigure_lcg
+    - make
+    - make install
