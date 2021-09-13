@@ -14,7 +14,7 @@ build:
 
   # install the necessary build tools
   before_script:
-    - yum -q -y install libX11 libX11-devel ghc-OpenGL ghc-OpenGL-devel
+    - yum -q -y install libX11 libX11-devel ghc-OpenGL ghc-OpenGL-devel motif motif-devel
 
   # build and test DMG4 and na64-tools/geant4/simulation
   script:
