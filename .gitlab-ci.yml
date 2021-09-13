@@ -2,8 +2,8 @@
 # https://cern.service-now.com/service-portal/article.do?n=KB0003690
 # https://gitlab.cern.ch/help/ci/yaml/README.md
 
-# use the default image for build (currently slc6)
-# image: slc7
+# use the default image for build (currently slc7)
+# image: slc6
 
 build:
   stage: build
@@ -33,6 +33,7 @@ build:
     - grep -r -lP "\r" * || true
     - cd -
 
-    - runconfigure_lcg
+    - source /cvmfs/sft.cern.ch/lcg/views/setupViews.sh LCG_96b x86_64-centos7-gcc62-opt
+    - ./runconfigure_lcg
     - make
     - make install
