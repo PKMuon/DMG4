@@ -21,7 +21,7 @@ build:
     - cat /etc/redhat-release
     - ls -l /lib64/libEGL*
     - cd /lib64
-    - sudo ln -fs libEGL.so.1.1.0 libEGL.so
+    - ln -fs libEGL.so.1.1.0 libEGL.so
     - cd -
 
     - cd src
