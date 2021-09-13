@@ -14,15 +14,18 @@ build:
 
   # install the necessary build tools
   before_script:
-    - yum -q -y install libX11 libX11-devel
+    - yum rm mesa-libEGL
+    - yum rm mesa-libGL
+    - yum -q -y install libX11 libX11-devel mesa-libEGL mesa-libGL
 
   # build and test DMG4 and na64-tools/geant4/simulation
   script:
     - cat /etc/redhat-release
     - ls -l /lib64/libEGL*
-    - cd /lib64
-    - ln -fs libEGL.so.1.1.0 libEGL.so
-    - cd -
+    - ls -l /lib64/libGL*
+    #- cd /lib64
+    #- ln -fs libEGL.so.1.1.0 libEGL.so
+    #- cd -
 
     - cd src
     - echo "List of files with TAB char:"
