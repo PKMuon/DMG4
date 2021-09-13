@@ -1,0 +1,34 @@
+# gitlab ci service
+# https://cern.service-now.com/service-portal/article.do?n=KB0003690
+# https://gitlab.cern.ch/help/ci/yaml/README.md
+
+# use the default image for build (currently slc6)
+  image: slc7
+
+build:
+  stage: build
+
+  tags:
+  # Make your job be executed in a shared runner that has CVMFS mounted
+  - cvmfs
+
+  # install the necessary build tools
+  before_script:
+  #  - yum -q -y install gsl root libSM
+
+  # build and test DMG4 and na64-tools/geant4/simulation
+  script:
+    - cat /etc/redhat-release
+
+    - cd src
+    - echo "List of files with TAB char:"
+    - echo '! grep -r -nP "\t" *' | bash
+    - echo "List of files with CR char:"
+    - grep -r -lP "\r" * || true
+    - cd -
+    - cd include
+    - echo "List of files with TAB char:"
+    - echo '! grep -r -nP "\t" *' | bash
+    - echo "List of files with CR char:"
+    - grep -r -lP "\r" * || true
+    - cd -
