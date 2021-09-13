@@ -14,7 +14,7 @@ build:
 
   # install the necessary build tools
   before_script:
-    - yum -q -y install libSM
+    - yum -q -y install libSM libEGL
 
   # build and test DMG4 and na64-tools/geant4/simulation
   script:
