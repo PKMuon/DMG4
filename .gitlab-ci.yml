@@ -34,7 +34,8 @@ build:
     - grep -r -lP "\r" * || true
     - cd -
 
-    - source /cvmfs/sft.cern.ch/lcg/views/setupViews.sh LCG_96b x86_64-centos7-gcc62-opt
+    #- source /cvmfs/sft.cern.ch/lcg/views/setupViews.sh LCG_96b x86_64-centos7-gcc62-opt
+    - source /cvmfs/sft.cern.ch/lcg/views/setupViews.sh LCG_100 x86_64-centos7-gcc9-opt
     - ./runconfigure_lcg
     - make
     - make install
