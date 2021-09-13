@@ -23,7 +23,7 @@ build:
     - ls -l /lib64/libGL*
     - cd /lib64
     - ln -fs libEGL.so.1.1.0 libEGL.so
-    - ln -fs libGL.so.1.1.0 libGL.so
+    - ln -fs libGL.so.1.7.0 libGL.so
     - cd -
 
     - cd src
