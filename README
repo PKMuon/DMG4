@@ -33,21 +33,22 @@ by gamma can be also simulated, usually gammas are secondary particles produced 
  II. Compilation of the library
 
 1. Configure the compiler
-2. Configure cmake if needed, version 3.5 or higher is required for root version 6.08.XX in order to specify c++14 std:
-   setenv PATH /cvmfs/sft.cern.ch/lcg/contrib/CMake/3.5.2/Linux-x86_64/bin:${PATH}
-3. Edit the script runconfigure and run it or run the configure script manually (./configure --help for help).
-   Note that the script runconfigure creates the file config.txt that can be used later when examples are compiled
+2. Configure cmake if needed
+3. Choose a script runconfigure* or edit script runconfigure and run it or run the configure script manually
+   (./configure --help for help). Note that the script runconfigure creates the file config.txt that can be used later
+   when examples are compiled
 4. make
 5. make install
 
- III. Compilation of an example
+ III. Compilation of internal examples and user applications
 
-1. Compile your Geant4 application together with 3 libraries put in the subdirectory /lib when "make install" is executed
+1. example1 is a test of DarkMatter subpackage only. Run script runconfigure, then make. The executable is mkgeant4.
+2. For your Geant4 application: compile it together with 3 libraries that are put in the subdirectory /lib when "make install" is executed
    Example of Dark Matter physics inclusion can be found in examples/mkgeant4.cc denoted by ""extension" part"
    Example of DarkMatterPhysicsConfigure.cc to simulate ALP is in examples/example1022
 2. Before running the application set the environment variable G4ORDPARAMTABLE to one of the files in subdirectory /DATA
-3. Instruction if you use DMG4 package : In this case the DM mass and the threshold are to be set set in the file DarkMatterPhysicsConfigure.cc.
-   You should tune BiasSigmaFactor0 in DarkMatterPhysicsConfigure.cc in a similar way.
+3. The DM mass and the threshold are to be set set in the file DarkMatterPhysicsConfigure.cc.
+   You should tune BiasSigmaFactor0 in DarkMatterPhysicsConfigure.cc.
    In simulation, the cross section is biased by the factor BiasSigmaFactor. It is always
    equal to BiasSigmaFactor0 for the invisible mode (simulation performed for the benchmark epsilon 10^-4). In the visible mode
    simulation BiasSigmaFactor is automatically scaled if epsilon is different from 10^-4, so that the average number of DM per event
