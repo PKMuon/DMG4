@@ -46,3 +46,8 @@ build:
     - ./runconfigure_lcg
     - make
     - make install
+
+    - cd examples/example1
+    - ./runconfigure
+    - make
+    - ./mkgeant4
