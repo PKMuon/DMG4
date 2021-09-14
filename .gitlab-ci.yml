@@ -16,8 +16,9 @@ build:
   before_script:
     - yum -q -y install libX11 libX11-devel ghc-OpenGL ghc-OpenGL-devel motif motif-devel
 
-  # build and test DMG4 and na64-tools/geant4/simulation
+  # build and test DMG4
   script:
+    # reparing EGL and GL links
     - cat /etc/redhat-release
     - ls -l /lib64/libEGL*
     - ls -l /lib64/libGL*
