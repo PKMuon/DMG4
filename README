@@ -32,13 +32,18 @@ by gamma can be also simulated, usually gammas are secondary particles produced 
 
  II. Compilation of the library
 
-1. Configure the compiler
-2. Configure cmake if needed
-3. Choose a script runconfigure* or edit script runconfigure and run it or run the configure script manually
+1. It is possible to use the lcg setup scripts, for example
+   source /cvmfs/sft.cern.ch/lcg/views/setupViews.csh LCG_96b x86_64-centos7-gcc62-opt
+   (use the first commented out line in the script runconfigure_lcg for information)
+   This is a tested release, should be compatible with precompiled Geant4 described in the package "simulation"
+   In this case simply use the script runconfigure_lcg or modify it to use your precompiled Geant4.
+2. Manual configuration follows. Configure the compiler.
+3. Configure cmake if needed
+4. Choose a script runconfigure* or edit script runconfigure and run it or run the configure script manually
    (./configure --help for help). Note that the script runconfigure creates the file config.txt that can be used later
    when examples are compiled
-4. make
-5. make install
+5. make
+6. make install
 
  III. Compilation of internal examples and user applications
 
