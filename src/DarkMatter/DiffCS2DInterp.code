@@ -53,7 +53,10 @@ double DsDxBilinearInterp(double MAtest, double Xtest) {
   }
 
   // bounds for X
-  if (Xtest <= XX00[0])
+
+  if (Xtest < XX00[0]) return 0.; // Because the total cross section is obtained from the integration above this
+
+  if (Xtest == XX00[0])
     Xtest = 1.00005 * XX00[0]; //  Lower limit for X
 
   if (Xtest >= XX00[nX-1] )
