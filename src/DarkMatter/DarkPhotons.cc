@@ -29,6 +29,10 @@
 
 double TotCSVectorParticle(double MAtest) // CS in GeV^-2 for epsilon=1
 {
+  // These are total cross sections of vector DM production in Brem. processes calculated at ETL.
+  // The lower X limit of integration is 0.01. It must be the same in the differential cross sections table, then the correct
+  // cutoff will be made in sampling.
+
   double  MMAA[nMALowM] = {0.000001, 0.00001, 0.00002, 0.00003, 0.00004, 0.00005, 0.00006, 0.00007, 0.0001, 0.00015, 0.0002,
                            0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008, 0.0009}; // mass of A' in GeV
   double TotCSList[nMALowM] ={831989.,714214.,608205.,537442.,485739.,445566.,413065.,386006.,325514.,261274.,219140.,
