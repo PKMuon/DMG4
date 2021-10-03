@@ -6,11 +6,13 @@ class DarkMatter;
 
 class DarkMatterPhysics : public G4VPhysicsConstructor {
   public:
+
     DarkMatterPhysics();
     ~DarkMatterPhysics();
     bool DarkMatterPhysicsConfigure();
 
     //A.C. I introduced this method to allow to pass at run-time the A' mass, the mChi/mA mass ratio, and the bias
+    DarkMatterPhysics(double Amass,double ratio,double Bias);
     bool DarkMatterPhysicsConfigureWithPars(double Amass,double ratio,double Bias);
 
 
