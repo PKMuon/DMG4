@@ -9,6 +9,11 @@ class DarkMatterPhysics : public G4VPhysicsConstructor {
     DarkMatterPhysics();
     ~DarkMatterPhysics();
     bool DarkMatterPhysicsConfigure();
+
+    //A.C. I introduced this method to allow to pass at run-time the A' mass, the mChi/mA mass ratio, and the bias
+    bool DarkMatterPhysicsConfigureWithPars(double Amass,double ratio,double Bias);
+
+
     // Should call initial constructor of particle singletons
     virtual void ConstructParticle() override;
     virtual void ConstructProcess() override;
