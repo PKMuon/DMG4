@@ -29,7 +29,7 @@
 // BiasSigmaFactor Visible mode Vector EThresh=18
 // 16.7  3.4e8
 
-bool DarkMatterPhysics::DarkMatterPhysicsConfigureWithPars(double Amass,double ratio,double Bias)
+bool DarkMatterPhysics::DarkMatterPhysicsConfigureWithPars(double Amass,double ratio,double alphaD,double Bias)
 {
   G4double BiasSigmaFactor0 = Bias;
 
