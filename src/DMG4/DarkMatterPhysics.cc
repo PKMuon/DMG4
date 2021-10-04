@@ -46,6 +46,19 @@ DarkMatterPhysics::DarkMatterPhysics()
   }
 }
 
+DarkMatterPhysics::DarkMatterPhysics(double Amass,double ratio,double alphaD,double Bias)
+: G4VPhysicsConstructor("DarkMatterPhysics")
+{
+  SetPhysicsType(bUnknown);
+  //fMessenger = new DarkMatterPhysicsMessenger();
+
+  if(!DarkMatterPhysicsConfigureWithPars(Amass,ratio,alphaD,Bias)) {
+    G4cout << "Dark Matter physics is not properly configured, exiting" << G4endl;
+    exit(1);
+  }
+}
+
+
 
 DarkMatterPhysics::~DarkMatterPhysics()
 {
