@@ -11,7 +11,8 @@ class DarkMatterPhysics : public G4VPhysicsConstructor {
     ~DarkMatterPhysics();
     bool DarkMatterPhysicsConfigure();
 
-    //A.C. I introduced this method to allow to pass at run-time the A' mass, the mChi/mA mass ratio, and the bias
+    //A.C. I introduced this method to allow to pass at run-time the A' mass (in GeV), the mChi/mA mass ratio, and the bias
+    //The units for Amass must be GeV!!!
     DarkMatterPhysics(double Amass,double ratio,double alphaD,double Bias);
     bool DarkMatterPhysicsConfigureWithPars(double Amass,double ratio,double alphaD,double Bias);
 
