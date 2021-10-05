@@ -93,25 +93,49 @@ double DarkPhotons::TotalCrossSectionCalc(double E0)
 
     double KFactor = KfactorApproximate(MA, E0);
 
-    G4cout << "Total CS calc, E = " << E0 << "  M = " << MA << "  KFactor = " << KFactor << G4endl;
+    double result = sigmaTot / KFactor; // This K-factor decreases the cross section for MA > ~2 MeV;
 
-    return sigmaTot / KFactor; // This K-factor decreases the cross section for MA > ~2 MeV
+    std::cout << "Total CS calc, E = " << E0 << "  M = " << MA << "  KFactor = " << KFactor << " CS = " << result << std::endl;
+
+    return result;
 
   } else {
-    
-    G4cout << "No analytical calculations below 1 MeV, exiting" << G4endl;
-    exit(1);
+
+    //G4cout << "No analytical calculations below 1 MeV, exiting" << G4endl;
+    //exit(1);
+
+    double XMin = 0.01; // to be taken from the table
+    if(MA/E0 > XMin) XMin = MA/E0;
+    if(XMin > 1.) return 0.;
+    int NSteps=10000;
+    double StepSize = (1.-XMin)/((double)NSteps);
+    double TotCS=0.;
+    double TotCSCut=0.;
+    for(int ix=0; ix<NSteps; ix++) {
+      double xi = XMin + ((double)ix + 0.5)*StepSize;
+      if(xi > 1. || xi < XMin) continue;
+      TotCS += CrossSectionDSDX(xi, E0);
+      if(E0*xi > EThresh) TotCSCut += CrossSectionDSDX(xi, E0);
+    }
+    double result = 0.;
+    if(TotCS > 0.) {
+      result = (TotCSCut/TotCS) * TotCSVectorParticle(MA)*(ZNucl*ZNucl/(82.*82.))*GeVtoPb*epsilBench*epsilBench; // ETL calculations are made for Pb
+                                                                                                                 // The dependency Z^2 is approximate!    
+    }
+    std::cout << "Total CS calc for masses < 1 MeV, E = " << E0 << "  M = " << MA << " Cut reduction factor = " << TotCSCut/TotCS 
+              << " CS = " << result << std::endl;
+    return result;
   }
 }
 
 
 double DarkPhotons::GetSigmaTot(double E0)
 {
-  if(MA > 0.001) {
+//  if(MA > 0.001) {
     return GetSigmaTot0(E0);
-  } else {
-    return TotCSVectorParticle(MA)*(ZNucl*ZNucl/(82.*82.))*GeVtoPb*epsilBench*epsilBench; // ETL calculations are made for Pb
-  }                                                                                       // The dependency Z^2 is approximate!
+//  } else {
+//    return TotCSVectorParticle(MA)*(ZNucl*ZNucl/(82.*82.))*GeVtoPb*epsilBench*epsilBench; // ETL calculations are made for Pb
+//  }                                                                                       // The dependency Z^2 is approximate!
 }
 
 

@@ -51,11 +51,11 @@ void DarkMatter::PrepareTable()
   MParent = 0.;
   if(fabs(ParentPDGID) == 11) MParent = Mel;
   if(fabs(ParentPDGID) == 13) MParent = Mmu;
-  if(fabs(ParentPDGID) == 11 && MA < 0.001) return;
+  //if(fabs(ParentPDGID) == 11 && MA < 0.001) return;
   for(int ip=0; ip < nptable; ip++) {
     sigmap[ip] = TotalCrossSectionCalc(ep[ip]);
-    sigmax[ip] = MaxCrossSectionCalc(ep[ip]);
-    sigmaxa[ip] = MaxCrossSectionAngleCalc(ep[ip]);
+    if(MA >= 0.001) sigmax[ip] = MaxCrossSectionCalc(ep[ip]);
+    if(MA >= 0.001) sigmaxa[ip] = MaxCrossSectionAngleCalc(ep[ip]);
     if(fabs(ParentPDGID) == 13) sigmaxpsi[ip] = MaxCrossSectionPsiCalc(ep[ip]);
     if(fabs(ParentPDGID) == 13) sigmaxtheta[ip] = MaxCrossSectionThetaCalc(ep[ip]);
   }
@@ -214,6 +214,7 @@ double DarkMatter::MaxCrossSectionThetaCalc(double E0)
 double DarkMatter::SimulateEmission(double E0, double* angles)
 {
   double Xmin = MA/E0;
+  if(MA < 0.001 && EThresh/E0 > Xmin) Xmin = EThresh/E0;
   double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MParent/E0;
 
   if(ParentPDGID == 22 || ParentPDGID == -11) {
@@ -221,7 +222,7 @@ double DarkMatter::SimulateEmission(double E0, double* angles)
     Xmax = 0.99999;
   }
   double sigmaMax = 1.01; // tabulated values below 1 MeV are normalized to max
-  if(MA >= 0.001) {
+  if(MA >= 0.001) { //FIXME: calculate max value also here
     sigmaMax = GetSigmaMax(E0);
   }
 
@@ -498,7 +499,7 @@ double DarkMatter::SimulateEmissionByMuon2(double E0, double* angles)
   double Xmin = MA/E0;
 
   if(abs(ParentPDGID) != 13) {
-    std::cout << "Error: SimulateEmissionFromMuon: this is only for muons, exiting" << std::endl;
+    std::cout << "Error: SimulateEmissionByMuon2: this is only for muons, exiting" << std::endl;
     exit(1);
   }
 
