@@ -54,7 +54,7 @@ void DarkMatter::PrepareTable()
   //if(fabs(ParentPDGID) == 11 && MA < 0.001) return;
   for(int ip=0; ip < nptable; ip++) {
     sigmap[ip] = TotalCrossSectionCalc(ep[ip]);
-    if(MA >= 0.001) sigmax[ip] = MaxCrossSectionCalc(ep[ip]);
+    sigmax[ip] = MaxCrossSectionCalc(ep[ip]);
     if(MA >= 0.001) sigmaxa[ip] = MaxCrossSectionAngleCalc(ep[ip]);
     if(fabs(ParentPDGID) == 13) sigmaxpsi[ip] = MaxCrossSectionPsiCalc(ep[ip]);
     if(fabs(ParentPDGID) == 13) sigmaxtheta[ip] = MaxCrossSectionThetaCalc(ep[ip]);
@@ -126,14 +126,16 @@ double DarkMatter::MaxCrossSectionCalc(double E0)
 
   if(ParentPDGID == 22 || ParentPDGID == -11) Xmax = 0.99999;
 
-  csmax = CrossSectionDSDX(Xmax, E0);
+  if(MA >= 0.001) csmax = CrossSectionDSDX(Xmax, E0); // preliminary
   for(int i=0; i<10000; i++) {
     double xi = 0.00005 + 0.0001*((double)i);
     if(xi >= Xmin && xi <= Xmax) {
       double csi = CrossSectionDSDX(xi, E0);
+      if(MA < 0.001 && xi < EThresh/E0) csi = 0.; // we cut DM at EThresh for these masses
       if(csi > csmax) csmax = csi;
     }
   }
+  std::cout << " E0 = " << E0 << "  Max cross section = " << csmax << std::endl;
   return 1.1*csmax;
 }
 
@@ -221,9 +223,10 @@ double DarkMatter::SimulateEmission(double E0, double* angles)
     Xmin = 0.999;
     Xmax = 0.99999;
   }
-  double sigmaMax = 1.01; // tabulated values below 1 MeV are normalized to max
-  if(MA >= 0.001) { //FIXME: calculate max value also here
-    sigmaMax = GetSigmaMax(E0);
+
+  double sigmaMax = GetSigmaMax(E0);
+  if(MA < 0.001 && sigmaMax > 1.2) { // diff. cross section normalized to 1.
+    std::cout << "Strange too big sigma max for the mass below 0.001, exiting" << std::endl; exit(1);
   }
 
   int maxiter = 1000000;

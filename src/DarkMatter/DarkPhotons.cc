@@ -99,10 +99,7 @@ double DarkPhotons::TotalCrossSectionCalc(double E0)
 
     return result;
 
-  } else {
-
-    //G4cout << "No analytical calculations below 1 MeV, exiting" << G4endl;
-    //exit(1);
+  } else { // below MA = 0.001 only ETL tabulated cross sections
 
     double XMin = 0.01; // to be taken from the table
     if(MA/E0 > XMin) XMin = MA/E0;
