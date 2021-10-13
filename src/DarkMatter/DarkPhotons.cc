@@ -128,11 +128,7 @@ double DarkPhotons::TotalCrossSectionCalc(double E0)
 
 double DarkPhotons::GetSigmaTot(double E0)
 {
-//  if(MA > 0.001) {
-    return GetSigmaTot0(E0);
-//  } else {
-//    return TotCSVectorParticle(MA)*(ZNucl*ZNucl/(82.*82.))*GeVtoPb*epsilBench*epsilBench; // ETL calculations are made for Pb
-//  }                                                                                       // The dependency Z^2 is approximate!
+  return GetSigmaTot0(E0);
 }
 
 
