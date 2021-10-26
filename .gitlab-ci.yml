@@ -14,7 +14,7 @@ build:
 
   # install the necessary build tools
   before_script:
-    - yum -q -y install libX11 libX11-devel ghc-OpenGL ghc-OpenGL-devel motif motif-devel
+    - yum -q -y install libX11 libX11-devel motif motif-devel mesa-libGL-devel mesa-libEGL-devel
 
   # build and test DMG4
   script:
@@ -22,10 +22,6 @@ build:
     - cat /etc/redhat-release
     - ls -l /lib64/libEGL*
     - ls -l /lib64/libGL*
-    - cd /lib64
-    - ln -fs libEGL.so.1.1.0 libEGL.so
-    - ln -fs libGL.so.1.7.0 libGL.so
-    - cd -
 
     #- source /cvmfs/sft.cern.ch/lcg/views/setupViews.sh LCG_96b x86_64-centos7-gcc62-opt
     - source /cvmfs/sft.cern.ch/lcg/views/setupViews.sh LCG_100 x86_64-centos7-gcc9-opt
