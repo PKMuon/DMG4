@@ -6,7 +6,7 @@
 # image: slc6
 
 build:
-  stage: build
+  stage: test
 
   tags:
   # Make your job be executed in a shared runner that has CVMFS mounted
@@ -27,19 +27,6 @@ build:
     - ln -fs libGL.so.1.7.0 libGL.so
     - cd -
 
-    - cd src
-    - echo "List of files with TAB char:"
-    - echo '! grep -r -nP "\t" *' | bash
-    - echo "List of files with CR char:"
-    - grep -r -lP "\r" * || true
-    - cd -
-    - cd include
-    - echo "List of files with TAB char:"
-    - echo '! grep -r -nP "\t" *' | bash
-    - echo "List of files with CR char:"
-    - grep -r -lP "\r" * || true
-    - cd -
-
     #- source /cvmfs/sft.cern.ch/lcg/views/setupViews.sh LCG_96b x86_64-centos7-gcc62-opt
     - source /cvmfs/sft.cern.ch/lcg/views/setupViews.sh LCG_100 x86_64-centos7-gcc9-opt
     #- export PATH=/cvmfs/sft.cern.ch/lcg/contrib/CMake/3.5.2/Linux-x86_64/bin:${PATH}
@@ -52,6 +39,23 @@ build:
     - ./runconfigure
     - make
     - ./mkgeant4
+
+check-tabs:
+  stage: test
+  
+  script:
+    - cd src
+    - echo "List of files with TAB char:"
+    - echo '! grep -r -nP "\t" *' | bash
+    - echo "List of files with CR char:"
+    - grep -r -lP "\r" * || true
+    - cd -
+    - cd include
+    - echo "List of files with TAB char:"
+    - echo '! grep -r -nP "\t" *' | bash
+    - echo "List of files with CR char:"
+    - grep -r -lP "\r" * || true
+    - cd -
 
 test-simu:
   stage: deploy
