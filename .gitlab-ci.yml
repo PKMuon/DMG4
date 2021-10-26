@@ -52,3 +52,7 @@ build:
     - ./runconfigure
     - make
     - ./mkgeant4
+
+test-simu:
+  stage: deploy
+  trigger: P348/na64-simulation
