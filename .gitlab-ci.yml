@@ -12,21 +12,20 @@ build:
   # Make your job be executed in a shared runner that has CVMFS mounted
   - cvmfs
 
-  # install the necessary build tools
+  # prepare environment
   before_script:
     - yum -q -y install libX11 libX11-devel motif motif-devel mesa-libGL-devel mesa-libEGL-devel
+    - source /cvmfs/sft.cern.ch/lcg/views/setupViews.sh LCG_100 x86_64-centos7-gcc9-opt
+    #- source /cvmfs/sft.cern.ch/lcg/views/setupViews.sh LCG_96b x86_64-centos7-gcc62-opt
+    #- export PATH=/cvmfs/sft.cern.ch/lcg/contrib/CMake/3.5.2/Linux-x86_64/bin:${PATH}
+    - cat /etc/redhat-release
+    - g++ --version
+    - cmake --version
+    - root-config --version
+    - root-config --features
 
   # build and test DMG4
   script:
-    # reparing EGL and GL links
-    - cat /etc/redhat-release
-    - ls -l /lib64/libEGL*
-    - ls -l /lib64/libGL*
-
-    #- source /cvmfs/sft.cern.ch/lcg/views/setupViews.sh LCG_96b x86_64-centos7-gcc62-opt
-    - source /cvmfs/sft.cern.ch/lcg/views/setupViews.sh LCG_100 x86_64-centos7-gcc9-opt
-    #- export PATH=/cvmfs/sft.cern.ch/lcg/contrib/CMake/3.5.2/Linux-x86_64/bin:${PATH}
-    - cmake --version
     - ./runconfigure_lcg
     - make
     - make install
