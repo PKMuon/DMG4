@@ -1,4 +1,5 @@
 #include "DMParticleALP.hh"
+#include "DarkMatterParametersFactory.hh"
 
 #include "G4ParticleTable.hh"
 #include "G4PhysicalConstants.hh"
@@ -9,11 +10,16 @@
 
 DMParticleALP * DMParticleALP::theInstance = nullptr;
 
-DMParticleALP* DMParticleALP::Definition(G4double MassIn, G4double epsilIn)
+DMParticleALP* DMParticleALP::Definition()
 {
   if( theInstance ) {
     return theInstance;
   }
+  //get parameters from factory
+  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
+  G4double MassIn    = DMpar->GetRegisteredParam("MassA");
+  G4double epsilIn   = DMpar->GetRegisteredParam("Epsil");
+  
   const G4String name = "DMParticleALP";
   // search in particle table]
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
@@ -59,14 +65,4 @@ DMParticleALP* DMParticleALP::Definition(G4double MassIn, G4double epsilIn)
   }
   theInstance = reinterpret_cast<DMParticleALP*>(anInstance);
   return theInstance;
-}
-
-
-DMParticleALP* DMParticleALP::Definition()
-{
-  if( theInstance ) {
-    return theInstance;
-  }
-  G4cout << "DMParticleALP::Definition() : ALP is not yet defined by the proper method with arguments, exiting" << G4endl;
-  exit(1);
 }

@@ -8,6 +8,5 @@ private:
     DMParticleScalar();
     ~DMParticleScalar();
 public:
-    static DMParticleScalar * Definition(G4double MassIn, G4double epsilIn=0.0001);
     static DMParticleScalar * Definition();
 };

@@ -10,6 +10,8 @@
 #include "DarkPseudoScalars.hh"
 #include "DarkAxials.hh"
 
+#include "DarkMatterParametersFactory.hh"
+
 #include "G4SystemOfUnits.hh"
 
 
@@ -31,29 +33,55 @@
 
 bool DarkMatterPhysics::DarkMatterPhysicsConfigure() 
 {
-  G4double BiasSigmaFactor0 = 9.e8;
-
-  G4double EThresh = 35.; // for sensitivity calculations invisible mode
+  //call an instance of the class
+  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();  
+  
+  G4double BiasSigmaFactor0 = DMpar->GetRegisteredParam("Bias", 9.e8);
+  G4double EThresh = DMpar->GetRegisteredParam("EThresh", 35.); // for sensitivity calculations invisible mode
   //G4double EThresh = 18.; // for sensitivity calculations visible mode
   //G4double EThresh = 1.; // for shape studies
-  //G4double EThresh = 2000.; // to turn off A emissions
+  //G4double EThresh = 2000.; // to turn off A emissions  
 
-  double DMMass=0.0167;
-  myDarkMatter = new DarkPhotons(DMMass, EThresh); // Initialize by default for Pb with eps=0.0001
-  //myDarkMatter = new DarkScalars(DMMass, EThresh); // Initialize by default for Pb with eps=0.0001
-  //myDarkMatter = new DarkPseudoScalars(DMMass, EThresh); // Initialize by default for Pb with eps=0.0001
-  //myDarkMatter = new DarkAxials(DMMass, EThresh); // Initialize by default for Pb with eps=0.0001
+  //select particle type and details
+  G4int DMType    = DMpar->GetRegisteredParam("DMType"     ,0.     );
+  double DMMass   = DMpar->GetRegisteredParam("MassA", 0.0167);
+  double Epsilon  = DMpar->GetRegisteredParam("Epsil", 0.0167);
+  // Initialize by default for Pb with eps=0.0001
+  G4int ANucl     = DMpar->GetRegisteredParam("ANucl"      ,207.   );
+  G4int ZNucl     = DMpar->GetRegisteredParam("ZNucl"      ,82.    );
+  G4int Density   = DMpar->GetRegisteredParam("Density"    ,11.35  );
+  G4int DecayType = DMpar->GetRegisteredParam("DecayType"  ,0.     ); //0 invisible, 2 visible
 
-  // Below is the code for the visible mode
-
-  //G4double Epsilon = 0.0009; // benchmark value 0.000316
-
-  //myDarkMatter = new DarkPhotons(DMMass, EThresh, 1., 184., 74., 19.25, Epsilon, 2); // Initialize for W
-  //myDarkMatter = new DarkScalars(DMMass, EThresh, 1., 184., 74., 19.25, Epsilon, 2); // Initialize for W
-  //myDarkMatter = new DarkPhotons(DMMass, EThresh, 1., 207., 82., 11.35, Epsilon, 2); // Initialize for Pb
-  //myDarkMatter = new DarkPseudoScalars(DMMass, EThresh, 1., 207., 82., 11.35, Epsilon, 2); // Initialize for Pb
-  //myDarkMatter = new ALP(DMMass, EThresh, 1., 207., 82., 11.35, Epsilon, 2); // Initialize for Pb
-  //myDarkMatter = new DarkZ(DMMass, EThresh, 1., 207., 82., 11.35, Epsilon, 1); // Initialize for Pb
+  //additional pareameters
+  G4double AlphaD = DMpar->GetRegisteredParam("AlphaD", 0.1);
+  
+  switch(DMType)
+    {
+    case 0:
+      G4cout << "Initialize DarkPhoton\n";
+      myDarkMatter = new DarkPhotons(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType); 
+      break;
+    case 1:
+      G4cout << "Initialize DarkScalar\n";
+      myDarkMatter = new DarkScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType);
+      break;
+    case 2:
+      G4cout << "Initialize DarkPseudoScalars\n";
+      myDarkMatter = new DarkPseudoScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+    case 3:
+      G4cout << "Initialize DarkAxials\n";
+      myDarkMatter = new DarkAxials(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+    case 4:
+      G4cout << "Initialize ALP\n";
+      myDarkMatter = new ALP(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+    case 5:
+      G4cout << "Initialize DarkZ\n";
+      myDarkMatter = new DarkZ(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+    default:
+      G4cout << "Initialize DarkPhoton\n";
+      myDarkMatter = new DarkPhotons(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType); 
+      break;      
+    }
 
   // End of code for the visible mode
 

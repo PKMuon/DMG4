@@ -8,6 +8,5 @@ private:
     DMParticleALP();
     ~DMParticleALP();
 public:
-    static DMParticleALP * Definition(G4double MassIn, G4double epsilIn);
     static DMParticleALP * Definition();
 };

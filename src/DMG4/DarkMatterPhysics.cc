@@ -15,13 +15,10 @@
 #include "DMProcessAnnihilation.hh"
 
 #include "DMParticleAPrime.hh"
-#include "DMParticleXBoson.hh"
 #include "DMParticleZPrime.hh"
 #include "DMParticleALP.hh"
 #include "DMParticleScalar.hh"
-#include "DMParticleXScalar.hh"
 #include "DMParticlePseudoScalar.hh"
-#include "DMParticleXPseudoScalar.hh"
 #include "DMParticleAxial.hh"
 
 #include "G4Electron.hh"
@@ -70,15 +67,12 @@ void DarkMatterPhysics::ConstructParticle()
 {
   // This call to particle definition must be first or at least go before
   // Physics::ConstructProcess()
-  DMParticleAPrime::Definition(myDarkMatter->GetMA()*GeV);
-  DMParticleXBoson::Definition(myDarkMatter->GetMA()*GeV, myDarkMatter->Getepsil());
-  DMParticleZPrime::Definition(myDarkMatter->GetMA()*GeV, myDarkMatter->Getepsil());
-  DMParticleALP::Definition(myDarkMatter->GetMA()*GeV, myDarkMatter->Getepsil());
-  DMParticleScalar::Definition(myDarkMatter->GetMA()*GeV);
-  DMParticleXScalar::Definition(myDarkMatter->GetMA()*GeV, myDarkMatter->Getepsil());
-  DMParticlePseudoScalar::Definition(myDarkMatter->GetMA()*GeV);
-  DMParticleXPseudoScalar::Definition(myDarkMatter->GetMA()*GeV, myDarkMatter->Getepsil());
-  DMParticleAxial::Definition(myDarkMatter->GetMA()*GeV);
+  DMParticleAPrime::Definition();
+  DMParticleZPrime::Definition();
+  DMParticleALP::Definition();
+  DMParticleScalar::Definition();
+  DMParticlePseudoScalar::Definition();
+  DMParticleAxial::Definition();
 }
 
 
@@ -89,19 +83,15 @@ void DarkMatterPhysics::ConstructProcess()
   if(myDarkMatter->GetParentPDGID() == 11) {
     if(myDarkMatter->GetDMType() == 1) {
       theDMParticlePtr = DMParticleAPrime::Definition();
-      if(myDarkMatter->Decay()) theDMParticlePtr = DMParticleXBoson::Definition();
     }
     if(myDarkMatter->GetDMType() == 2) {
       theDMParticlePtr = DMParticleScalar::Definition();
-      if(myDarkMatter->Decay()) theDMParticlePtr = DMParticleXScalar::Definition();
     }
     if(myDarkMatter->GetDMType() == 3) {
       theDMParticlePtr = DMParticleAxial::Definition();
-      //if(myDarkMatter->Decay()) theDMParticlePtr = DMParticleXAxial::Definition();
     }
     if(myDarkMatter->GetDMType() == 4) {
       theDMParticlePtr = DMParticlePseudoScalar::Definition();
-      if(myDarkMatter->Decay()) theDMParticlePtr = DMParticleXPseudoScalar::Definition();
     }
   }
   if(myDarkMatter->GetParentPDGID() == -11) { // Annihilation: only vector and scalar for the moment
@@ -113,8 +103,7 @@ void DarkMatterPhysics::ConstructProcess()
     }
   }
   if(myDarkMatter->GetParentPDGID() == 13) {
-    theDMParticlePtr = DMParticleAPrime::Definition(); // Fully invisible decay (or almost)
-    if(myDarkMatter->Decay()) theDMParticlePtr = DMParticleZPrime::Definition(); // Decay to SM particles
+    theDMParticlePtr = DMParticleZPrime::Definition(); // Decay to SM particles
   }
   if(myDarkMatter->GetParentPDGID() == 22) {
     theDMParticlePtr = DMParticleALP::Definition();

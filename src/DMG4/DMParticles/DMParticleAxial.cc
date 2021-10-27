@@ -1,18 +1,25 @@
 #include "DMParticleAxial.hh"
+#include "DarkMatterParametersFactory.hh"
 
 #include "G4ParticleTable.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
 #include "G4PhaseSpaceDecayChannel.hh"
 #include "G4DalitzDecayChannel.hh"
 #include "G4DecayTable.hh"
 
 DMParticleAxial * DMParticleAxial::theInstance = nullptr;
 
-DMParticleAxial* DMParticleAxial::Definition(G4double MassIn, G4double epsilIn)
+DMParticleAxial* DMParticleAxial::Definition()
 {
   if( theInstance ) {
     return theInstance;
   }
+   //get parameters from factory
+  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
+  G4double MassIn    = DMpar->GetRegisteredParam("MassA");
+  G4double epsilIn   = DMpar->GetRegisteredParam("Epsil");
+
   const G4String name = "DMParticleAxial";
   // search in particle table]
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
@@ -43,14 +50,4 @@ DMParticleAxial* DMParticleAxial::Definition(G4double MassIn, G4double epsilIn)
   }
   theInstance = reinterpret_cast<DMParticleAxial*>(anInstance);
   return theInstance;
-}
-
-
-DMParticleAxial* DMParticleAxial::Definition()
-{
-  if( theInstance ) {
-    return theInstance;
-  }
-  G4cout << "DMParticleAxial::Definition() : Axial is not yet defined by the proper method with arguments, exiting" << G4endl;
-  exit(1);
 }
