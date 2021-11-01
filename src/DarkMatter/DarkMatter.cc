@@ -383,6 +383,7 @@ double DarkMatter::SimulateEmissionWithAngle(double E0, double* angles)
 double DarkMatter::SimulateEmissionWithAngle2(double E0, double* angles)
 {
   double Xmin = MA/E0;
+  if(MA < 0.001 && EThresh/E0 > Xmin) Xmin = EThresh/E0;
 
   if(ParentPDGID == 22) {
     std::cout << "ALP: Error: double differential cross section DSDXDU is not implemented, exiting" << std::endl;
@@ -397,18 +398,25 @@ double DarkMatter::SimulateEmissionWithAngle2(double E0, double* angles)
     exit(1);
   }
 
-  if(!ISampler) { // Don't use external sampler DarkMatterSampler
+  angles[0] = 0.;
+  angles[1] = 0.;
+
+  if(!ISampler || MA < 0.001) { // Don't use external sampler DarkMatterSampler
 
     double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MParent/E0;
+    if(Xmin > Xmax) return 0.;
 
     if(ParentPDGID == 22 || ParentPDGID == -11) {
       Xmin = 0.999;
       Xmax = 0.99999;
     }
     double sigmaMax = GetSigmaMax(E0);
+    if(MA < 0.001 && sigmaMax > 1.2) { // diff. cross section normalized to 1.
+      std::cout << "Strange too big sigma max for the mass below 0.001, exiting" << std::endl; exit(1);
+    }
     int maxiterX = 1000000;
 
-    double XAcc = 0., ThetaAcc, PhiAcc;
+    double XAcc = 0., ThetaAcc = 0., PhiAcc = 0.;
     int NIterX = 0;
 
     for(int iii = 1; iii < maxiterX; iii++) { // X simulation loop
@@ -431,13 +439,16 @@ double DarkMatter::SimulateEmissionWithAngle2(double E0, double* angles)
       printf ("Simulation of X failed after N iterations = %d\n", maxiterX);
       return 0.;
     }
+    if(MA < 0.001) { // No angle sampling for these masses
+      std::cout << "Accepted after " << NIterX << " iterations for X " << std::endl;
+      return XAcc;
+    }
 
     double ThetaMaxA = 0.0002*pow((MA/0.001), 0.7)*(100./E0);
     if(XAcc > 0.999) ThetaMaxA *= 0.5;
     if(XAcc > 0.9999) ThetaMaxA *= 0.5;
     if(ThetaMaxA > 1.) ThetaMaxA = 1.;
     double UThetaMaxA = 0.5*ThetaMaxA*ThetaMaxA; // Nota Bene !!! this is maximum of u= 0.5*theta^2 variable!!
-    //sigmaMax = GetSigmaAngleMax(E0);
     double UThetaEv, sigma;
 
     int NIterMax = 100000.;
