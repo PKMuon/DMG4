@@ -270,6 +270,7 @@ double DarkMatter::SimulateEmission(double E0, double* angles)
 double DarkMatter::SimulateEmissionWithAngle(double E0, double* angles)
 {
   double Xmin = MA/E0;
+  if(MA < 0.001 && EThresh/E0 > Xmin) Xmin = EThresh/E0;
 
   if(ParentPDGID == 22) {
     std::cout << "ALP: Error: double differential cross section DSDXDU is not implemented, exiting" << std::endl;
@@ -284,15 +285,20 @@ double DarkMatter::SimulateEmissionWithAngle(double E0, double* angles)
     exit(1);
   }
 
+  if(MA < 0.001) {
+    std::cout << "Error: mass < 0.001, don't use SimulateEmissionWithAngle" << std::endl;
+    exit(1);
+  }
+
   if(!ISampler) { // Don't use external sampler DarkMatterSampler
 
-    double Xmax = 1.0-Xmin; // Incorrect limit, but for MA > 100 MeV works only like this without sampler
+    double Xmax = 1. - Xmin; // Incorrect limit, but for MA > 100 MeV works only like this without sampler
     if(MA <= 0.02) Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MParent/E0;
 
     //double ThetaMaxA = 0.0001*sqrt((MA/E0)/(0.001/100.));
     double ThetaMaxA = 0.0001*sqrt(MA/0.001)*(100./E0);
     double UThetaMaxA = 0.5*ThetaMaxA*ThetaMaxA; // Nota Bene !!! this is maximum of u= 0.5*theta^2 variable!!
-    if(MA <= 0.001) UThetaMaxA = 0.; // Angle is simulated only for MA > 0.001 GeV
+    if(MA < 0.001) UThetaMaxA = 0.; // Angle is simulated only for MA > 0.001 GeV
     double sigmaMax = GetSigmaAngleMax(E0);
     int maxiter = 3000000;
 
@@ -301,7 +307,7 @@ double DarkMatter::SimulateEmissionWithAngle(double E0, double* angles)
     for( int iii = 1; iii < maxiter; iii++) {
 
       double XEv, FactorSigma=1.;
-      if(MA > 0.001) {
+      if(MA >= 0.001) {
         double XFactor = 1.5*sqrt(0.001/MA);
         double AlphaX = exp(-(1. - Xmax)/XFactor);
         double BetaX = exp(-(1. - Xmin)/XFactor);
@@ -313,7 +319,7 @@ double DarkMatter::SimulateEmissionWithAngle(double E0, double* angles)
       }
 
       double UThetaEv, FactorSigmaU=1.;
-      if(MA > 0.001) {
+      if(MA >= 0.001) {
         double UFactor = 0.3*UThetaMaxA;
         double BetaU = exp(-UThetaMaxA/UFactor);
         UThetaEv = - UFactor * log(BetaU+G4UniformRand()*(1.-BetaU));
