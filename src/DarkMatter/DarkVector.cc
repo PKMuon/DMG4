@@ -233,7 +233,7 @@ double DarkVector::Width()
   double nuWidth        = 0.;
   double muWidth        = 0.;
   if (MA < 2.*tauMass) {
-    nuWidth = epsil*epsil*CLHEP::fine_structure_const*(1./3.)*MA;
+    nuWidth = epsil*epsil*alphaEW*(1./3.)*MA;
     if (MA > 2.*muMass) {
       double factor = (1.+2.*massRatio2)*sqrt(1.-4.*massRatio2);
       muWidth = nuWidth*factor;

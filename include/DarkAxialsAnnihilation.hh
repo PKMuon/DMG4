@@ -8,7 +8,7 @@
 #ifndef INCLUDE_DARKAXIALSANNIHILATION_HH_
 #define INCLUDE_DARKAXIALSANNIHILATION_HH_
 
-class DarkMatter;
+//class DarkMatter;
 
 
 class DarkAxialsAnnihilation : public DarkMatter

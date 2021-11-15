@@ -7,21 +7,9 @@
 #include "ALP.hh"
 #include "Utils.hh"
 
-#include "Randomize.hh"
-
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_multimin.h>
-#include <gsl/gsl_monte.h>
-#include <gsl/gsl_monte_plain.h>
-#include <gsl/gsl_monte_miser.h>
-#include <gsl/gsl_monte_vegas.h>
-#include <gsl/gsl_integration.h>
-#include <gsl/gsl_rng.h>
+#include "G4Electron.hh" // to get CLHEP constants
 
 #include <iostream>
-#include "G4ios.hh"
-
-#define  nMALowM 18 // number of MA grid divisions
 
 
 ALP::ALP(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,

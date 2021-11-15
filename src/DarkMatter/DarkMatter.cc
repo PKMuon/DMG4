@@ -118,6 +118,7 @@ bool DarkMatter::Emission(double E0, double DensityMat, double StepLength)
 double DarkMatter::MaxCrossSectionCalc(double E0)
 {
   if(E0 < 2.*MA) return 0.;
+  if(ParentPDGID == 13 && E0 < EThresh) return 0.;
 
   double Xmin = MA/E0;
   double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MParent/E0;
@@ -131,7 +132,8 @@ double DarkMatter::MaxCrossSectionCalc(double E0)
     double xi = 0.00005 + 0.0001*((double)i);
     if(xi >= Xmin && xi <= Xmax) {
       double csi = CrossSectionDSDX(xi, E0);
-      if(MA < 0.001 && xi < EThresh/E0) csi = 0.; // we cut DM at EThresh for these masses
+      if(MA < 0.001 && xi < EThresh/E0) csi = 0.;        // we cut DM at EThresh for these masses
+      if(ParentPDGID == 13 && xi < EThresh/E0) csi = 0.; // we cut DM at EThresh for the muon beam
       if(csi > csmax) csmax = csi;
     }
   }
@@ -517,6 +519,7 @@ double DarkMatter::SimulateEmissionWithAngle2(double E0, double* angles)
 double DarkMatter::SimulateEmissionByMuon2(double E0, double* angles)
 {
   double Xmin = MA/E0;
+  if(EThresh/E0 > Xmin) Xmin = EThresh/E0;
 
   if(abs(ParentPDGID) != 13) {
     std::cout << "Error: SimulateEmissionByMuon2: this is only for muons, exiting" << std::endl;

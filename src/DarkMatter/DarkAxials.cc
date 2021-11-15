@@ -7,19 +7,9 @@
 #include "DarkAxials.hh"
 #include "Utils.hh"
 
-#include "Randomize.hh"
-
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_multimin.h>
-#include <gsl/gsl_monte.h>
-#include <gsl/gsl_monte_plain.h>
-#include <gsl/gsl_monte_miser.h>
-#include <gsl/gsl_monte_vegas.h>
-#include <gsl/gsl_integration.h>
-#include <gsl/gsl_rng.h>
+#include "G4Electron.hh" // to get CLHEP constants
 
 #include <iostream>
-#include "G4ios.hh"
 
 #include "KFactorsAxials.code"
 
@@ -129,5 +119,5 @@ double DarkAxials::CrossSectionDSDXDU(double XEv, double UThetaEv, double E0)
 
 double DarkAxials::Width()
 {
-  return 1./3.*1./137.*MA*epsil*epsil*sqrt(1.-4.*Mel*Mel/(MA*MA))*(1.-4.*Mel*Mel/(MA*MA));
+  return 1./3.*alphaEW*MA*epsil*epsil*sqrt(1.-4.*Mel*Mel/(MA*MA))*(1.-4.*Mel*Mel/(MA*MA));
 }
