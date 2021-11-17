@@ -323,15 +323,13 @@ double DarkZ::CrossSectionDSDX_WW(double XEv, double E0)
   double aa = 111.*pow(ZNucl,-1./3.)/Mel;
   double d = 0.164*pow(ANucl,-2./3.);
   // Constant
-  double Th_max = 0.1                 // Maximum angle of radiation of Z'-boson
-       , t_scr = pow(1./aa,2.)   // GeV^2, transmitted momentum, nuclear shielding
-       , t_size = d // GeV^2, transmitted momentum, nuclear size
-       , alphaEW3 = alphaEW*alphaEW*alphaEW;
+  double t_scr = pow(1./aa,2.)   // GeV^2, transmitted momentum, nuclear shielding
+       , t_size = d; // GeV^2, transmitted momentum, nuclear size
   // Get sq for varible and constant
   double XEv2 = XEv*XEv, Mmu2 = Mmu*Mmu, MA2 = MA*MA, E02 = E0*E0;
   // Limits on u(x)
   double uMax = - MA2 * (1.0 - XEv) / XEv - Mmu2*XEv
-       , uMin = -  XEv*E02*Th_max*Th_max -  MA2 * (1.0 - XEv) / XEv - Mmu2*XEv
+       , uMin = -  XEv*E02*ThetaMax*ThetaMax -  MA2 * (1.0 - XEv) / XEv - Mmu2*XEv
        , uMax2 = uMax*uMax, uMin2 = uMin*uMin;
   // Conversion coefficient from tmin to u
   double gZ = 1.0 / ( 2.0*E0*(1.0 - XEv) ), gZ2 = gZ*gZ;
@@ -340,7 +338,7 @@ double DarkZ::CrossSectionDSDX_WW(double XEv, double E0)
        , K = 4.0 * (MA2 + 2.0*Mmu2) * XEv
        , LZ = 4.0 * (MA2 + 2.0*Mmu2) * (MA2*(1.0 - XEv) + Mmu2*XEv2 );
   // Coefficient in photon flux
-  double genCoef = t_size*t_size*ZNucl*ZNucl / ( pow( t_scr - t_size, 3.0) )
+  double genCoef = t_size*t_size / ( pow( t_scr - t_size, 3.0) )
        , D = 2.0*genCoef*(t_size - t_scr)
        , H = - genCoef*(t_size + t_scr)
        , I = - 2.0*genCoef*gZ2;
@@ -408,7 +406,7 @@ double DarkZ::CrossSectionDSDX_WW(double XEv, double E0)
   // Sum integrals
   double sumIng = Ing1 + Ing2 + Ing3 + Ing4 + Ing5 + Ing6;
   // Prefactor analytical integral
-  double coef = alphaEW3*sqrt( XEv*XEv - (MA2) / (E02) )*( 1.0 - XEv ) / ( XEv );
+  double coef = sqrt( XEv*XEv - (MA2) / (E02) )*( 1.0 - XEv ) / ( XEv );
   return sumIng*coef;
 }
 

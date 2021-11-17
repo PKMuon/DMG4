@@ -556,8 +556,10 @@ double DarkMatter::SimulateEmissionByMuon2(double E0, double* angles)
     return 0.;
   }
 
-  double PsiMaxA = 0.001*(MA/0.001)*(100./E0);
+  //double PsiMaxA = 0.001*(MA/0.001)*(100./E0);
+  double PsiMaxA = 700.*MA/E0;
   if(PsiMaxA > 1.) PsiMaxA = 1.;
+  if(PsiMaxA < 0.007*100./E0) PsiMaxA = 0.007*100./E0;
   double UPsiMaxA = 0.5*PsiMaxA*PsiMaxA; // Nota Bene !!! this is maximum of u= 0.5*theta^2 variable!!
   double UPsiEv, sigma;
 
@@ -570,7 +572,7 @@ double DarkMatter::SimulateEmissionByMuon2(double E0, double* angles)
   }
   sigmaMax *= 1.5;
 
-  int maxiterA = 2000000;
+  int maxiterA = 20000000;
   for(int iii = 1; iii < maxiterA; iii++) { // Angle simulation loop
 
     UPsiEv = UPsiMaxA * G4UniformRand();
