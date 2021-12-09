@@ -7,27 +7,16 @@
 #include "DarkPhotons.hh"
 #include "Utils.hh"
 
-#include "Randomize.hh"
-
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_multimin.h>
-#include <gsl/gsl_monte.h>
-#include <gsl/gsl_monte_plain.h>
-#include <gsl/gsl_monte_miser.h>
-#include <gsl/gsl_monte_vegas.h>
-#include <gsl/gsl_integration.h>
-#include <gsl/gsl_rng.h>
+#include "G4Electron.hh" // to get CLHEP constants
 
 #include <iostream>
-#include "G4ios.hh"
-
 
 #include "KFactors.code"
 
 
 #define  nMALowM 18 // number of MA grid divisions
 
-double TotCSVectorParticle(double MAtest) // CS in GeV^-2 for epsilon=1
+double TotCSVectorParticle(double MAtest) // CS in GeV^-2 for masses below 1 MeV for epsilon=1
 {
   // These are total cross sections of vector DM production in Brem. processes calculated at ETL.
   // The lower X limit of integration is 0.01. It must be the same in the differential cross sections table, then the correct
@@ -164,5 +153,5 @@ double DarkPhotons::CrossSectionDSDXDU(double XEv, double UThetaEv, double E0)
 
 double DarkPhotons::Width()
 {
-  return 1./3.*1./137.*MA*epsil*epsil*(1.+2.*Mel*Mel/(MA*MA))*sqrt(1.-4.*Mel*Mel/(MA*MA));
+  return 1./3.*alphaEW*MA*epsil*epsil*(1.+2.*Mel*Mel/(MA*MA))*sqrt(1.-4.*Mel*Mel/(MA*MA));
 }

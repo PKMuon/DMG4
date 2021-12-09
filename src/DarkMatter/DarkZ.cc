@@ -20,6 +20,7 @@
 #include <gsl/gsl_monte_vegas.h>
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_rng.h>
+#include <gsl/gsl_sf_dilog.h>
 
 #include <iostream>
 #include "G4ios.hh"
@@ -88,8 +89,8 @@ DarkZ::~DarkZ()
 double DarkZ::TotalCrossSectionCalc(double E0)
 {
   if(IApprox == 1) return TotalCrossSectionCalc_IWW(E0); 
-  //return TotalCrossSectionCalc_WW(E0); // Integral of ds/dx
-  if(IApprox == 2) return TotalCrossSectionCalc_WW2(E0);
+  //if(IApprox == 2) return TotalCrossSectionCalc_WW(E0); // Integral of ds/dx
+  if(IApprox == 2) return TotalCrossSectionCalc_WW2(E0); // Integral of ds/dxdTheta
   std::cout << "DarkZ: wrong value of IApprox, exiting" << std::endl;
   exit(1);
 }
@@ -139,12 +140,13 @@ double DarkZ::TotalCrossSectionCalc_WW(double E0)
 {
   double sigmaTot;
 
-  if(E0 < 2.*MA) return 0.;
-  if(E0 < MA*99.) return 0.; // Some approximations probably don't work for smaller energy
+  //if(E0 < 2.*MA) return 0.;
+  //if(E0 < MA*99.) return 0.; // Some approximations probably don't work for smaller energy
 
   gsl_integration_workspace* w1 = gsl_integration_workspace_alloc (1000);
   double result1, error1;
   double Xmin1 = MA/E0;
+  if(EThresh/E0 > Xmin1) Xmin1 = EThresh/E0;
   double Xmax1 = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MParent/E0;
   if(Xmax1 < Xmin1) return 0.;
 
@@ -262,8 +264,9 @@ double DarkZ::CrossSectionDSDX_IWW(double XEv, double E0)
 }
 
 
-// Below is cross section obtained by integration of ds/dxdpsi with additional simplification of flux
-// for references see e.g. https://www.overleaf.com/8686251169nmvbnqfszfxs
+#if 0
+// Below is cross section obtained by integration of ds/dxdpsi with additional simplification of flux.
+// for references see e.g. https://www.overleaf.com/8686251169nmvbnqfszfxs.
 // It is unstable, works only for very small M/E
 //
 double DarkZ::CrossSectionDSDX_WW(double XEv, double E0)
@@ -308,6 +311,103 @@ double DarkZ::CrossSectionDSDX_WW(double XEv, double E0)
     dsdxWW = AtWWAnalyticalIntegral*PrefactorAnalyticalIntegral;
   }
   return dsdxWW;
+}
+#endif
+
+
+// Below is cross section obtained by integration of ds/dxdTheta
+//
+double DarkZ::CrossSectionDSDX_WW(double XEv, double E0)
+{
+  if(XEv*E0 <= MA) return 0.;
+  double aa = 111.*pow(ZNucl,-1./3.)/Mel;
+  double d = 0.164*pow(ANucl,-2./3.);
+  // Constant
+  double t_scr = pow(1./aa,2.)   // GeV^2, transmitted momentum, nuclear shielding
+       , t_size = d; // GeV^2, transmitted momentum, nuclear size
+  // Get sq for varible and constant
+  double XEv2 = XEv*XEv, Mmu2 = Mmu*Mmu, MA2 = MA*MA, E02 = E0*E0;
+  // Limits on u(x)
+  double uMax = - MA2 * (1.0 - XEv) / XEv - Mmu2*XEv
+       , uMin = -  XEv*E02*ThetaMax*ThetaMax -  MA2 * (1.0 - XEv) / XEv - Mmu2*XEv
+       , uMax2 = uMax*uMax, uMin2 = uMin*uMin;
+  // Conversion coefficient from tmin to u
+  double gZ = 1.0 / ( 2.0*E0*(1.0 - XEv) ), gZ2 = gZ*gZ;
+  // Coefficient in amplitude
+  double JZ = 2.0 * ( (2.0 - 2.0*XEv + XEv2) / (1.0 - XEv) )
+       , K = 4.0 * (MA2 + 2.0*Mmu2) * XEv
+       , LZ = 4.0 * (MA2 + 2.0*Mmu2) * (MA2*(1.0 - XEv) + Mmu2*XEv2 );
+  // Coefficient in photon flux
+  double genCoef = t_size*t_size / ( pow( t_scr - t_size, 3.0) )
+       , D = 2.0*genCoef*(t_size - t_scr)
+       , H = - genCoef*(t_size + t_scr)
+       , I = - 2.0*genCoef*gZ2;
+  // Secondary functions
+  double lnuMax = std::log( (gZ2*uMax2 + t_scr) / (gZ2*uMax2 + t_size) )
+       , lnuMin = std::log( (gZ2*uMin2 + t_scr) / (gZ2*uMin2 + t_size) )
+       , aTantSizeMax = std::atan( gZ*uMax / sqrt(t_size) )
+       , aTantSizeMin = std::atan( gZ*uMin / sqrt(t_size) )
+       , aTantScrMax = std::atan( gZ*uMax / sqrt(t_scr) )
+       , aTantScrMin = std::atan( gZ*uMin / sqrt(t_scr) );
+  // Integrals
+  double
+  Ing1 = - JZ*D / uMax - K*D / ( 2.0*uMax2 ) - LZ*D / ( 3.0*pow(uMax, 3.0) )
+         + JZ*D / uMin + K*D / ( 2.0*uMin2 ) + LZ*D / ( 3.0*pow(uMin, 3.0) ),
+  Ing2 = LZ * H
+           * ( lnuMax / ( 3.0*pow( uMax, 3.0 ) )
+             - 2.0*gZ2 / ( 3.0*t_size*uMax )
+             + 2.0*gZ2 / ( 3.0*t_scr*uMax )
+             -  ( 2.0*pow( gZ, 3.0 ) / 3.0 )
+                * ( pow(t_size, -3./2)*aTantSizeMax - pow(t_scr, -3./2)*aTantScrMax )
+             - lnuMin / ( 3.0*pow( uMin, 3.0 ) )
+             + 2.0*gZ2 / ( 3.0*t_size*uMin )
+             - 2.0*gZ2 / ( 3.0*t_scr*uMin )
+             +  ( 2.0*pow( gZ, 3.0 ) / 3.0 )
+                * ( pow(t_size, -3./2)*aTantSizeMin - pow(t_scr, -3./2)*aTantScrMin )
+             ),
+  Ing3 = K * H
+           * ( lnuMax / (uMax2)
+             + gZ2
+               * ( std::log( (uMax2) / (gZ2*uMax2 + t_size) ) / t_size
+                 - std::log( (uMax2) / (gZ2*uMax2 + t_scr) ) / t_scr
+                 )
+             - lnuMin / (uMin2)
+             - gZ2
+               * ( std::log( (uMin2) / (gZ2*uMin2 + t_size) ) / t_size
+                 - std::log( (uMin2) / (gZ2*uMin2 + t_scr) ) / t_scr
+                 )
+             ) / 2.0,
+  Ing4 = ( JZ*H + LZ*I )
+         * ( lnuMax / uMax
+           + 2.0* gZ * ( std::pow(t_size, -1.0/2.0) * aTantSizeMax
+                      - std::pow(t_scr, -1.0/2.0) * aTantScrMax )
+           - lnuMin / uMin
+           - 2.0* gZ * ( std::pow(t_size, -1.0/2.0) * aTantSizeMin
+                      - std::pow(t_scr, -1.0/2.0) * aTantScrMin )
+           ),
+  Ing5 = K * I
+           * ( std::log( std::abs(uMax) ) * std::log( t_size / t_scr )
+             + (1.0/2.0) * ( gsl_sf_dilog(- uMax2*gZ2/t_scr )
+                           - gsl_sf_dilog(- uMax2*gZ2/t_size ) )
+             - std::log( std::abs(uMin) ) * std::log( t_size / t_scr )
+             - (1.0/2.0) * ( gsl_sf_dilog(- uMin2*gZ2/t_scr )
+                           - gsl_sf_dilog(- uMin2*gZ2/t_size ) )
+             ),
+  Ing6 = JZ * I
+           * ( - ( lnuMax * uMax )
+             + (2/gZ)
+               * ( std::pow(t_size, 1./2) * aTantSizeMax
+                 - std::pow(t_scr, 1./2) * aTantScrMax )
+             + ( lnuMin * uMin )
+             - (2/gZ)
+               * ( std::pow(t_size, 1./2) * aTantSizeMin
+                 - std::pow(t_scr, 1./2) * aTantScrMin )
+             );
+  // Sum integrals
+  double sumIng = Ing1 + Ing2 + Ing3 + Ing4 + Ing5 + Ing6;
+  // Prefactor analytical integral
+  double coef = sqrt( XEv*XEv - (MA2) / (E02) )*( 1.0 - XEv ) / ( XEv );
+  return sumIng*coef;
 }
 
 
@@ -448,7 +548,7 @@ double DarkZ::Width()
   double nuWidth        = 0.;
   double muWidth        = 0.;
   if (MA < 2.*tauMass) {
-    nuWidth = epsil*epsil*CLHEP::fine_structure_const*(1./3.)*MA;
+    nuWidth = epsil*epsil*alphaEW*(1./3.)*MA;
     if (MA > 2.*muMass) {
       double factor = (1.+2.*massRatio2)*sqrt(1.-4.*massRatio2);
       muWidth = nuWidth*factor;

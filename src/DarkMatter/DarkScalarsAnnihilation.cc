@@ -9,6 +9,8 @@
 #include "DarkScalarsAnnihilation.hh"
 #include "Utils.hh"
 
+#include "G4Electron.hh" // to get CLHEP constants
+
 #include <iostream>
 #include <cmath>
 
@@ -36,18 +38,18 @@ DarkScalarsAnnihilation::~DarkScalarsAnnihilation()
 //Since the framework assumes this method is returning the total cross section per nucleous, for the moment I scale this by Z.
 double DarkScalarsAnnihilation::TotalCrossSectionCalc(double E0)
 {
-  double s = 2. * Mel * E0;
-  if (sqrt(s) < 2.*mChi) return 0.;   // A.C. e+e- -> S -> chi chi can happen also for an S and chi with large mass,
-                                      // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
-  double q = sqrt(s) / 2. * sqrt(1 - 4 * mChi * mChi / (s));
-  double g = this->Width();
+  double ss = 2. * Mel * E0;
+  if (sqrt(ss) < 2.*mChi) return 0.;   // A.C. e+e- -> S -> chi chi can happen also for an S and chi with large mass,
+                                       // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
+  double qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
+  double gg = this->Width();
 
   double sigma = 4 * M_PI * alphaEW * epsil * epsil * alphaD;
-  sigma = sigma * q / sqrt(s);
-  sigma = sigma / ((s - MA * MA) * (s - MA * MA) + MA * MA * g * g);
+  sigma = sigma * qq / sqrt(ss);
+  sigma = sigma / ((ss - MA * MA) * (ss - MA * MA) + MA * MA * gg * gg);
 
-  sigma = sigma * (2 * q * q);   // A.C. this is for final state fermions (default)
-  //sigma = sigma * (MA * MA)/4; // A.C. this is for final state scalars
+  sigma = sigma * (2 * qq * qq);   // A.C. this is for final state fermions (default)
+  //sigma = sigma * (MA * MA)/4;   // A.C. this is for final state scalars
 
   sigma = sigma * GeVtoPb;
 

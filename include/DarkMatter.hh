@@ -1,6 +1,7 @@
 #define Mel 5.109989461E-04 // electron mass in GeV
 #define Mmu 0.1056583745 // muon mass in GeV
-#define alphaEW 1.0/137.0
+//#define alphaEW 1./137.
+#define alphaEW CLHEP::fine_structure_const
 #define MUp 2.79 // protonMu
 #define Mpr 0.938 // proton mass
 #define max_uint 4294967296.0l
