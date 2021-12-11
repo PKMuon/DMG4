@@ -14,6 +14,26 @@
 #include "KFactorsPseudoScalars.code"
 
 
+#define  nMALowM 18 // number of MA grid divisions
+
+double TotCSPseudoScalarParticle(double MAtest) // CS in GeV^-2 for masses below 1 MeV for epsilon=1
+{
+  // These are total cross sections of pseudoscalar DM production in Brem. processes calculated at ETL.
+  // The lower X limit of integration is 0.01. It must be the same in the differential cross sections table, then the correct
+  // cutoff will be made in sampling.
+
+  double  MMAA[nMALowM] = {0.000001, 0.00001, 0.00002, 0.00003, 0.00004, 0.00005, 0.00006, 0.00007, 0.0001, 0.00015, 0.0002,
+                           0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008, 0.0009}; // mass of A' in GeV
+  double TotCSList[nMALowM] = {37492.4,37398.,37189.6,36916.6,36600.1,36252.8,35883.4,35498.1,32228.9,34287.6,30240.8,26656.1,23621.6,21070.9,18919.5,17093.,15530.6,14184.};
+                              
+  return parinv(MAtest, MMAA, TotCSList, nMALowM); // This is to be converted to pb and multiplied by eps^2
+}
+
+
+
+#include "DiffCS2DInterpPseudoScalars.code"
+
+
 DarkPseudoScalars::DarkPseudoScalars(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
                          double epsilIn, int IDecayIn)
 : DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn)
@@ -61,14 +81,35 @@ double DarkPseudoScalars::TotalCrossSectionCalc(double E0)
 
     double KFactor = KfactorPseudoScalarsApproximate(MA, E0);
 
-    G4cout << "Total CS pseudoscalars calc, E = " << E0 << "  M = " << MA << "  KFactor = " << KFactor << G4endl;
+    double result = sigmaTot / KFactor; // This K-factor decreases the cross section for MA > ~2 MeV;
 
-    return sigmaTot / KFactor; // This K-factor decreases the cross section for MA > ~2 MeV
+    std::cout << "Total CS calc, E = " << E0 << "  M = " << MA << "  KFactor = " << KFactor << " CS = " << result << std::endl;
 
-  } else {
+    return result;
+    
+  } else {// below MA = 0.001 only ETL tabulated cross sections
 
-    G4cout << "No analytical calculations below 1 MeV, exiting" << G4endl;
-    exit(1);
+    double XMin = 0.01; // to be taken from the table
+    if(MA/E0 > XMin) XMin = MA/E0;
+    if(XMin > 1.) return 0.;
+    int NSteps=10000;
+    double StepSize = (1.-XMin)/((double)NSteps);
+    double TotCS=0.;
+    double TotCSCut=0.;
+    for(int ix=0; ix<NSteps; ix++) {
+      double xi = XMin + ((double)ix + 0.5)*StepSize;
+      if(xi > 1. || xi < XMin) continue;
+      TotCS += CrossSectionDSDX(xi, E0);
+      if(E0*xi > EThresh) TotCSCut += CrossSectionDSDX(xi, E0);
+    }
+    double result = 0.;
+    if(TotCS > 0.) {
+      result = (TotCSCut/TotCS) * TotCSPseudoScalarParticle(MA)*(ZNucl*ZNucl/(82.*82.))*GeVtoPb*epsilBench*epsilBench; // ETL calculations are made for Pb
+                                                                                                                 // The dependency Z^2 is approximate!    
+    }
+    std::cout << "Total CS calc for masses < 1 MeV, E = " << E0 << "  M = " << MA << " Cut reduction factor = " << TotCSCut/TotCS 
+              << " CS = " << result << std::endl;
+    return result;
   }
 }
 
@@ -78,8 +119,7 @@ double DarkPseudoScalars::GetSigmaTot(double E0)
   if(MA > 0.001) {
     return GetSigmaTot0(E0);
   } else {
-    G4cout << "CS for masses below 1 MeV is not yet implemented" << G4endl;
-    exit(1);
+    return TotCSPseudoScalarParticle(MA);
   }
 }
 
@@ -94,8 +134,7 @@ double DarkPseudoScalars::CrossSectionDSDX(double XEv, double E0)
     double sigma = momentumOfDP*Numerator/Denominator;
     return sigma;
   } else {
-    std::cout << "DarkPseudoScalars: Error: differential cs for pseudoscalars below 1 MeV is not implemented, exiting" << std::endl;
-    exit(1);
+    return DsDxBilinearInterpPseudoScalars(MA, XEv);
   }
 }
 
@@ -110,8 +149,7 @@ double DarkPseudoScalars::CrossSectionDSDXDU(double XEv, double UThetaEv, double
     double sigma = sqrt(XEv*XEv - MA*MA/(E0*E0)) * (AA + BB*CC);
     return sigma;
   } else {
-    std::cout << "DarkPseudoScalars: Error: differential cs for pseudoscalars below 1 MeV is not implemented, exiting" << std::endl;
-    exit(1);
+    return DsDxBilinearInterpPseudoScalars(MA, XEv);
   }
 }
 
