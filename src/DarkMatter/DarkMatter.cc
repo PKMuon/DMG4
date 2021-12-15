@@ -32,7 +32,7 @@ DarkMatter::DarkMatter(double MAIn, double EThreshIn, double SigmaNormIn, double
 ANucl(ANuclIn), ZNucl(ZNuclIn), Density(DensityIn), epsilBench(0.0001), epsil(epsilIn), IDecay(IDecayIn),
 AccumulatedProbability(0.), NEmissions(0)
 {
-  if(MA > 1.) {std::cout << "Maximal allowed mass is 1 GeV, exiting" << std::endl; exit(1);}
+  if(MA > 3.) {std::cout << "Maximal allowed mass is 3 GeV, exiting" << std::endl; exit(1);}
   nptable = NPTAB;
   double epi[NPTAB]={0.008, 0.02, 0.05, 0.1, 0.2, 0.5, 1., 2., 5., 10., 15., 25., 50., 80., 150., 200.};
   for(int ip=0; ip < nptable; ip++) {ep[ip] = epi[ip];}
