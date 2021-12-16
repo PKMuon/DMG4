@@ -61,6 +61,13 @@ static double _DarkZDsDxDThetaMuon(double x[], size_t dim, void * parms_) {
     return parms->this_->CrossSectionDSDXDTheta( x[0], x[1], parms->E0 );
 }
 
+// A callback wrapping function for DarkZ::CrossSectionDSDXDpsi()
+static double _DarkZDsDxDPsiMuon(double x[], size_t dim, void * parms_) {
+    BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
+    // Forward invocation to target method
+    return parms->this_->CrossSectionDSDXDPSI_WW( x[0], x[1], parms->E0 );
+}
+
 
 // Class methods:  ---------------
 
@@ -74,9 +81,11 @@ DarkZ::DarkZ(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, 
   DaughterPDGID = 0;
   IApprox = 2; // Approximation: 1 - IWW; 2 - WW
   ThetaMax = 0.3; // Max. angle of Z
+  PsiMax = 1.0;
   std::cout << "Initialized Dark Z boson for material density = " << DensityIn << std::endl;
   if(IApprox == 1) std::cout << "Using IWW approximation" << std::endl;
-  if(IApprox == 2) std::cout << "Using WW approximation" << std::endl;
+  if(IApprox == 2) std::cout << "Using WW approximation (theta)" << std::endl;
+  if(IApprox == 3) std::cout << "Using WW approximation (psi)" << std::endl;
   std::cout << "Energy cutoff = " << EThresh << " GeV" << std::endl;
   std::cout << std::endl;
 }
@@ -91,6 +100,7 @@ double DarkZ::TotalCrossSectionCalc(double E0)
   if(IApprox == 1) return TotalCrossSectionCalc_IWW(E0); 
   //if(IApprox == 2) return TotalCrossSectionCalc_WW(E0); // Integral of ds/dx
   if(IApprox == 2) return TotalCrossSectionCalc_WW2(E0); // Integral of ds/dxdTheta
+  if(IApprox == 3) return TotalCrossSectionCalc_WW3(E0); // Integral of ds/dxdPsi
   std::cout << "DarkZ: wrong value of IApprox, exiting" << std::endl;
   exit(1);
 }
@@ -229,6 +239,65 @@ double DarkZ::TotalCrossSectionCalc_WW2(double E0)
   return sigmaTot;
 }
 
+// Below is the 2 - dimensional integration of WW ds/dxdPsi
+//
+double DarkZ::TotalCrossSectionCalc_WW3(double E0)
+{
+  if(E0 < 2.*MA) return 0.;
+
+  double Xmin1 = MA/E0;
+  if(EThresh/E0 > Xmin1) Xmin1 = EThresh/E0;
+  double Xmax1 = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MParent/E0;
+  if(Xmax1 < Xmin1) return 0.;
+
+  double PrefactorEpsilonAlphaEWE0 = 8.0*epsilBench*epsilBench*alphaEW*alphaEW*alphaEW*E0*E0*ZNucl*ZNucl;
+
+  double xl[2] = { Xmin1, 0.};
+  double xu[2] = { Xmax1, PsiMax};
+
+  const gsl_rng_type *T;
+  gsl_rng *r;
+
+  gsl_monte_function G;
+  BoundParms parms = {this, E0};
+  G.f = _DarkZDsDxDPsiMuon;
+  G.dim = 2;
+  G.params = &parms;
+
+  gsl_rng_env_setup();
+
+  T = gsl_rng_default;
+  r = gsl_rng_alloc (T);
+
+  double res, err, sigmaTot;
+
+  // monte_miser: adaptive MC integration
+
+  size_t calls = 5000000;
+  gsl_monte_miser_state* stat = gsl_monte_miser_alloc(2);
+  gsl_monte_miser_integrate(&G, xl, xu, 2, calls, r, stat, &res, &err);
+  gsl_monte_miser_free(stat);
+  sigmaTot = GeVtoPb*res*PrefactorEpsilonAlphaEWE0;
+
+  // Other vegas integration methods:
+  // gsl_monte_plain : plain MC
+  // gsl_monte_vegas
+
+#if 0
+  gsl_monte_vegas_state* stat = gsl_monte_vegas_alloc(2);
+  gsl_monte_vegas_integrate(&G, xl, xu, 2, 10000, r, s, &res, &err);
+  do {
+    gsl_monte_vegas_integrate (&G, xl, xu, 2, calls/5, r, s, &res, &err);
+  } while (fabs (gsl_monte_vegas_chisq(stat) - 1.0) > 0.5);
+  double sigmaTot = GeVtoPb*res*PrefactorEpsilonAlphaEWE0;
+  gsl_monte_vegas_free(stat);
+#endif
+
+  gsl_rng_free (r);
+  G4cout << "Total CS calc, E = " << E0 << "  M = " << MA << " CS = " << sigmaTot << G4endl;
+  return sigmaTot;
+}
+
 
 double DarkZ::GetSigmaTot(double E0)
 {
@@ -239,7 +308,7 @@ double DarkZ::GetSigmaTot(double E0)
 double DarkZ::CrossSectionDSDX(double XEv, double E0)
 {
   if(IApprox == 1) return CrossSectionDSDX_IWW(XEv, E0);
-  if(IApprox == 2) return CrossSectionDSDX_WW(XEv, E0);
+  if(IApprox == 2||IApprox == 3) return CrossSectionDSDX_WW(XEv, E0);
   std::cout << "DarkZ: wrong value of IApprox, exiting" << std::endl;
   exit(1);
 }
@@ -429,7 +498,7 @@ double DarkZ::CrossSectionDSDXDU(double XEv, double UThetaEv, double E0)
 double DarkZ::CrossSectionDSDXDPSI(double XEv, double auxpsi, double E0)
 {
   if(IApprox == 1) return CrossSectionDSDXDPSI_IWW(XEv, auxpsi, E0);
-  if(IApprox == 2) return CrossSectionDSDXDPSI_WW(XEv, auxpsi, E0);
+  if(IApprox == 2||IApprox == 3) return CrossSectionDSDXDPSI_WW(XEv, auxpsi, E0);
   std::cout << "DarkZ: wrong value of IApprox, exiting" << std::endl;
   exit(1);
 }
@@ -476,6 +545,11 @@ double DarkZ::CrossSectionDSDXDPSI_WW(double XEv, double auxpsi, double E0)
   //double flux = log(td/(tmin + ta)) - 2.0;
   double flux = -((td*td*(((ta - td)*(ta + td + 2.0*tmax)*(tmax - tmin))/((ta + tmax)*(td + tmax)) + (ta + td + 2.0*tmin)*(log(ta + tmax)
                   - log(td + tmax) - log(ta + tmin) + log(td + tmin))))/((ta-td)*(ta-td)*(ta-td)));
+  // MODIFIED
+  //flux = -ZNucl*ZNucl*((td*td*(((ta - td)*(ta + td + 2.0*tmax)*(tmax - tmin))/((ta + tmax)*(td + tmax)) + (ta + td + 2.0*tmin)*(log(ta + tmax)
+    //              - log(td + tmax) - log(ta + tmin) + log(td + tmin))))/((ta-td)*(ta-td)*(ta-td)));
+
+  //
   if(flux < 0.) return 0.;
   // ds/dpprime
   double fac1 = (1.-y)/(t*t);
