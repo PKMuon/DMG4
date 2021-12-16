@@ -12,6 +12,7 @@ class DarkZ : public DarkMatter
     double TotalCrossSectionCalc_IWW(double E0);
     double TotalCrossSectionCalc_WW(double E0);
     double TotalCrossSectionCalc_WW2(double E0);
+    double TotalCrossSectionCalc_WW3(double E0);
     virtual double GetSigmaTot(double E0);
     virtual double CrossSectionDSDX(double XEv, double E0);
     virtual double CrossSectionDSDXDU(double XEv, double UThetaEv, double E0);
@@ -27,4 +28,5 @@ class DarkZ : public DarkMatter
 
     int IApprox;
     double ThetaMax;
+    double PsiMax;
 };
