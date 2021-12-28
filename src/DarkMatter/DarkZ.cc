@@ -80,7 +80,7 @@ DarkZ::DarkZ(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, 
   ParentPDGID = 13;
   DaughterPDGID = 0;
   IApprox = 2; // Approximation: 1 - IWW; 2 - WW
-  ThetaMax = 0.1; // Max. angle of Z
+  ThetaMax = 0.3; // Max. angle of Z
   PsiMax = 1.0;
   std::cout << "Initialized Dark Z boson for material density = " << DensityIn << std::endl;
   if(IApprox == 1) std::cout << "Using IWW approximation" << std::endl;
@@ -622,7 +622,8 @@ double DarkZ::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double E0)
   double utilde2=utilde*utilde;
   double ta = 1.0/(aa*aa);
   double td = d;
-  double tmax=E02;
+  double tmax=MA2+Mmu2;
+  //double tmax=E02;
   double tmin= utilde2/(4.0*E02*(1.0-XEv)*(1.0-XEv));
   // I've calculated ChiWWAnalytical by using mathematica's "Integrate[...]" function
   // and converted the resulted expression to C-like form
