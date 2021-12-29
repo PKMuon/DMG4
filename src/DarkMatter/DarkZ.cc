@@ -79,13 +79,19 @@ DarkZ::DarkZ(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, 
   DMType = 11;
   ParentPDGID = 13;
   DaughterPDGID = 0;
-  IApprox = 2; // Approximation: 1 - IWW; 2 - WW
-  ThetaMax = 0.3; // Max. angle of Z
-  PsiMax = 1.0;
+
+  IApprox =        2;   // Approximation: 1 - IWW; 2 - WW, ds/dxdTheta for total CS; 3 - WW, ds/dxdPsi for total CS; 4 - WW, ds/dx for total CS
+  IMethodTotalCS = 1;   // Method for total CS: 1 - ds/dxdTheta; 2 - ds/dxdPsi; 3 - ds/dx
+  tMax =       10000.;  // tmax initial; Value 10000. means that tmax = E0*E0 will be taken
+  ThetaMax =     0.3;   // Max. angle of Z
+  PsiMax =       1.0;   // Max. angle of recoil muon
+
   std::cout << "Initialized Dark Z boson for material density = " << DensityIn << std::endl;
   if(IApprox == 1) std::cout << "Using IWW approximation" << std::endl;
-  if(IApprox == 2) std::cout << "Using WW approximation (theta)" << std::endl;
-  if(IApprox == 3) std::cout << "Using WW approximation (psi)" << std::endl;
+  if(IApprox == 2) std::cout << "Using WW approximation" << std::endl; 
+  if(IMethodTotalCS == 1) std::cout << "ds/dxdTheta is used for total CS" << std::endl;
+  if(IMethodTotalCS == 2) std::cout << "ds/dxdPsi is used for total CS" << std::endl;
+  if(IMethodTotalCS == 3) std::cout << "ds/dx is used for total CS" << std::endl;
   std::cout << "Energy cutoff = " << EThresh << " GeV" << std::endl;
   std::cout << std::endl;
 }
@@ -98,10 +104,15 @@ DarkZ::~DarkZ()
 double DarkZ::TotalCrossSectionCalc(double E0)
 {
   if(IApprox == 1) return TotalCrossSectionCalc_IWW(E0); 
-  //if(IApprox == 2) return TotalCrossSectionCalc_WW(E0); // Integral of ds/dx
-  if(IApprox == 2) return TotalCrossSectionCalc_WW2(E0); // Integral of ds/dxdTheta
-  if(IApprox == 3) return TotalCrossSectionCalc_WW3(E0); // Integral of ds/dxdPsi
-  std::cout << "DarkZ: wrong value of IApprox, exiting" << std::endl;
+  if(IApprox == 2) {
+    if(IMethodTotalCS == 1) return TotalCrossSectionCalc_WW2(E0); // Integral of ds/dxdTheta
+    if(IMethodTotalCS == 2) return TotalCrossSectionCalc_WW3(E0); // Integral of ds/dxdPsi
+    if(IMethodTotalCS == 3) return TotalCrossSectionCalc_WW(E0);  // Integral of ds/dx
+    std::cout << "DarkZ: wrong value of IMethodTotalCS, exiting" << std::endl;
+    exit(1);
+  } else {
+    std::cout << "DarkZ: wrong value of IApprox, exiting" << std::endl;
+  }
   exit(1);
 }
 
@@ -116,7 +127,9 @@ double DarkZ::TotalCrossSectionCalc_IWW(double E0)
   gsl_integration_workspace* w1 = gsl_integration_workspace_alloc (1000);
   double result1, error1;
   double tmin = MA*MA*MA*MA/(4.*E0*E0);
-  double tmax = MA*MA+Mmu*Mmu;
+  //double tmax = MA*MA+Mmu*Mmu;
+  double tmax = tMax;
+  if(fabs(tMax - 10000.) < 0.001) tmax = E0*E0;
   double Xmin1=MA/E0;
   double Xmax1 = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MParent/E0;
 
@@ -133,7 +146,7 @@ double DarkZ::TotalCrossSectionCalc_IWW(double E0)
   double td = d;
   double fluxAnalytical = ZNucl*ZNucl*(-((td*td*(((ta - td)*(ta + td + 2.0*tmax)*(tmax - tmin))/((ta + tmax)*(td + tmax)) + (ta + td + 2.0*tmin)*(log(ta + tmax)
                           - log(td + tmax) - log(ta + tmin) + log(td + tmin))))/((ta-td)*(ta-td)*(ta-td))));
-  double IntDsDx = result1; 
+  double IntDsDx = result1;
   gsl_integration_workspace_free (w1);
 
   double PrefactorMuonZTotCS= 2.0*epsilBench*epsilBench*alphaEW*alphaEW*alphaEW/E0;
@@ -308,7 +321,7 @@ double DarkZ::GetSigmaTot(double E0)
 double DarkZ::CrossSectionDSDX(double XEv, double E0)
 {
   if(IApprox == 1) return CrossSectionDSDX_IWW(XEv, E0);
-  if(IApprox == 2||IApprox == 3) return CrossSectionDSDX_WW(XEv, E0);
+  if(IApprox == 2) return CrossSectionDSDX_WW(XEv, E0);
   std::cout << "DarkZ: wrong value of IApprox, exiting" << std::endl;
   exit(1);
 }
@@ -404,8 +417,10 @@ double DarkZ::CrossSectionDSDX_WW(double XEv, double E0)
   double d      = 0.164*pow(ANucl,-2./3.); 
   // Transmitted momentum, GeV^2
   double t_scr  = pow(1./aa,2.) // nuclear shielding
-       , t_size = d             // nuclear size
-       , tmax   = E02;          // max 
+       , t_size = d;            // nuclear size
+
+  double tmax = tMax;
+  if(fabs(tMax - 10000.) < 0.001) tmax = E0*E0;
 
   // Conversion coefficient from tmin to u varible
   double gZ   = 1.0 / ( 2.0*E0*(1.0 - XEv) ), gZ2 = gZ*gZ;
@@ -534,7 +549,7 @@ double DarkZ::CrossSectionDSDXDU(double XEv, double UThetaEv, double E0)
 double DarkZ::CrossSectionDSDXDPSI(double XEv, double auxpsi, double E0)
 {
   if(IApprox == 1) return CrossSectionDSDXDPSI_IWW(XEv, auxpsi, E0);
-  if(IApprox == 2||IApprox == 3) return CrossSectionDSDXDPSI_WW(XEv, auxpsi, E0);
+  if(IApprox == 2) return CrossSectionDSDXDPSI_WW(XEv, auxpsi, E0);
   std::cout << "DarkZ: wrong value of IApprox, exiting" << std::endl;
   exit(1);
 }
@@ -576,7 +591,8 @@ double DarkZ::CrossSectionDSDXDPSI_WW(double XEv, double auxpsi, double E0)
   double t  = MA*MA - t2;
   double q = t/(2.*E0*(1.0-y));
   double tmin = q*q;
-  double tmax = MA*MA + Mmu*Mmu;
+  double tmax = tMax;
+  if(fabs(tMax - 10000.) < 0.001) tmax = E0*E0;
   if(tmax < tmin) return 0.;
   //double flux = log(td/(tmin + ta)) - 2.0;
   double flux = -((td*td*(((ta - td)*(ta + td + 2.0*tmax)*(tmax - tmin))/((ta + tmax)*(td + tmax)) + (ta + td + 2.0*tmin)*(log(ta + tmax)
@@ -622,8 +638,8 @@ double DarkZ::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double E0)
   double utilde2=utilde*utilde;
   double ta = 1.0/(aa*aa);
   double td = d;
-  double tmax=MA2+Mmu2;
-  //double tmax=E02;
+  double tmax = tMax;
+  if(fabs(tMax - 10000.) < 0.001) tmax = E0*E0;
   double tmin= utilde2/(4.0*E02*(1.0-XEv)*(1.0-XEv));
   // I've calculated ChiWWAnalytical by using mathematica's "Integrate[...]" function
   // and converted the resulted expression to C-like form
