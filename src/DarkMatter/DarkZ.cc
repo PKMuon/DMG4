@@ -80,8 +80,8 @@ DarkZ::DarkZ(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, 
   ParentPDGID = 13;
   DaughterPDGID = 0;
 
-  IApprox =        2;   // Approximation: 1 - IWW; 2 - WW, ds/dxdTheta for total CS; 3 - WW, ds/dxdPsi for total CS; 4 - WW, ds/dx for total CS
-  IMethodTotalCS = 1;   // Method for total CS: 1 - ds/dxdTheta; 2 - ds/dxdPsi; 3 - ds/dx
+  IApprox =        2;   // Approximation: 1 - IWW; 2 - WW (default is 2)
+  IMethodTotalCS = 1;   // Method for total CS: 1 - ds/dxdTheta; 2 - ds/dxdPsi; 3 - ds/dx (default is 1)
   tMax =       10000.;  // tmax initial; Value 10000. means that tmax = E0*E0 will be taken
   ThetaMax =     0.3;   // Max. angle of Z
   PsiMax =       1.0;   // Max. angle of recoil muon
@@ -166,6 +166,9 @@ double DarkZ::TotalCrossSectionCalc_WW(double E0)
   //if(E0 < 2.*MA) return 0.;
   //if(E0 < MA*99.) return 0.; // Some approximations probably don't work for smaller energy
 
+  //to switch off default error handler, store old error handler in old_handler:
+  gsl_error_handler_t * old_handler=gsl_set_error_handler_off();
+
   gsl_integration_workspace* w1 = gsl_integration_workspace_alloc (1000);
   double result1, error1;
   double Xmin1 = MA/E0;
@@ -178,7 +181,17 @@ double DarkZ::TotalCrossSectionCalc_WW(double E0)
   F1.function = _DarkZDsDxMuon_WW;
   F1.params = &parms;
 
-  gsl_integration_qags (&F1, Xmin1, Xmax1, 0, 1e-7, 1000, w1, &result1, &error1);
+  //gsl_integration_qags (&F1, Xmin1, Xmax1, 0, 1e-7, 1000, w1, &result1, &error1);
+  double relerr=1.0e-7;   //initial error tolerance (relative error)
+  int status=1;
+  while(status) {
+    status=gsl_integration_qags (&F1, Xmin1, Xmax1, 0, relerr, 1000, w1, &result1, &error1);
+    relerr *= 1.2;
+    if(status) G4cout << "Increased tolerance=" << relerr << G4endl;
+  }
+  //if integration routine returns error code, integration is repeated
+  //using increased error tolerance, message is printed out
+  gsl_set_error_handler(old_handler); //reset error handler (might be unneccessary.)
 
   double IntDsDx = result1;
   gsl_integration_workspace_free (w1);
