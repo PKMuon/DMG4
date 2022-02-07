@@ -66,7 +66,7 @@ DMParticlePseudoScalar* DMParticlePseudoScalar::Definition()
 	if(DecayType > 0)
 	  {
 	    // X -> e+ + e-
-	    mode = new G4PhaseSpaceDecayChannel("DMParticlePseudoscalar", 1., 2, "e-", "e+");
+	    mode = new G4PhaseSpaceDecayChannel("DMParticlePseudoScalar", 1., 2, "e-", "e+");
 	  }
 	table->Insert(mode);
 	anInstance->SetDecayTable(table);
