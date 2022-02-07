@@ -3,10 +3,10 @@
 #include <DMParticle.hh>
 
 class DMParticleZPrime : public DMParticle {
-private:
+  private:
     static DMParticleZPrime * theInstance;
     DMParticleZPrime();
     ~DMParticleZPrime();
-public:
+  public:
     static DMParticleZPrime * Definition();
 };

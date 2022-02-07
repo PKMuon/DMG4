@@ -3,10 +3,10 @@
 #include <DMParticle.hh>
 
 class DMParticleAxial : public DMParticle {
-private:
+  private:
     static DMParticleAxial * theInstance;
     DMParticleAxial();
     ~DMParticleAxial();
-public:
+  public:
     static DMParticleAxial * Definition();
 };

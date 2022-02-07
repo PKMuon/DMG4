@@ -3,10 +3,10 @@
 #include <DMParticle.hh>
 
 class DMParticleALP : public DMParticle {
-private:
+  private:
     static DMParticleALP * theInstance;
     DMParticleALP();
     ~DMParticleALP();
-public:
+  public:
     static DMParticleALP * Definition();
 };

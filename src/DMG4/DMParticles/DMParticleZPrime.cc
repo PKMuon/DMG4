@@ -15,12 +15,12 @@ DMParticleZPrime* DMParticleZPrime::Definition()
   if( theInstance ) {
     return theInstance;
   }
-   //get parameters from factory
+  //get parameters from factory
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
   G4double MassIn    = DMpar->GetRegisteredParam("MassA");
   G4double epsilIn   = DMpar->GetRegisteredParam("Epsil");
   G4double DecayType = DMpar->GetRegisteredParam("DecayType");
-  
+
   const G4String name = "DMParticleZPrime";
   // search in particle table]
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
@@ -46,47 +46,47 @@ DMParticleZPrime* DMParticleZPrime::Definition()
 
   if( !anInstance ) {
     anInstance = new G4ParticleDefinition(
-                /* Name ..................... */ name,
-                /* Mass ..................... */ MassIn,
-                /* Decay width .............. */ WidthIn,
-                /* Charge ................... */ 0.*eplus,
-                /* 2*spin ................... */ 2,
-                /* parity ................... */ +1,
-                /* C-conjugation ............ */ 0,
-                /* 2*Isospin ................ */ 0,
-                /* 2*Isospin3 ............... */ 0,
-                /* G-parity ................. */ 0,
-                /* type ..................... */ "boson",
-                /* lepton number ............ */ 0,
-                /* baryon number ............ */ 0,
-                /* PDG encoding ............. */ 5500023, // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
-                /* stable ................... */ isStable,
-                /* lifetime.................. */ 0,
-                /* decay table .............. */ NULL,
-                /* shortlived ............... */ false,
-                /* subType .................. */ "DMParticleZPrime",
-                /* anti particle encoding ... */ 5500023
-            );
-        if(!isStable)
-      {
-	// Life time is given from width
-	((DMParticle*)anInstance)->CalculateLifeTime();
-	
-	// create decay table and add modes
-	G4DecayTable* table = new G4DecayTable();
-	G4VDecayChannel** mode = new G4VDecayChannel*[3];
-	// DMParticleZPrime -> nu_mu + anti_nu_mu
-	mode[0] = new G4PhaseSpaceDecayChannel(name, nuBrRatio/2., 2, "anti_nu_mu", "nu_mu");
-	// DMParticleZPrime -> nu_tau + anti_nu_tau
-	mode[1] = new G4PhaseSpaceDecayChannel(name, nuBrRatio/2., 2, "anti_nu_tau", "nu_tau");
-	// DMParticleZPrime -> mu+ + mu-
-	mode[2] = new G4PhaseSpaceDecayChannel(name, muBrRatio, 2, "mu+", "mu-");
-	for (G4int index = 0; index < 3; index++) table->Insert(mode[index]);
-	delete [] mode;
-	
-	anInstance->SetDecayTable(table);
-	anInstance->DumpTable();
-      }
+        /* Name ..................... */ name,
+        /* Mass ..................... */ MassIn,
+        /* Decay width .............. */ WidthIn,
+        /* Charge ................... */ 0.*eplus,
+        /* 2*spin ................... */ 2,
+        /* parity ................... */ +1,
+        /* C-conjugation ............ */ 0,
+        /* 2*Isospin ................ */ 0,
+        /* 2*Isospin3 ............... */ 0,
+        /* G-parity ................. */ 0,
+        /* type ..................... */ "boson",
+        /* lepton number ............ */ 0,
+        /* baryon number ............ */ 0,
+        /* PDG encoding ............. */ 5500023, // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
+        /* stable ................... */ isStable,
+        /* lifetime.................. */ 0,
+        /* decay table .............. */ NULL,
+        /* shortlived ............... */ false,
+        /* subType .................. */ "DMParticleZPrime",
+        /* anti particle encoding ... */ 5500023
+          );
+    if(!isStable)
+    {
+      // Life time is given from width
+      ((DMParticle*)anInstance)->CalculateLifeTime();
+
+      // create decay table and add modes
+      G4DecayTable* table = new G4DecayTable();
+      G4VDecayChannel** mode = new G4VDecayChannel*[3];
+      // DMParticleZPrime -> nu_mu + anti_nu_mu
+      mode[0] = new G4PhaseSpaceDecayChannel(name, nuBrRatio/2., 2, "anti_nu_mu", "nu_mu");
+      // DMParticleZPrime -> nu_tau + anti_nu_tau
+      mode[1] = new G4PhaseSpaceDecayChannel(name, nuBrRatio/2., 2, "anti_nu_tau", "nu_tau");
+      // DMParticleZPrime -> mu+ + mu-
+      mode[2] = new G4PhaseSpaceDecayChannel(name, muBrRatio, 2, "mu+", "mu-");
+      for (G4int index = 0; index < 3; index++) table->Insert(mode[index]);
+      delete [] mode;
+
+      anInstance->SetDecayTable(table);
+      anInstance->DumpTable();
+    }
 
   }
   theInstance = reinterpret_cast<DMParticleZPrime*>(anInstance);

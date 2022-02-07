@@ -19,7 +19,7 @@ DMParticleALP* DMParticleALP::Definition()
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
   G4double MassIn    = DMpar->GetRegisteredParam("MassA");
   G4double epsilIn   = DMpar->GetRegisteredParam("Epsil");
-  
+
   const G4String name = "DMParticleALP";
   // search in particle table]
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
@@ -27,27 +27,27 @@ DMParticleALP* DMParticleALP::Definition()
   G4double WidthIn = 1./(64.*pi)*MassIn*MassIn*MassIn*epsilIn*epsilIn;
   if( !anInstance ) {
     anInstance = new G4ParticleDefinition(
-                /* Name ..................... */ name,
-                /* Mass ..................... */ MassIn,
-                /* Decay width .............. */ WidthIn,
-                /* Charge ................... */ 0.,
-                /* 2*spin ................... */ 0,
-                /* parity ................... */ -1,
-                /* C-conjugation ............ */ 0,
-                /* 2*Isospin ................ */ 0,
-                /* 2*Isospin3 ............... */ 0,
-                /* G-parity ................. */ 0,
-                /* type ..................... */ "boson",
-                /* lepton number ............ */ 0,
-                /* baryon number ............ */ 0,
-                /* PDG encoding ............. */ 5300122, // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
-                /* stable ................... */ false,
-                /* lifetime.................. */ 0,
-                /* decay table .............. */ NULL,
-                /* shortlived ............... */ false,
-                /* subType .................. */ "DMParticleALP",
-                /* anti particle encoding ... */ 5300122
-            );
+        /* Name ..................... */ name,
+        /* Mass ..................... */ MassIn,
+        /* Decay width .............. */ WidthIn,
+        /* Charge ................... */ 0.,
+        /* 2*spin ................... */ 0,
+        /* parity ................... */ -1,
+        /* C-conjugation ............ */ 0,
+        /* 2*Isospin ................ */ 0,
+        /* 2*Isospin3 ............... */ 0,
+        /* G-parity ................. */ 0,
+        /* type ..................... */ "boson",
+        /* lepton number ............ */ 0,
+        /* baryon number ............ */ 0,
+        /* PDG encoding ............. */ 5300122, // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
+        /* stable ................... */ false,
+        /* lifetime.................. */ 0,
+        /* decay table .............. */ NULL,
+        /* shortlived ............... */ false,
+        /* subType .................. */ "DMParticleALP",
+        /* anti particle encoding ... */ 5300122
+          );
 
     // Life time is given from width
     ((DMParticle*)anInstance)->CalculateLifeTime();

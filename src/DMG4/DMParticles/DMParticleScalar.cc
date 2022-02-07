@@ -15,12 +15,12 @@ DMParticleScalar* DMParticleScalar::Definition()
   if( theInstance ) {
     return theInstance;
   }
-   //get parameters from factory
+  //get parameters from factory
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
   G4double MassIn    = DMpar->GetRegisteredParam("MassA");
   G4double epsilIn   = DMpar->GetRegisteredParam("Epsil");
   G4double DecayType = DMpar->GetRegisteredParam("DecayType");
-  
+
   const G4String name = "DMParticleScalar";
   // search in particle table]
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
@@ -31,46 +31,46 @@ DMParticleScalar* DMParticleScalar::Definition()
     isStable ? 0 : (1./2.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.-4.*RatioEA2);
   if( !anInstance ) {
     anInstance = new G4ParticleDefinition(
-                /* Name ..................... */ name,
-                /* Mass ..................... */ MassIn,
-                /* Decay width .............. */ WidthIn,
-                /* Charge ................... */ 0.*eplus,
-                /* 2*spin ................... */ 0,
-                /* parity ................... */ 0,
-                /* C-conjugation ............ */ 0,
-                /* 2*Isospin ................ */ 0,
-                /* 2*Isospin3 ............... */ 0,
-                /* G-parity ................. */ 0,
-                /* type ..................... */ "boson",
-                /* lepton number ............ */ 0,
-                /* baryon number ............ */ 0,
-                /* PDG encoding ............. */ 5400022, // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
-                /* stable ................... */ isStable,
-                /* lifetime.................. */ 0,
-                /* decay table .............. */ NULL,
-                /* shortlived ............... */ false,
-                /* subType .................. */ "DMParticleScalar",
-                /* anti particle encoding ... */ 5400022
-            );
+        /* Name ..................... */ name,
+        /* Mass ..................... */ MassIn,
+        /* Decay width .............. */ WidthIn,
+        /* Charge ................... */ 0.*eplus,
+        /* 2*spin ................... */ 0,
+        /* parity ................... */ 0,
+        /* C-conjugation ............ */ 0,
+        /* 2*Isospin ................ */ 0,
+        /* 2*Isospin3 ............... */ 0,
+        /* G-parity ................. */ 0,
+        /* type ..................... */ "boson",
+        /* lepton number ............ */ 0,
+        /* baryon number ............ */ 0,
+        /* PDG encoding ............. */ 5400022, // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
+        /* stable ................... */ isStable,
+        /* lifetime.................. */ 0,
+        /* decay table .............. */ NULL,
+        /* shortlived ............... */ false,
+        /* subType .................. */ "DMParticleScalar",
+        /* anti particle encoding ... */ 5400022
+          );
   }
-      if(!isStable)
-      {
-	// Life time is given from width
-	((DMParticle*)anInstance)->CalculateLifeTime();
-	
-	//create Decay Table
-	G4DecayTable* table = new G4DecayTable();
-	
-	// create a decay channel
-	G4VDecayChannel* mode;
-	if(DecayType > 0)
-	  {
-	    // X -> e+ + e-
-	    mode = new G4PhaseSpaceDecayChannel("DMParticleScalar", 1., 2, "e-", "e+");
-	  }
-	table->Insert(mode);
-	anInstance->SetDecayTable(table);
-      }
-      theInstance = reinterpret_cast<DMParticleScalar*>(anInstance);
-      return theInstance;
+  if(!isStable)
+  {
+    // Life time is given from width
+    ((DMParticle*)anInstance)->CalculateLifeTime();
+
+    //create Decay Table
+    G4DecayTable* table = new G4DecayTable();
+
+    // create a decay channel
+    G4VDecayChannel* mode;
+    if(DecayType > 0)
+    {
+      // X -> e+ + e-
+      mode = new G4PhaseSpaceDecayChannel("DMParticleScalar", 1., 2, "e-", "e+");
+    }
+    table->Insert(mode);
+    anInstance->SetDecayTable(table);
+  }
+  theInstance = reinterpret_cast<DMParticleScalar*>(anInstance);
+  return theInstance;
 }

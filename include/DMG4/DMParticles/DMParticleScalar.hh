@@ -3,10 +3,10 @@
 #include <DMParticle.hh>
 
 class DMParticleScalar : public DMParticle {
-private:
+  private:
     static DMParticleScalar * theInstance;
     DMParticleScalar();
     ~DMParticleScalar();
-public:
+  public:
     static DMParticleScalar * Definition();
 };
