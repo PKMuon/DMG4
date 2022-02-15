@@ -24,7 +24,7 @@ double TotCSScalarParticle(double MAtest) // CS in GeV^-2 for masses below 1 MeV
 
   double  MMAA[nMALowM] = {0.000001, 0.00001, 0.00002, 0.00003, 0.00004, 0.00005, 0.00006, 0.00007, 0.0001, 0.00015, 0.0002,
                            0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008, 0.0009}; // mass of A' in GeV
-  double TotCSList[nMALowM] = {387019.,278547.,219644.,185952.,163112.,146194.,132967.,122242.,76215.6,99180.3,62157.5,45520.8, 35870.9,29518.7,25002.2,21618.9,18987.2,16881.1};
+  double TotCSList[nMALowM] = {387019.,278547.,219644.,185952.,163112.,146194.,132967.,122242.,99180.3,76215.6,62157.5,45520.8, 35870.9,29518.7,25002.2,21618.9,18987.2,16881.1};
                               
   return parinv(MAtest, MMAA, TotCSList, nMALowM); // This is to be converted to pb and multiplied by eps^2
 }
