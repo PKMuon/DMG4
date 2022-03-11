@@ -33,31 +33,50 @@
 #include "G4BuilderType.hh"
 #include "G4SystemOfUnits.hh"
 
+#include "CommandsFactory.hh"
+#include "DarkMatterPhysicsMessenger.hh"
 
-DarkMatterPhysics::DarkMatterPhysics() 
-: G4VPhysicsConstructor("DarkMatterPhysics")
+DarkMatterPhysics::DarkMatterPhysics(DarkMatterPhysicsMessenger* Messenger) 
+: G4VPhysicsConstructor("DarkMatterPhysics"), fMessenger(Messenger)
 {
-  SetPhysicsType(bUnknown);
-  //fMessenger = new DarkMatterPhysicsMessenger();
+  fEThresh = 35.;
+  fBiasSigmaFactor0 = 1.e8;
+  fDMMass = 0.0167;
+  fDMParticle = "DarkPhotons";
+  fSigmaNorm = 1.;
+  fANucl = 207.;
+  fZNucl = 82.;
+  fDensity = 11.35;
+  fEpsilon = 1.e-4;
+  fDecay = 0;
 
-  if(!DarkMatterPhysicsConfigure()) {
-    G4cout << "Dark Matter physics is not properly configured, exiting" << G4endl;
-    exit(1);
-  }
+  SetPhysicsType(bUnknown);
+
+
 }
 
+
 DarkMatterPhysics::DarkMatterPhysics(double Amass,double ratio,double alphaD,double Bias)
-: G4VPhysicsConstructor("DarkMatterPhysics")
+: G4VPhysicsConstructor("DarkMatterPhysics"), fMessenger(nullptr)
 {
+  fEThresh = 35.;
+  fBiasSigmaFactor0 = Bias;
+  fDMMass = Amass;
+  fDMParticle = "DarkPhotons";
+  fSigmaNorm = 1.;
+  fANucl = 207.;
+  fZNucl = 82.;
+  fDensity = 11.35;
+  fEpsilon = 1.e-4;
+  fDecay = 0;
+
   SetPhysicsType(bUnknown);
-  //fMessenger = new DarkMatterPhysicsMessenger();
 
   if(!DarkMatterPhysicsConfigureWithPars(Amass,ratio,alphaD,Bias)) {
     G4cout << "Dark Matter physics is not properly configured, exiting" << G4endl;
     exit(1);
   }
 }
-
 
 
 DarkMatterPhysics::~DarkMatterPhysics()
@@ -68,6 +87,15 @@ DarkMatterPhysics::~DarkMatterPhysics()
 
 void DarkMatterPhysics::ConstructParticle()
 {
+  if (fMessenger) {
+    fMessenger->SetPhysicsList(this);
+    fMessenger->ApplyCmd();
+  }
+  if(!DarkMatterPhysicsConfigure()) {
+    G4cout << "Dark Matter physics is not properly configured, exiting" << G4endl;
+    exit(1);
+  }
+
   // This call to particle definition must be first or at least go before
   // Physics::ConstructProcess()
   DMParticleAPrime::Definition(myDarkMatter->GetMA()*GeV);
@@ -161,4 +189,24 @@ void DarkMatterPhysics::ConstructProcess()
     phLHelper->RegisterProcess( new DMProcessPrimakoffALP(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
                                 G4Gamma::GammaDefinition() );
   }
+}
+
+
+bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
+{
+  if (fDMParticle == "DarkPhotons")  
+    myDarkMatter = new DarkPhotons(fDMMass, fEThresh, fSigmaNorm, fANucl, fZNucl, fDensity, fEpsilon, fDecay);
+  if (fDMParticle == "DarkScalars") 
+    myDarkMatter = new DarkScalars(fDMMass, fEThresh, fSigmaNorm, fANucl, fZNucl, fDensity, fEpsilon, fDecay);
+  if (fDMParticle == "DarkPseudoScalars") 
+    myDarkMatter = new DarkPseudoScalars(fDMMass, fEThresh, fSigmaNorm, fANucl, fZNucl, fDensity, fEpsilon, fDecay);
+  if (fDMParticle == "DarkAxials") 
+    myDarkMatter = new DarkAxials(fDMMass, fEThresh, fSigmaNorm, fANucl, fZNucl, fDensity, fEpsilon, fDecay);
+  if (fDMParticle == "DarkZ")
+    myDarkMatter = new DarkZ(fDMMass, fEThresh, fSigmaNorm, fANucl, fZNucl, fDensity, fEpsilon, fDecay);
+
+  BiasSigmaFactor = fBiasSigmaFactor0 * 0.0001 * 0.0001 / (myDarkMatter->Getepsil()*myDarkMatter->Getepsil());
+
+  if(!myDarkMatter) return false;
+  return true;
 }
