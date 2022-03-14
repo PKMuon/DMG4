@@ -27,6 +27,8 @@ class DarkZ : public DarkMatter
   private:
 
     int IApprox;
+    int IMethodTotalCS;
+    double tMax;
     double ThetaMax;
     double PsiMax;
 };
