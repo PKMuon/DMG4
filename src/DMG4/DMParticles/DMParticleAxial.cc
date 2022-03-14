@@ -17,18 +17,23 @@ DMParticleAxial* DMParticleAxial::Definition()
   }
   //get parameters from factory (NOTE: mass is parsed in GeV)
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
-  G4double MassIn    = DMpar->GetRegisteredParam("MassA")*GeV;
+  G4double MassIn    = DMpar->GetRegisteredParam("DMMass")*GeV;
   G4double epsilIn   = DMpar->GetRegisteredParam("Epsil");
+  G4double DecayType = DMpar->GetRegisteredParam("DecayType");
 
   const G4String name = "DMParticleAxial";
   // search in particle table]
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition * anInstance = pTable->FindParticle(name);
+  G4double RatioEA2 = electron_mass_c2*electron_mass_c2/(MassIn*MassIn);
+  G4bool isStable = DecayType > 0 ? false : true;
+  G4double WidthIn =
+    isStable ? 0 : (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.-4.*RatioEA2);
   if( !anInstance ) {
     anInstance = new G4ParticleDefinition(
         /* Name ..................... */ name,
         /* Mass ..................... */ MassIn,
-        /* Decay width .............. */ 0.,
+        /* Decay width .............. */ WidthIn,
         /* Charge ................... */ 0.*eplus,
         /* 2*spin ................... */ 2,
         /* parity ................... */ -1,
