@@ -45,7 +45,7 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
   //select particle type and details
   G4int DMType    = DMpar->GetRegisteredParam("DMType"     ,0.     );
   double DMMass   = DMpar->GetRegisteredParam("DMMass", 0.0167);
-  double Epsilon  = DMpar->GetRegisteredParam("Epsil", 0.0001);
+  double Epsilon  = DMpar->GetRegisteredParam("Epsilon", 0.0001);
   // Initialize by default for Pb with eps=0.0001
   G4double ANucl     = DMpar->GetRegisteredParam("ANucl"      ,207.   );
   G4double ZNucl     = DMpar->GetRegisteredParam("ZNucl"      ,82.    );

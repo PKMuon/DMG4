@@ -18,7 +18,7 @@ DMParticleALP* DMParticleALP::Definition()
   //get parameters from factory (NOTE: mass is parsed in GeV)
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
   G4double MassIn    = DMpar->GetRegisteredParam("DMMass")*GeV;
-  G4double epsilIn   = DMpar->GetRegisteredParam("Epsil");
+  G4double epsilIn   = DMpar->GetRegisteredParam("Epsilon");
 
   const G4String name = "DMParticleALP";
   // search in particle table]
