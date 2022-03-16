@@ -48,7 +48,6 @@ DarkMatterPhysics::DarkMatterPhysics()
   //call an instance of the class
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
 
-  G4double BiasSigmaFactor0 = DMpar->GetRegisteredParam("Bias");
   G4double EThresh = DMpar->GetRegisteredParam("EThresh");
   G4int DMProcessType = DMpar->GetRegisteredParam("DMProcessType");
   double DMMass   = DMpar->GetRegisteredParam("DMMass");
@@ -109,9 +108,9 @@ DarkMatterPhysics::DarkMatterPhysics()
       exit(1);
     }
 
-  BiasSigmaFactor = BiasSigmaFactor0 * 0.0001 * 0.0001 / (myDarkMatter->Getepsil()*myDarkMatter->Getepsil());
-
+  BiasSigmaFactor = DMpar->GetRegisteredParam("BiasSigmaFactor0") * 0.0001 * 0.0001 / (myDarkMatter->Getepsil()*myDarkMatter->Getepsil());
 }
+
 
 DarkMatterPhysics::DarkMatterPhysics(double Amass,double ratio,double alphaD,double Bias)
 : G4VPhysicsConstructor("DarkMatterPhysics")
@@ -124,7 +123,6 @@ DarkMatterPhysics::DarkMatterPhysics(double Amass,double ratio,double alphaD,dou
     exit(1);
   }
 }
-
 
 
 DarkMatterPhysics::~DarkMatterPhysics()
