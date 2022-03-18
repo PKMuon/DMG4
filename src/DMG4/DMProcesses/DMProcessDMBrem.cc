@@ -8,7 +8,6 @@
 #include "DarkAxials.hh"
 
 #include "DMParticleAPrime.hh"
-#include "DMParticleXBoson.hh"
 #include "DMParticleZPrime.hh"
 #include "DMParticleScalar.hh"
 #include "DMParticlePseudoScalar.hh"

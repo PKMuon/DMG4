@@ -32,18 +32,20 @@ find_package(GSL REQUIRED)
 # Setup include directory for this project
 #
 include(${Geant4_USE_FILE})
-include_directories(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/include/DMG4 ${GSL_INCLUDE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/include/DMG4 ${GSL_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/include/DMG4/DMParticles ${PROJECT_SOURCE_DIR}/include/DMG4/DMProcesses)
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
-file(GLOB sources_DMG4 ${PROJECT_SOURCE_DIR}/src/DMG4/*.cc)
-file(GLOB sources_DarkMatter ${PROJECT_SOURCE_DIR}/src/DarkMatter/*.cc)
-file(GLOB sources_UtilsDM ${PROJECT_SOURCE_DIR}/src/UtilsDM/*.cc)
+file(GLOB sources_DMG4        ${PROJECT_SOURCE_DIR}/src/DMG4/*.cc)
+file(GLOB sources_DMParticles ${PROJECT_SOURCE_DIR}/src/DMG4/DMParticles/*.cc)
+file(GLOB sources_DMProcesses ${PROJECT_SOURCE_DIR}/src/DMG4/DMProcesses/*.cc)
+file(GLOB sources_DarkMatter  ${PROJECT_SOURCE_DIR}/src/DarkMatter/*.cc)
+file(GLOB sources_UtilsDM     ${PROJECT_SOURCE_DIR}/src/UtilsDM/*.cc)
 
 add_library(UtilsDM SHARED ${sources_UtilsDM})
 set_target_properties(UtilsDM PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
 
-add_library(DMG4 SHARED ${sources_DMG4})
+add_library(DMG4 SHARED ${sources_DMG4} ${sources_DMParticles} ${sources_DMProcesses})
 target_link_libraries(DMG4 ${Geant4_LIBRARIES} ${GSL_LIBRARIES} UtilsDM)
 set_target_properties(DMG4 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
 

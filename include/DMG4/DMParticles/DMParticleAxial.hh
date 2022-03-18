@@ -3,11 +3,10 @@
 #include <DMParticle.hh>
 
 class DMParticleAxial : public DMParticle {
-private:
+  private:
     static DMParticleAxial * theInstance;
     DMParticleAxial();
     ~DMParticleAxial();
-public:
-    static DMParticleAxial * Definition(G4double MassIn, G4double epsilIn=0.0001);
+  public:
     static DMParticleAxial * Definition();
 };

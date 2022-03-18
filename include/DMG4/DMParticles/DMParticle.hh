@@ -3,10 +3,10 @@
 #include <G4ParticleDefinition.hh>
 
 class DMParticle : public G4ParticleDefinition {
-private:
+  private:
     DMParticle();
     ~DMParticle();
-public:
+  public:
     inline void CalculateLifeTime() {SetPDGLifeTime(CLHEP::hbar_Planck/GetPDGWidth());}
     inline void SetLongLived() {SetPDGLifeTime(1000.);}
 };

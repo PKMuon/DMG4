@@ -3,11 +3,10 @@
 #include <DMParticle.hh>
 
 class DMParticleZPrime : public DMParticle {
-private:
+  private:
     static DMParticleZPrime * theInstance;
     DMParticleZPrime();
     ~DMParticleZPrime();
-public:
-    static DMParticleZPrime * Definition(G4double MassIn, G4double epsilIn);
+  public:
     static DMParticleZPrime * Definition();
 };

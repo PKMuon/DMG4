@@ -4,7 +4,6 @@
 #include "DarkPhotons.hh"
 
 #include "DMParticleAPrime.hh"
-#include "DMParticleXBoson.hh"
 
 #include "G4ProcessType.hh"
 #include "G4EmProcessSubType.hh"

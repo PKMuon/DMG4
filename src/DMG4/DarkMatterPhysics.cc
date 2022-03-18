@@ -1,4 +1,5 @@
 #include "DarkMatterPhysics.hh"
+#include "DarkMatterParametersFactory.hh"
 
 #include "DarkMatter.hh"
 #include "DarkPhotons.hh"
@@ -6,6 +7,8 @@
 #include "ALP.hh"
 #include "DarkPhotonsAnnihilation.hh"
 #include "DarkScalarsAnnihilation.hh"
+#include "DarkPseudoScalarsAnnihilation.hh"
+#include "DarkAxialsAnnihilation.hh"
 #include "DarkScalars.hh"
 #include "DarkPseudoScalars.hh"
 #include "DarkAxials.hh"
@@ -15,13 +18,10 @@
 #include "DMProcessAnnihilation.hh"
 
 #include "DMParticleAPrime.hh"
-#include "DMParticleXBoson.hh"
 #include "DMParticleZPrime.hh"
 #include "DMParticleALP.hh"
 #include "DMParticleScalar.hh"
-#include "DMParticleXScalar.hh"
 #include "DMParticlePseudoScalar.hh"
-#include "DMParticleXPseudoScalar.hh"
 #include "DMParticleAxial.hh"
 
 #include "G4Electron.hh"
@@ -44,7 +44,73 @@ DarkMatterPhysics::DarkMatterPhysics()
     G4cout << "Dark Matter physics is not properly configured, exiting" << G4endl;
     exit(1);
   }
+
+  //call an instance of the class
+  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
+
+  G4double EThresh = DMpar->GetRegisteredParam("EThresh");
+  G4int DMProcessType = DMpar->GetRegisteredParam("DMProcessType");
+  double DMMass   = DMpar->GetRegisteredParam("DMMass");
+  double Epsilon  = DMpar->GetRegisteredParam("Epsilon");
+  G4double ANucl     = DMpar->GetRegisteredParam("ANucl");
+  G4double ZNucl     = DMpar->GetRegisteredParam("ZNucl");
+  G4double Density   = DMpar->GetRegisteredParam("Density");
+  G4int DecayType = DMpar->GetRegisteredParam("DecayType");
+
+  switch(DMProcessType)
+    {
+    case 1:
+      G4cout << "Initialize DarkPhoton\n";
+      myDarkMatter = new DarkPhotons(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType);
+      break;
+    case 2:
+      G4cout << "Initialize DarkScalar\n";
+      myDarkMatter = new DarkScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType);
+      break;
+    case 3:
+      G4cout << "Initialize DarkPseudoScalars\n";
+      myDarkMatter = new DarkPseudoScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+      break;
+    case 4:
+      G4cout << "Initialize DarkAxials\n";
+      myDarkMatter = new DarkAxials(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+      break;
+    case 21:
+      G4cout << "Initialize ALP\n";
+      myDarkMatter = new ALP(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+      break;
+    case 31:
+      G4cout << "Initialize DarkZ\n";
+      myDarkMatter = new DarkZ(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+      break;
+    case 11:
+      G4cout << "Initialize DarkPhotonsAnnihilation\n";
+      myDarkMatter = new DarkPhotonsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,
+                                                 DMpar->GetRegisteredParam("RDM"), DMpar->GetRegisteredParam("AlphaD") );
+      break;
+    case 12:
+      G4cout << "Initialize DarkScalarsAnnihilation\n";
+      myDarkMatter = new DarkScalarsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,
+                                                 DMpar->GetRegisteredParam("RDM"), DMpar->GetRegisteredParam("AlphaD") );
+      break;
+    case 13:
+      G4cout << "Initialize DarkPseudoScalarsAnnihilation\n";
+      myDarkMatter = new DarkPseudoScalarsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,
+                                                       DMpar->GetRegisteredParam("RDM"), DMpar->GetRegisteredParam("AlphaD") );
+      break;
+    case 14:
+      G4cout << "Initialize DarkAxialsAnnihilation\n";
+      myDarkMatter = new DarkAxialsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,
+                                                DMpar->GetRegisteredParam("RDM"), DMpar->GetRegisteredParam("AlphaD") );
+      break;
+    default:
+      G4cout << G4endl << "Wrong DM process type specified: " << DMProcessType << " , exiting" << G4endl << G4endl;
+      exit(1);
+    }
+
+  BiasSigmaFactor = DMpar->GetRegisteredParam("BiasSigmaFactor0") * 0.0001 * 0.0001 / (myDarkMatter->Getepsil()*myDarkMatter->Getepsil());
 }
+
 
 DarkMatterPhysics::DarkMatterPhysics(double Amass,double ratio,double alphaD,double Bias)
 : G4VPhysicsConstructor("DarkMatterPhysics")
@@ -59,7 +125,6 @@ DarkMatterPhysics::DarkMatterPhysics(double Amass,double ratio,double alphaD,dou
 }
 
 
-
 DarkMatterPhysics::~DarkMatterPhysics()
 {
   if(myDarkMatter) delete myDarkMatter;
@@ -70,15 +135,12 @@ void DarkMatterPhysics::ConstructParticle()
 {
   // This call to particle definition must be first or at least go before
   // Physics::ConstructProcess()
-  DMParticleAPrime::Definition(myDarkMatter->GetMA()*GeV);
-  DMParticleXBoson::Definition(myDarkMatter->GetMA()*GeV, myDarkMatter->Getepsil());
-  DMParticleZPrime::Definition(myDarkMatter->GetMA()*GeV, myDarkMatter->Getepsil());
-  DMParticleALP::Definition(myDarkMatter->GetMA()*GeV, myDarkMatter->Getepsil());
-  DMParticleScalar::Definition(myDarkMatter->GetMA()*GeV);
-  DMParticleXScalar::Definition(myDarkMatter->GetMA()*GeV, myDarkMatter->Getepsil());
-  DMParticlePseudoScalar::Definition(myDarkMatter->GetMA()*GeV);
-  DMParticleXPseudoScalar::Definition(myDarkMatter->GetMA()*GeV, myDarkMatter->Getepsil());
-  DMParticleAxial::Definition(myDarkMatter->GetMA()*GeV);
+  DMParticleAPrime::Definition();
+  DMParticleZPrime::Definition();
+  DMParticleALP::Definition();
+  DMParticleScalar::Definition();
+  DMParticlePseudoScalar::Definition();
+  DMParticleAxial::Definition();
 }
 
 
@@ -89,19 +151,15 @@ void DarkMatterPhysics::ConstructProcess()
   if(myDarkMatter->GetParentPDGID() == 11) {
     if(myDarkMatter->GetDMType() == 1) {
       theDMParticlePtr = DMParticleAPrime::Definition();
-      if(myDarkMatter->Decay()) theDMParticlePtr = DMParticleXBoson::Definition();
     }
     if(myDarkMatter->GetDMType() == 2) {
       theDMParticlePtr = DMParticleScalar::Definition();
-      if(myDarkMatter->Decay()) theDMParticlePtr = DMParticleXScalar::Definition();
     }
     if(myDarkMatter->GetDMType() == 3) {
       theDMParticlePtr = DMParticleAxial::Definition();
-      //if(myDarkMatter->Decay()) theDMParticlePtr = DMParticleXAxial::Definition();
     }
     if(myDarkMatter->GetDMType() == 4) {
       theDMParticlePtr = DMParticlePseudoScalar::Definition();
-      if(myDarkMatter->Decay()) theDMParticlePtr = DMParticleXPseudoScalar::Definition();
     }
   }
   if(myDarkMatter->GetParentPDGID() == -11) { // Annihilation: only vector and scalar for the moment
@@ -113,8 +171,7 @@ void DarkMatterPhysics::ConstructProcess()
     }
   }
   if(myDarkMatter->GetParentPDGID() == 13) {
-    theDMParticlePtr = DMParticleAPrime::Definition(); // Fully invisible decay (or almost)
-    if(myDarkMatter->Decay()) theDMParticlePtr = DMParticleZPrime::Definition(); // Decay to SM particles
+    theDMParticlePtr = DMParticleZPrime::Definition(); // Decay to SM particles
   }
   if(myDarkMatter->GetParentPDGID() == 22) {
     theDMParticlePtr = DMParticleALP::Definition();
