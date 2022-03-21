@@ -39,8 +39,8 @@ int main() {
     //double XAcc = myDarkMatter->SimulateEmission(ekin, angles);            // used in invisible mode for electrons
     //double XAcc = myDarkMatter->SimulateEmissionWithAngle(ekin, angles);   // one-step sampling, for electrons, not used by default
     double XAcc = myDarkMatter->SimulateEmissionWithAngle2(ekin, angles);    // two-step sampling, used by default for electrons if decays are enabled
-    //double XAcc = myDarkMatter->SimulateEmissionByMuon(ekin, angles);      // one-step sampling, used by default for muons
-    //double XAcc = myDarkMatter->SimulateEmissionByMuon2(ekin, angles);     // two-step sampling, for muons, problematic because of dsdx
+    //double XAcc = myDarkMatter->SimulateEmissionByMuon(ekin, angles);      // one-step sampling (2-dim), for muons
+    //double XAcc = myDarkMatter->SimulateEmissionByMuon2(ekin, angles);     // two-step sampling, used by default for muons
 
     if(XAcc > 0.0000001) {
       G4cout << "Emission simulated, X = " << XAcc << " Theta = " << angles[0] << G4endl;
