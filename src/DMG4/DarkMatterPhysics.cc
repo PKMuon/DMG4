@@ -58,6 +58,7 @@ DarkMatterPhysics::DarkMatterPhysics(void *ptr)
     G4cout << "Dark Matter physics is not properly configured, exiting" << G4endl;
     exit(1);
   }
+  this->Init();
 }
 
 
