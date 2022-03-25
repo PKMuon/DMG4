@@ -10,4 +10,4 @@ echo "GSLLOCATION=${GSLLOCATION}"
 echo "GEANT4LOCATION=${GEANT4LOCATION}" > config.txt
 echo "GSLLOCATION=${GSLLOCATION}" >> config.txt
 #
-./configure --with-geant4=${GEANT4LOCATION} --with-gsl=${GSLLOCATION}
+./configure --with-geant4=${GEANT4LOCATION} --with-gsl=${GSLLOCATION} --goaconfig

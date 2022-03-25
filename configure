@@ -15,6 +15,7 @@ for arg in $* ; do
     echo "--buildtype=value    : possible types: None, Release, Debug, MinSizeRel, RelWithDebInfo, D=Release, see CMakeLists.txt"
     echo "--with-geant4=path   : path to the installed Geant4, with directory /bin/geant4.sh, /include etc."
     echo "--with-gsl=path      : path to the GSL package"
+    echo "--goaconfig          : enable genova-specific settings"
     echo
     echo "Note: to obtain complete library structure do make install"
     echo "to see the actual compilation commands add argument VERBOSE=1 to make"
@@ -22,6 +23,8 @@ for arg in $* ; do
     exit
   elif [ "x$arg" = "x--enable-debug" ] ; then
     COMPMODE=Debug
+  elif [ "x$arg" = "x--goaconfig" ] ; then
+    GOACONFIG=YES
   elif [ x`echo x${arg} | grep "="` != x ] ; then
     option=`echo ${arg} | awk -F = '{print $1}'`
     value=`echo ${arg} | awk -F = '{print $2}'`
@@ -79,5 +82,10 @@ ARGLIST="-DCMAKE_INSTALL_PREFIX=${PREFIX}"
 if [ "x${GSLLOCATION}" != "x" ] ; then
   ARGLIST="${ARGLIST} -DGSL_ROOT_DIR=${GSLLOCATION}"
 fi
+
+if [ "x${GOACONFIG}" == "xYES" ] ; then
+  ARGLIST="${ARGLIST} -DBUILD_GOA=ON"
+fi
+
 
 cmake ${ARGLIST} .

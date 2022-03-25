@@ -5,7 +5,16 @@ cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project(DMG4)
 
 # This below is to compile statements with nullptr (compilers 4.9, 6.3). At some point will not be needed?
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#Added by A.C.
+OPTION(BUILD_GOA "Build for genova cluster" OFF)
+if (BUILD_GOA)
+   MESSAGE( "BUILD_GOA ENABLED" )
+   SET(CMAKE_CXX_STANDARD 17)
+   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+else(BUILD_GOA)
+   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif(BUILD_GOA)
+
 
 #----------------------------------------------------------------------------
 # Find Geant4 package, activating all available UI and Vis drivers by default
