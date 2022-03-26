@@ -62,7 +62,7 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
 
   DMpar->RegisterNewParam("DecayType", 0.); // 0 invisible, 2 visible
 
-  // additional parameters for annihilation
+  // additional parameters for annihilation (if absent the default ones will be used)
 //  DMpar->RegisterNewParam("RDM", 1./3.);
 //  DMpar->RegisterNewParam("AlphaD", 0.5);
   

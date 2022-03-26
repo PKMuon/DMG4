@@ -109,22 +109,22 @@ void DarkMatterPhysics::Init(){
      case 11:
        G4cout << "Initialize DarkPhotonsAnnihilation\n";
        myDarkMatter = new DarkPhotonsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,
-                                                  DMpar->GetRegisteredParam("RDM"), DMpar->GetRegisteredParam("AlphaD") );
+                                                  DMpar->GetRegisteredParam("RDM", 1./3.), DMpar->GetRegisteredParam("AlphaD", 0.5) );
        break;
      case 12:
        G4cout << "Initialize DarkScalarsAnnihilation\n";
        myDarkMatter = new DarkScalarsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,
-                                                  DMpar->GetRegisteredParam("RDM"), DMpar->GetRegisteredParam("AlphaD") );
+                                                  DMpar->GetRegisteredParam("RDM", 1./3.), DMpar->GetRegisteredParam("AlphaD", 0.5) );
        break;
      case 13:
        G4cout << "Initialize DarkPseudoScalarsAnnihilation\n";
        myDarkMatter = new DarkPseudoScalarsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,
-                                                        DMpar->GetRegisteredParam("RDM"), DMpar->GetRegisteredParam("AlphaD") );
+                                                        DMpar->GetRegisteredParam("RDM", 1./3.), DMpar->GetRegisteredParam("AlphaD", 0.5) );
        break;
      case 14:
        G4cout << "Initialize DarkAxialsAnnihilation\n";
        myDarkMatter = new DarkAxialsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,
-                                                 DMpar->GetRegisteredParam("RDM"), DMpar->GetRegisteredParam("AlphaD") );
+                                                 DMpar->GetRegisteredParam("RDM", 1./3.), DMpar->GetRegisteredParam("AlphaD", 0.5) );
        break;
      default:
        G4cout << G4endl << "Wrong DM process type specified: " << DMProcessType << " , exiting" << G4endl << G4endl;
