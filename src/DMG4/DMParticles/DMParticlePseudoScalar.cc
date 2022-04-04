@@ -27,6 +27,7 @@ DMParticlePseudoScalar* DMParticlePseudoScalar::Definition()
   G4ParticleDefinition * anInstance = pTable->FindParticle(name);
   G4double RatioEA2 = electron_mass_c2*electron_mass_c2/(MassIn*MassIn);
   G4bool isStable = DecayType > 0 ? false : true;
+  if(MassIn < 2.001*electron_mass_c2) isStable = true;
   G4double WidthIn =
     isStable ? 0 : (1./2.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.-4.*RatioEA2);
   if( !anInstance ) {
@@ -62,12 +63,9 @@ DMParticlePseudoScalar* DMParticlePseudoScalar::Definition()
       G4DecayTable* table = new G4DecayTable();
 
       // create a decay channel
-      G4VDecayChannel* mode;
-      if(DecayType > 0)
-      {
-        // X -> e+ + e-
-        mode = new G4PhaseSpaceDecayChannel("DMParticlePseudoScalar", 1., 2, "e-", "e+");
-      }
+      // X -> e+ + e-
+      G4VDecayChannel* mode = new G4PhaseSpaceDecayChannel("DMParticlePseudoScalar", 1., 2, "e-", "e+");
+
       table->Insert(mode);
       anInstance->SetDecayTable(table);
     }

@@ -27,6 +27,7 @@ DMParticleAxial* DMParticleAxial::Definition()
   G4ParticleDefinition * anInstance = pTable->FindParticle(name);
   G4double RatioEA2 = electron_mass_c2*electron_mass_c2/(MassIn*MassIn);
   G4bool isStable = DecayType > 0 ? false : true;
+  if(MassIn < 2.001*electron_mass_c2) isStable = true;
   G4double WidthIn =
     isStable ? 0 : (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.-4.*RatioEA2);
   if( !anInstance ) {
@@ -45,13 +46,29 @@ DMParticleAxial* DMParticleAxial::Definition()
         /* lepton number ............ */ 0,
         /* baryon number ............ */ 0,
         /* PDG encoding ............. */ 5510022, // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
-        /* stable ................... */ true,
+        /* stable ................... */ isStable,
         /* lifetime.................. */ 0,
         /* decay table .............. */ NULL,
         /* shortlived ............... */ false,
         /* subType .................. */ "DMParticleAxial",
         /* anti particle encoding ... */ 5510022
           );
+
+    if(!isStable)
+    {
+      // Life time is given from width
+      ((DMParticle*)anInstance)->CalculateLifeTime();
+
+      //create Decay Table
+      G4DecayTable* table = new G4DecayTable();
+
+      // create a decay channel
+      // X -> e+ + e-
+      G4VDecayChannel* mode = new G4PhaseSpaceDecayChannel("DMParticleAxial", 1., 2, "e-", "e+");
+
+      table->Insert(mode);
+      anInstance->SetDecayTable(table);
+    }
   }
   theInstance = reinterpret_cast<DMParticleAxial*>(anInstance);
   return theInstance;
