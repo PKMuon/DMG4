@@ -58,7 +58,7 @@ DMParticleALP* DMParticleALP::Definition()
     // create a decay channel
     G4VDecayChannel* mode;
     // ALP -> gamma + gamma
-    mode = new G4PhaseSpaceDecayChannel("DMParticleALP", 1., 2, "gamma", "gamma");
+    mode = new G4PhaseSpaceDecayChannel(name, 1., 2, "gamma", "gamma");
     table->Insert(mode);
 
     anInstance->SetDecayTable(table);

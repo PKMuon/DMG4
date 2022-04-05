@@ -27,7 +27,7 @@ DMParticleZPrime* DMParticleZPrime::Definition()
   G4ParticleDefinition * anInstance = pTable->FindParticle(name);
 
   // determine decay rates
-  const G4double muMass = G4MuonMinus::MuonMinusDefinition()->GetPDGMass()/MeV;
+  const G4double muMass = G4MuonMinus::MuonMinusDefinition()->GetPDGMass();
   G4double massRatio2 = muMass*muMass/(MassIn*MassIn);
   G4double WidthIn = 0.; // in MeV
   G4double nuWidth = 0.;

@@ -64,7 +64,7 @@ DMParticleAxial* DMParticleAxial::Definition()
 
       // create a decay channel
       // X -> e+ + e-
-      G4VDecayChannel* mode = new G4PhaseSpaceDecayChannel("DMParticleAxial", 1., 2, "e-", "e+");
+      G4VDecayChannel* mode = new G4PhaseSpaceDecayChannel(name, 1., 2, "e-", "e+");
 
       table->Insert(mode);
       anInstance->SetDecayTable(table);
