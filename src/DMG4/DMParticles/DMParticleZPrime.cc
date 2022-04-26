@@ -44,6 +44,9 @@ DMParticleZPrime* DMParticleZPrime::Definition()
   G4bool isStable = DecayType > 0 ? false : true;
   WidthIn = isStable ? 0 : nuWidth + muWidth;
 
+  G4int IDPDG = 5500023; // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
+  if(DecayType > 0) IDPDG = 5500123;
+
   if( !anInstance ) {
     anInstance = new G4ParticleDefinition(
         /* Name ..................... */ name,
@@ -59,13 +62,13 @@ DMParticleZPrime* DMParticleZPrime::Definition()
         /* type ..................... */ "boson",
         /* lepton number ............ */ 0,
         /* baryon number ............ */ 0,
-        /* PDG encoding ............. */ 5500023, // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
+        /* PDG encoding ............. */ IDPDG,
         /* stable ................... */ isStable,
         /* lifetime.................. */ 0,
         /* decay table .............. */ NULL,
         /* shortlived ............... */ false,
         /* subType .................. */ "DMParticleZPrime",
-        /* anti particle encoding ... */ 5500023
+        /* anti particle encoding ... */ IDPDG
           );
     if(!isStable)
     {

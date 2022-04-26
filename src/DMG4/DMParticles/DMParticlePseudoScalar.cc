@@ -30,6 +30,10 @@ DMParticlePseudoScalar* DMParticlePseudoScalar::Definition()
   if(MassIn < 2.001*electron_mass_c2) isStable = true;
   G4double WidthIn =
     isStable ? 0 : (1./2.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.-4.*RatioEA2);
+
+  G4int IDPDG = 5410022; // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
+  if(DecayType > 0) IDPDG = 5410122;
+
   if( !anInstance ) {
     anInstance = new G4ParticleDefinition(
         /* Name ..................... */ name,
@@ -45,13 +49,13 @@ DMParticlePseudoScalar* DMParticlePseudoScalar::Definition()
         /* type ..................... */ "boson",
         /* lepton number ............ */ 0,
         /* baryon number ............ */ 0,
-        /* PDG encoding ............. */ 5410022, // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
+        /* PDG encoding ............. */ IDPDG,
         /* stable ................... */ isStable,
         /* lifetime.................. */ 0,
         /* decay table .............. */ NULL,
         /* shortlived ............... */ false,
         /* subType .................. */ "DMParticlePseudoScalar",
-        /* anti particle encoding ... */ 5410022
+        /* anti particle encoding ... */ IDPDG
           );
 
     if(!isStable)

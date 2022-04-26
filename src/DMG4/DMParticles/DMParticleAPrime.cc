@@ -33,8 +33,8 @@ DMParticleAPrime* DMParticleAPrime::Definition()
     isStable ? 0 : (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.+2.*RatioEA2);
 
   G4int IDPDG = 5500022; // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
-  if(DecayType > 0 && BranchingType == 0) IDPDG = 5501022;
-  if(DecayType > 0 && BranchingType == 1) IDPDG = 5502022;
+  if(DecayType > 0 && BranchingType == 0) IDPDG = 5500122;
+  if(DecayType > 0 && BranchingType == 1) IDPDG = 5500222;
 
   if( !anInstance ) {
     anInstance = new G4ParticleDefinition(
