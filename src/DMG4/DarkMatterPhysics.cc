@@ -193,6 +193,7 @@ void DarkMatterPhysics::ConstructProcess()
   if(!theDMParticlePtr) {G4cout << "DarkMatterPhysics::ConstructProcess: did not manage to determine the DM particle type, exiting" << G4endl; exit(1);}
 
   myDarkMatter->SetMA(theDMParticlePtr->GetPDGMass()/GeV);
+  myDarkMatter->SetDMPDGID(theDMParticlePtr->GetPDGEncoding());
   myDarkMatter->PrepareTable();
 
   G4PhysicsListHelper * phLHelper = G4PhysicsListHelper::GetPhysicsListHelper();

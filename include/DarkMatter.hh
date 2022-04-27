@@ -48,6 +48,8 @@ class DarkMatter
     int GetDMType() {return DMType;}
     int GetParentPDGID() {return ParentPDGID;}
     int GetDaughterPDGID() {return DaughterPDGID;}
+    int GetDMPDGID() {return DMPDGID;}
+    void SetDMPDGID(int DMPDGIDin) {DMPDGID = DMPDGIDin;}
     int Decay() {return IDecay;}
      // usage of normalization below:   Nsign = (Naccepted/Nsimulated)*Normalization*EOT
     double GetNormalization() {return 3.0e-15 * (Density/11.35) * (207./ANucl) *
@@ -96,6 +98,7 @@ class DarkMatter
     int ParentPDGID;
     double MParent;
     int DaughterPDGID;
+    int DMPDGID;
     int IDecay; // 0 - DM particle does not decay; 1 - DM particle decays; 2 - Force DM particle decay
     int ISampler; // if use a special sampler to simulate X, angle
 
