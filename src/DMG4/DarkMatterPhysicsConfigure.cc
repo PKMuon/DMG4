@@ -46,7 +46,8 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
   //G4double EThresh = 2000.; // to turn off A emissions  
 
   //select particle type and details
-  DMpar->RegisterNewParam("DMProcessType", 1.);
+  DMpar->RegisterNewParam("DMProcessType", 1.); // 1 - 4: Brem. process for Vector, Scalar, Axial, Pseudoscalar, 21 - ALP
+                                                // 31 - ZPrime (muon beams), 11 - 14: Annihilation
   DMpar->RegisterNewParam("DMMass", 0.0167);
   DMpar->RegisterNewParam("Epsilon", 0.0001);
 
@@ -60,11 +61,13 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
 //  DMpar->RegisterNewParam("ZNucl"   ,74.    );
 //  DMpar->RegisterNewParam("Density" ,19.25  );
 
-  DMpar->RegisterNewParam("DecayType", 0.); // 0 invisible, 2 visible
+  DMpar->RegisterNewParam("DecayType", 0.); // 0: invisible (no decays simulated), 1: visible, 2: visible with constraints
+
+  //DMpar->RegisterNewParam("BranchingType", 0.); // Optional to make different decay table; Default 0
 
   // additional parameters for annihilation (if absent the default ones will be used)
-//  DMpar->RegisterNewParam("RDM", 1./3.);
-//  DMpar->RegisterNewParam("AlphaD", 0.5);
+  //DMpar->RegisterNewParam("RDM", 1./3.);
+  //DMpar->RegisterNewParam("AlphaD", 0.5);
   
   return true;
 }
