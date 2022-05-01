@@ -8,6 +8,7 @@
 #include "G4DalitzDecayChannel.hh"
 #include "G4DecayTable.hh"
 #include "G4MuonMinus.hh"
+#include "G4PionZero.hh"
 
 DMParticleAPrime * DMParticleAPrime::theInstance = nullptr;
 
@@ -28,6 +29,7 @@ DMParticleAPrime* DMParticleAPrime::Definition()
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition * anInstance = pTable->FindParticle(name);
   const G4double muMass = G4MuonMinus::MuonMinusDefinition()->GetPDGMass();
+  const G4double pi0Mass = G4PionZero::PionZeroDefinition()->GetPDGMass();
   G4double RatioEA2 = electron_mass_c2*electron_mass_c2/(MassIn*MassIn);
   G4double massRatio2 = muMass*muMass/(MassIn*MassIn);
   G4bool isStable = true;
@@ -50,11 +52,19 @@ DMParticleAPrime* DMParticleAPrime::Definition()
         isStable ? 0 : (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.+2.*RatioEA2);
       IDPDG = 5500122;
     } else if (BranchingType == 1) { // B-L Z' boson with coupling to all SM particles
-      if(MassIn > 140.) {G4cout << "Branching ratios for this BranchingType and this mass are not yet implemented, exiting" << G4endl; exit(1);}
+      if(MassIn > 600.) {G4cout << "Branching ratios for this BranchingType and this mass are not yet implemented, exiting" << G4endl; exit(1);}
       nuWidth = epsilIn*epsilIn*CLHEP::fine_structure_const*MassIn;
       if(MassIn > 2.*electron_mass_c2) eWidth = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.+2.*RatioEA2);
       if(MassIn > 2.*muMass) muWidth = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*massRatio2)*(1.+2.*massRatio2);
-      // here calculate hWidth
+      if(MassIn > pi0Mass) {
+        hWidth = (CLHEP::fine_structure_const*epsilIn*epsilIn*MassIn*MassIn*MassIn) /
+                 (96.*3.141*3.141*3.141*0.93*0.93*pi0Mass*pi0Mass);
+        hWidth *= (1. - pi0Mass*pi0Mass/(MassIn*MassIn));
+        G4double a = 1. - (MassIn*MassIn)/(782.66*782.66);
+        G4double b = 12.3/782.66;
+        G4double mod2 = 1./(a*a + b*b);
+        hWidth *= mod2;
+      }
       WidthIn = nuWidth + eWidth + muWidth + hWidth;
       nuBrRatio = nuWidth/WidthIn;
       eBrRatio = eWidth/WidthIn;
@@ -110,7 +120,7 @@ DMParticleAPrime* DMParticleAPrime::Definition()
 
       if (BranchingType == 1) { // B-L Z' boson with coupling to all SM particles
 
-        G4VDecayChannel** mode = new G4VDecayChannel*[5];
+        G4VDecayChannel** mode = new G4VDecayChannel*[6];
         // DMParticleZPrime -> nu_e + anti_nu_e
         mode[0] = new G4PhaseSpaceDecayChannel(name, nuBrRatio/3., 2, "anti_nu_e", "nu_e");
         // DMParticleZPrime -> nu_mu + anti_nu_mu
@@ -121,8 +131,10 @@ DMParticleAPrime* DMParticleAPrime::Definition()
         mode[3] = new G4PhaseSpaceDecayChannel(name, eBrRatio, 2, "e+", "e-");
         // DMParticleZPrime -> mu+ + mu-
         mode[4] = new G4PhaseSpaceDecayChannel(name, muBrRatio, 2, "mu+", "mu-");
+        // DMParticleZPrime -> pi0 + gamma
+        mode[5] = new G4PhaseSpaceDecayChannel(name, hBrRatio, 2, "pi0", "gamma");
 
-       for (G4int index = 0; index < 5; index++) table->Insert(mode[index]);
+       for (G4int index = 0; index < 6; index++) table->Insert(mode[index]);
        delete [] mode;
       }
 
