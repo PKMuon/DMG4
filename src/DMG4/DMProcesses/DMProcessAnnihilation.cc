@@ -60,6 +60,9 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt( const G4Track& aTrack,
 
   G4double DMTheta = angles[0], DMPhi = angles[1];
   G4double DME = incidentE * XAcc;
+  G4double DMM = myDarkMatter->GetMA()*GeV;
+  G4double DMKinE = DME - DMM;
+  if(DMKinE < 0.) DMKinE = 0.;
 
   // Initialize DM direction vector:
   G4ThreeVector DMDirection(0., 0., .1);
@@ -72,7 +75,7 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt( const G4Track& aTrack,
   
   G4DynamicParticle* movingDM = new G4DynamicParticle( theDMParticlePtr,
                                                        DMDirection,
-                                                       DME );
+                                                       DMKinE );
   aParticleChange.Initialize( aTrack );
 
   // Set DM:
