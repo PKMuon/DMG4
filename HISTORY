@@ -7,7 +7,13 @@
                               K-factors extended above the mass of 1 GeV for some particles.
                               A minor bug is fixed in the processes (small energy non-conservation due to inconsistent usage of total and kinetic energies)
 
-18.03.2022   Version 1.2      Analytical expression for ds/dx in WW approximation is implemented for DarkZ (muon beam). Other improvements in DarkZ.
+18.03.2022   Version 1.2      Analytical expression for ds/dx in WW approximation is implemented for DarkZ (muon beam).
+                              Maximal Psi is made x-dependent in the sampling of DarkZ events. The number of events truncated by this cut is now
+                              <10-3 (<10-4 for the masses above 1 MeV).
+                              Other improvements in DarkZ.
+                              For DarkZ (all DM masses) and for electron Brem (DM masses below 1 MeV) processes the parameter Threshold is now treated
+                              not only as a minimal parent particle energy, but also as a minimal emitted DM energy. This significantly improves
+                              the efficiency of simulation sample production. 
                               Small bugs fixed in K-factor tables. K-factors tables below 1 Mev extended for other DM types. This is the last version
                               before the major reorganization of the code.
 
