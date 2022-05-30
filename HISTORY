@@ -20,7 +20,9 @@
 06.09.2021   Version 1.1      Moved to using the analytical formula for the "flux" in the electron beams. Cross section drops because of this, it was
                               overestimated in the previous code because of a bug. Enable simulation of Dark Photons with the mass below 1 MeV.
 
-30.06.2021   Version 1.0      Move to WW formulas in Muon Brems. process (Z' emission)
+30.06.2021   Version 1.0      Unlike electron beams, where IWW approximation is used, we moved to WW formulas in Muon Bremsstrahlung process (Z' emission).
+                              In this approximation the total cross sections are in good agreement with the ETL calculations (within 1 - 2%), so K-factors
+                              are not needed. 
 
 26.04.2021   Version Beta 3   All simulations are now made with correct Xmax. There is now maximal DM particle mass that can be simulated (1 GeV now)
 
