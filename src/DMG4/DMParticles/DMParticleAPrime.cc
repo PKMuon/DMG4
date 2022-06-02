@@ -24,7 +24,8 @@ DMParticleAPrime* DMParticleAPrime::Definition()
   G4double DecayType = DMpar->GetRegisteredParam("DecayType");  
   G4double BranchingType = DMpar->GetRegisteredParam("BranchingType", 0);
 
-  const G4String name = "DMParticleAPrime";
+  G4String name = "DMParticleAPrime";
+  const G4String nameSubType = "DMParticleAPrime";
   // search in particle table]
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition * anInstance = pTable->FindParticle(name);
@@ -48,9 +49,11 @@ DMParticleAPrime* DMParticleAPrime::Definition()
     isStable = false;
     if (BranchingType == 0) { // X boson with visible decays
       if(MassIn < 2.001*electron_mass_c2) isStable = true;
-      WidthIn =
-        isStable ? 0 : (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.+2.*RatioEA2);
-      IDPDG = 5500122;
+      if(!isStable) {
+        WidthIn = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.+2.*RatioEA2);
+        IDPDG = 5500122;
+        name = "DMParticleXBoson";
+      }
     } else if (BranchingType == 1) { // B-L Z' boson with coupling to all SM particles
       if(MassIn > 600.) {G4cout << "Branching ratios for this BranchingType and this mass are not yet implemented, exiting" << G4endl; exit(1);}
       nuWidth = epsilIn*epsilIn*CLHEP::fine_structure_const*MassIn;
@@ -71,6 +74,7 @@ DMParticleAPrime* DMParticleAPrime::Definition()
       muBrRatio = muWidth/WidthIn;
       hBrRatio = hWidth/WidthIn;
       IDPDG = 5500222;
+      name = "DMParticleB-LBoson";
     } else {
       G4cout << "BranchingType = " << BranchingType << " is not implemented, exiting" << G4endl;
       exit(1);
@@ -97,7 +101,7 @@ DMParticleAPrime* DMParticleAPrime::Definition()
         /* lifetime.................. */ 0,
         /* decay table .............. */ NULL,
         /* shortlived ............... */ false,
-        /* subType .................. */ "DMParticleAPrime",
+        /* subType .................. */ nameSubType,
         /* anti particle encoding ... */ IDPDG
           );
 

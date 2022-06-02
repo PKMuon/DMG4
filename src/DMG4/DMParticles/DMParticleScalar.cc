@@ -21,19 +21,22 @@ DMParticleScalar* DMParticleScalar::Definition()
   G4double epsilIn   = DMpar->GetRegisteredParam("Epsilon");
   G4double DecayType = DMpar->GetRegisteredParam("DecayType");
 
-  const G4String name = "DMParticleScalar";
+  G4String name = "DMParticleScalar";
+  const G4String nameSubType = "DMParticleScalar";
   // search in particle table]
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition * anInstance = pTable->FindParticle(name);
   G4double RatioEA2 = electron_mass_c2*electron_mass_c2/(MassIn*MassIn);
   G4bool isStable = DecayType > 0 ? false : true;
   if(MassIn < 2.001*electron_mass_c2) isStable = true;
-  G4double WidthIn =
-    isStable ? 0 : (1./2.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.-4.*RatioEA2);
 
   G4int IDPDG = 5400022; // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
-  if(DecayType > 0) IDPDG = 5400122;
-
+  G4double WidthIn = 0.;
+  if(!isStable) {
+    WidthIn = (1./2.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.-4.*RatioEA2);
+    IDPDG = 5400122;
+    name = "DMParticleXScalar";
+  }
   if( !anInstance ) {
     anInstance = new G4ParticleDefinition(
         /* Name ..................... */ name,
@@ -54,7 +57,7 @@ DMParticleScalar* DMParticleScalar::Definition()
         /* lifetime.................. */ 0,
         /* decay table .............. */ NULL,
         /* shortlived ............... */ false,
-        /* subType .................. */ "DMParticleScalar",
+        /* subType .................. */ nameSubType,
         /* anti particle encoding ... */ IDPDG
           );
   }

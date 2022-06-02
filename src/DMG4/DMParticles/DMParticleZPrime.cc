@@ -21,7 +21,8 @@ DMParticleZPrime* DMParticleZPrime::Definition()
   G4double epsilIn   = DMpar->GetRegisteredParam("Epsilon");
   G4double DecayType = DMpar->GetRegisteredParam("DecayType");
 
-  const G4String name = "DMParticleZPrime";
+  G4String name = "DMParticleZPrime";
+  const G4String nameSubType = "DMParticleZPrime";
   // search in particle table]
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition * anInstance = pTable->FindParticle(name);
@@ -42,11 +43,13 @@ DMParticleZPrime* DMParticleZPrime::Definition()
   }
   nuBrRatio = 1. - muBrRatio;
   G4bool isStable = DecayType > 0 ? false : true;
-  WidthIn = isStable ? 0 : nuWidth + muWidth;
 
   G4int IDPDG = 5500023; // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
-  if(DecayType > 0) IDPDG = 5500123;
-
+  if(!isStable) {
+    WidthIn = nuWidth + muWidth;
+    IDPDG = 5500123;
+    name = "DMParticleZPrimeVis";
+  }
   if( !anInstance ) {
     anInstance = new G4ParticleDefinition(
         /* Name ..................... */ name,
@@ -67,7 +70,7 @@ DMParticleZPrime* DMParticleZPrime::Definition()
         /* lifetime.................. */ 0,
         /* decay table .............. */ NULL,
         /* shortlived ............... */ false,
-        /* subType .................. */ "DMParticleZPrime",
+        /* subType .................. */ nameSubType,
         /* anti particle encoding ... */ IDPDG
           );
     if(!isStable)

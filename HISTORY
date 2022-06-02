@@ -1,10 +1,11 @@
 31.05.2022   Version 2.0      Reorganization of the DMG4 code. The number of DM particle singletons is reduced, the corresponding codes put in a subdirectory.
                               The class DarkMatterParametersFactory is added in order to specify different decay options in the same particle constructor.
                               This way a possibility of a B-L vector particle is added (can decay to SM particles, for example e+e-, mu+mu-).
+                              Particle name and PDG ID now depend on stability and on BranchingType. Particle subtype name is only one per constructor.
                               Further optimisation of the sampling limits for DarkZ
                               A few bugs fixed in the cross section tables, the smooth transition between the mass regions below and above the mass of 1 MeV
                               is ensured.
-                              K-factors extended above the mass of 1 GeV for some particles.
+                              K-factors extended above the mass of 1 GeV up to 3 GeV for some particles.
                               A minor bug is fixed in the processes (small energy non-conservation due to inconsistent usage of total and kinetic energies)
 
 18.03.2022   Version 1.2      Analytical expression for ds/dx in WW approximation is implemented for DarkZ (muon beam).

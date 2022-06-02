@@ -21,19 +21,22 @@ DMParticleAxial* DMParticleAxial::Definition()
   G4double epsilIn   = DMpar->GetRegisteredParam("Epsilon");
   G4double DecayType = DMpar->GetRegisteredParam("DecayType");
 
-  const G4String name = "DMParticleAxial";
+  G4String name = "DMParticleAxial";
+  const G4String nameSubType = "DMParticleAxial";
   // search in particle table]
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition * anInstance = pTable->FindParticle(name);
   G4double RatioEA2 = electron_mass_c2*electron_mass_c2/(MassIn*MassIn);
   G4bool isStable = DecayType > 0 ? false : true;
   if(MassIn < 2.001*electron_mass_c2) isStable = true;
-  G4double WidthIn =
-    isStable ? 0 : (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.-4.*RatioEA2);
 
   G4int IDPDG = 5510022; // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
-  if(DecayType > 0) IDPDG = 5510122;
-
+  G4double WidthIn = 0.;
+  if(!isStable) {
+    WidthIn = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.-4.*RatioEA2);
+    IDPDG = 5510122;
+    name = "DMParticleXAxial";
+  }
   if( !anInstance ) {
     anInstance = new G4ParticleDefinition(
         /* Name ..................... */ name,
@@ -54,7 +57,7 @@ DMParticleAxial* DMParticleAxial::Definition()
         /* lifetime.................. */ 0,
         /* decay table .............. */ NULL,
         /* shortlived ............... */ false,
-        /* subType .................. */ "DMParticleAxial",
+        /* subType .................. */ nameSubType,
         /* anti particle encoding ... */ IDPDG
           );
 
