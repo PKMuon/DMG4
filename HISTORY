@@ -1,4 +1,4 @@
-31.05.2022   Version 2.0      Reorganization of the DMG4 code. The number of DM particle singletons is reduced, the corresponding codes put in a subdirectory.
+02.06.2022   Version 2.0      Reorganization of the DMG4 code. The number of DM particle singletons is reduced, the corresponding codes put in a subdirectory.
                               The class DarkMatterParametersFactory is added in order to specify different decay options in the same particle constructor.
                               This way a possibility of a B-L vector particle is added (can decay to SM particles, for example e+e-, mu+mu-).
                               Particle name and PDG ID now depend on stability and on BranchingType. Particle subtype name is only one per constructor.
