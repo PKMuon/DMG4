@@ -39,10 +39,12 @@ DMParticleAPrime* DMParticleAPrime::Definition()
   G4double eWidth = 0.;
   G4double muWidth = 0.;
   G4double hWidth = 0.;
+  G4double Chi12Width = 0.;
   G4double nuBrRatio = 0.;
   G4double eBrRatio = 0.;
   G4double muBrRatio = 0.;
   G4double hBrRatio = 0.;
+  G4double Chi12BrRatio = 0.;
   G4int IDPDG = 5500022; // Totally invisible A' PDG ID, can be redefined below for different decays
                          // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
   if(DecayType) {
@@ -75,6 +77,23 @@ DMParticleAPrime* DMParticleAPrime::Definition()
       hBrRatio = hWidth/WidthIn;
       IDPDG = 5500222;
       name = "DMParticleB-LBoson";
+    } else if (BranchingType == 2) { // Inelastic DM: decay to Chi2 + Chi1
+      const G4double MChi1 =   DMpar->GetRegisteredParam("MassChi1")*GeV;
+      const G4double MChi2 =   DMpar->GetRegisteredParam("MassChi2")*GeV;
+      const G4double AlphaD =  DMpar->GetRegisteredParam("AlphaD");
+      const G4double Delta =   DMpar->GetRegisteredParam("MassSplitting")*GeV;
+      if(MassIn > 2.*electron_mass_c2) eWidth = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.+2.*RatioEA2);
+      if (MassIn > MChi1+MChi2) {
+        Chi12Width = AlphaD*MassIn/6.*sqrt(1.+MChi1*MChi1/(MassIn*MassIn)*(Delta*Delta/(MassIn*MassIn)*(Delta/MChi1+2.)*(Delta/MChi1+2.)-2.*
+                     (1.+(1.+Delta/MChi1)*(1.+Delta/MChi1))))*(2.-MChi1*MChi1/(MassIn*MassIn)*(1.+Delta*Delta/(MassIn*MassIn)*(2.+Delta/MChi1)*
+                     (2.+Delta/MChi1)+(1.+Delta/MChi1)*(1.+Delta/MChi1)-6.*(1.+Delta/MChi1)));
+      }
+      WidthIn = eWidth + Chi12Width;
+      if(WidthIn == 0.) isStable = true;
+      eBrRatio = eWidth/WidthIn;
+      Chi12BrRatio = Chi12Width/WidthIn;
+      IDPDG = 5500322;
+      name = "DMParticleInelasticBoson";
     } else {
       G4cout << "BranchingType = " << BranchingType << " is not implemented, exiting" << G4endl;
       exit(1);
@@ -140,6 +159,16 @@ DMParticleAPrime* DMParticleAPrime::Definition()
 
        for (G4int index = 0; index < 6; index++) table->Insert(mode[index]);
        delete [] mode;
+      }
+
+      if (BranchingType == 2) { // Inelastic DM: decay to Chi2 + Chi1
+
+        G4VDecayChannel** mode = new G4VDecayChannel*[2];
+        // DMParticleZPrime -> e+ + e-
+        mode[0] = new G4PhaseSpaceDecayChannel(name, eBrRatio, 2, "e+", "e-");
+        mode[1] = new G4PhaseSpaceDecayChannel(name, Chi12BrRatio, 2, "DMParticleChi1", "DMParticleChi2");
+        for (G4int index = 0; index < 2; index++) table->Insert(mode[index]);
+        delete [] mode;
       }
 
       anInstance->SetDecayTable(table);
