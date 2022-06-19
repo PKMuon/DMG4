@@ -41,7 +41,8 @@ link_directories (${PROJECT_SOURCE_DIR}/../lib)
 # Add the executable, and link it to the Geant4 and other libraries
 #
 add_executable(mkgeant4 ${sources})
-target_link_libraries(mkgeant4 DarkMatter DMG4 UtilsDM ${Geant4_LIBRARIES} ${GSL_LIBRARIES})
+#target_link_libraries(mkgeant4 DarkMatter DMG4 UtilsDM ${Geant4_LIBRARIES} ${GSL_LIBRARIES})
+target_link_libraries(mkgeant4 DMG4 UtilsDM ${Geant4_LIBRARIES} ${GSL_LIBRARIES})
 
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
