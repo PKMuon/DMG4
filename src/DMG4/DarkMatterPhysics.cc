@@ -23,6 +23,8 @@
 #include "DMParticleScalar.hh"
 #include "DMParticlePseudoScalar.hh"
 #include "DMParticleAxial.hh"
+#include "DMParticleChi1.hh"
+#include "DMParticleChi2.hh"
 
 #include "G4Electron.hh"
 #include "G4Positron.hh"
@@ -148,6 +150,8 @@ void DarkMatterPhysics::ConstructParticle()
   DMParticleScalar::Definition();
   DMParticlePseudoScalar::Definition();
   DMParticleAxial::Definition();
+  DMParticleChi1::Definition();
+  DMParticleChi2::Definition();
 }
 
 

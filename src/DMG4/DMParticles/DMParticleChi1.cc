@@ -16,7 +16,7 @@ DMParticleChi1* DMParticleChi1::Definition()
   }
   //get parameters from factory (NOTE: mass is parsed in GeV)
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
-  double MassChi1 = DMpar->GetRegisteredParam("MassChi1")*GeV;
+  double MassChi1 = (DMpar->GetRegisteredParam("DMMass")*GeV) * DMpar->GetRegisteredParam("RDM", 1./3.);
 
   const G4String name = "DMParticleChi1";
   // search in particle table
