@@ -150,8 +150,11 @@ void DarkMatterPhysics::ConstructParticle()
   DMParticleScalar::Definition();
   DMParticlePseudoScalar::Definition();
   DMParticleAxial::Definition();
-  DMParticleChi1::Definition();
-  DMParticleChi2::Definition();
+  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
+  if(DMpar->GetRegisteredParam("BranchingType", 0.) > 1.5) {
+    DMParticleChi1::Definition();
+    DMParticleChi2::Definition();
+  }
 }
 
 
