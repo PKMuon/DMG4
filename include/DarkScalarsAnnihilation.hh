@@ -9,7 +9,7 @@
 #define INCLUDE_DarkScalarsANNIHILATION_HH_
 
 class DarkMatter;
-
+class DarkMatterParametersFactory;
 
 class DarkScalarsAnnihilation : public DarkMatter
 {
@@ -17,7 +17,7 @@ class DarkScalarsAnnihilation : public DarkMatter
   public:
 
     DarkScalarsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn=1., double ANuclIn=207., double ZNuclIn=82.,
-                            double DensityIn=11.35, double epsilIn=0.0001, int IDecayIn=0,double rIn=1./3,double alphaDIn=0.5);
+                            double DensityIn=11.35, double epsilIn=0.0001, int IDecayIn=0,double alphaDIn=0.5);
 
     virtual ~DarkScalarsAnnihilation();
 
@@ -30,10 +30,13 @@ class DarkScalarsAnnihilation : public DarkMatter
     virtual void SetMA(double MAIn);
 
   private:
+    DarkMatterParametersFactory* DMpar;
+         int iBranchingType;
 
-    double r;
-    double alphaD;
-    double mChi;
+         double r;
+         double alphaD;
+         double mChi;
+         double mChi1,mChi2,deltaMchi;
 };
 
 #endif /* INCLUDE_DarkScalarsANNIHILATION_HH_ */

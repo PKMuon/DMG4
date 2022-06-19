@@ -10,94 +10,149 @@
 #include "Utils.hh"
 
 #include "G4Electron.hh" // to get CLHEP constants
+#include "DarkMatterParametersFactory.hh"
+#include "G4SystemOfUnits.hh"
 
 #include <iostream>
 #include <cmath>
 
+DarkScalarsAnnihilation::DarkScalarsAnnihilation(double MAIn, double EThreshIn,
+        double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
+        double epsilIn, int IDecayIn, double alphaDIn) :
+        DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn,
+                epsilIn, IDecayIn), alphaD(alphaDIn) {
+    DMType = 2; //A.C.
+    ParentPDGID = -11;
+    DaughterPDGID = 11;
 
-DarkScalarsAnnihilation::DarkScalarsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn,
-                                                 double DensityIn, double epsilIn, int IDecayIn, double rIn, double alphaDIn)
-: DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn),
-  r(rIn), alphaD(alphaDIn)
-{
-  DMType = 2; //A.C.
-  ParentPDGID = -11;
-  DaughterPDGID = 11;
-  mChi = MA * r;
-  std::cout << "Initialized DarkScalarsAnnihilation (e+ e- -> A' -> DM DM) for material density = " << DensityIn << std::endl;
-  std::cout << std::endl;
+    //default values
+
+    //A.C. use G4 internal units.
+    MA = MA * GeV;
+
+    r = 1. / 3;
+    mChi = MA / 3;
+    mChi1 = mChi;
+    mChi2 = mChi;
+
+    DMpar = DarkMatterParametersFactory::GetInstance();
+    if (DMpar) {
+        iBranchingType = (int) (DMpar->GetRegisteredParam("BranchingType", 0));
+    }
+
+    if (iBranchingType == 2) {
+        std::cerr
+                << " DarkScalarAnnihilation iBranchingType==2 not yet supported"
+                << std::endl;
+        exit(1);
+    }
+
+    if (iBranchingType == 2) {
+        mChi1 = DMpar->GetRegisteredParam("MassChi1") * GeV;
+        mChi2 = DMpar->GetRegisteredParam("MassChi2") * GeV;
+    } else {
+        r = DMpar->GetRegisteredParam("RDM", 1. / 3);
+        mChi = MA * r;
+        mChi2 = mChi;
+        mChi1 = mChi;
+    }
+
+    deltaMchi = mChi2 - mChi1;
+    std::cout
+            << "Initialized DarkScalarsAnnihilation (e+ e- -> A' -> DM DM) for material density = "
+            << DensityIn << std::endl;
+    std::cout << std::endl;
+
 }
 
-
-DarkScalarsAnnihilation::~DarkScalarsAnnihilation()
-{;}
-
+DarkScalarsAnnihilation::~DarkScalarsAnnihilation() {
+    ;
+}
 
 //Input: E0, positron energy in GeV
 //output: total annihilation cross-section in pbarn.
 //Since the framework assumes this method is returning the total cross section per nucleous, for the moment I scale this by Z.
-double DarkScalarsAnnihilation::TotalCrossSectionCalc(double E0)
-{
-  double ss = 2. * Mel * E0;
-  if (sqrt(ss) < 2.*mChi) return 0.;   // A.C. e+e- -> S -> chi chi can happen also for an S and chi with large mass,
-                                       // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
-  double qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
-  double gg = this->Width();
+double DarkScalarsAnnihilation::TotalCrossSectionCalc(double E0) {
 
-  double sigma = 4 * M_PI * alphaEW * epsil * epsil * alphaD;
-  sigma = sigma * qq / sqrt(ss);
-  sigma = sigma / ((ss - MA * MA) * (ss - MA * MA) + MA * MA * gg * gg);
+    E0 = E0 * GeV;
 
-  sigma = sigma * (2 * qq * qq);   // A.C. this is for final state fermions (default)
-  //sigma = sigma * (MA * MA)/4;   // A.C. this is for final state scalars
+    double ss = 2. * CLHEP::electron_mass_c2 * E0;
+    if (sqrt(ss) < 2. * mChi)
+        return 0.; // A.C. e+e- -> S -> chi chi can happen also for an S and chi with large mass,
+                   // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
+    double qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
+    double gg = this->Width();
 
-  sigma = sigma * GeVtoPb;
+    double sigma = 4 * M_PI * alphaEW * epsil * epsil * alphaD;
+    sigma = sigma * qq / sqrt(ss);
 
-  //A.C. correct here for atomic effects
-  sigma = sigma * ZNucl;
-  return sigma;
+    sigma = sigma / ((ss - MA * MA) * (ss - MA * MA) + MA * MA * gg * gg);
+
+    switch (iBranchingType) {
+    case 0:
+        sigma = sigma * (2 * qq * qq); // A.C. this is for final state fermions (default)
+        break;
+    case 1:
+        sigma = sigma * (MA * MA) / 4;   // A.C. this is for final state scalars
+        break;
+    }
+
+    //here sigma is in G4 internal units, 1 /Energy^2. Move to pBarn;
+    sigma = sigma * CLHEP::hbarc_squared;
+    sigma = sigma / CLHEP::picobarn;
+
+    //A.C. correct here for atomic effects
+    sigma = sigma * ZNucl;
+    return sigma;
 }
-
 
 double DarkScalarsAnnihilation::GetSigmaTot(double E0) {
-  return TotalCrossSectionCalc(E0);
+    return TotalCrossSectionCalc(E0);
 }
-
 
 bool DarkScalarsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
-{
-  if (sqrt(2.*Mel*E0) < 2.*mChi) return false;
-  if(E0 < EThresh) return false;
-  if(NEmissions) return false; // For G4 DM classes
-  if(fabs(DensityMat - Density) > 0.1) return false;
-  return true;
-}
+        {
 
+    E0=E0*GeV;
+
+    if (sqrt(2. * CLHEP::electron_mass_c2 * E0) < 2. * mChi)
+        return false;
+    if (E0 < EThresh)
+        return false;
+    if (NEmissions)
+        return false; // For G4 DM classes
+    if (fabs(DensityMat - Density) > 0.1)
+        return false;
+    return true;
+}
 
 double DarkScalarsAnnihilation::CrossSectionDSDX(double XEv, double E0) {
-  if (XEv > 0.9999) return 1.;
-  return 0.;
+    if (XEv > 0.9999)
+        return 1.;
+    return 0.;
 }
 
-
-double DarkScalarsAnnihilation::CrossSectionDSDXDU(double XEv, double UThetaEv, double E0) {
-  if (XEv > 0.9999) return 1.;
-  return 0.;
+double DarkScalarsAnnihilation::CrossSectionDSDXDU(double XEv, double UThetaEv,
+        double E0) {
+    if (XEv > 0.9999)
+        return 1.;
+    return 0.;
 }
-
 
 double DarkScalarsAnnihilation::Width() {
-  double ret;
-  ret = MA * epsil * epsil * alphaEW * 1. / 2;
-  if (MA/2. > mChi) {
-    ret += MA * alphaD * (1 - 4 * mChi * mChi / (MA * MA)) * sqrt(1 - 4 * mChi * mChi / (MA * MA)) / 2.;
-  }
-  return ret;
+    double ret;
+    ret = MA * epsil * epsil * alphaEW * 1. / 2;
+    if (MA / 2. > mChi) {
+        ret += MA * alphaD * (1 - 4 * mChi * mChi / (MA * MA))
+                * sqrt(1 - 4 * mChi * mChi / (MA * MA)) / 2.;
+    }
+    return ret;
 }
 
-
 void DarkScalarsAnnihilation::SetMA(double MAIn) {
-  std::cout << "DarkScalarsAnnihilation::SetMA was called with MAIn = " << MAIn << std::endl;
-  MA = MAIn;
-  mChi = MA * r;
+    std::cout << "DarkScalarsAnnihilation::SetMA was called with MAIn = "
+            << MAIn << std::endl;
+
+    MA = MAIn*GeV;
+    mChi = MA * r;
 }

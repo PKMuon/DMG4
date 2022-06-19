@@ -28,7 +28,7 @@ DMParticleAPrime* DMParticleAPrime::Definition()
   const G4String nameSubType = "DMParticleAPrime";
   // search in particle table]
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition * anInstance = pTable->FindParticle(name);
+  G4ParticleDefinition *anInstance = pTable->FindParticle(name);
   const G4double muMass = G4MuonMinus::MuonMinusDefinition()->GetPDGMass();
   const G4double pi0Mass = G4PionZero::PionZeroDefinition()->GetPDGMass();
   G4double RatioEA2 = electron_mass_c2*electron_mass_c2/(MassIn*MassIn);

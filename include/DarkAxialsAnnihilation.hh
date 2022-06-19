@@ -8,8 +8,8 @@
 #ifndef INCLUDE_DARKAXIALSANNIHILATION_HH_
 #define INCLUDE_DARKAXIALSANNIHILATION_HH_
 
-//class DarkMatter;
-
+class DarkMatter;
+class DarkMatterParametersFactory;
 
 class DarkAxialsAnnihilation : public DarkMatter
 {
@@ -17,7 +17,7 @@ class DarkAxialsAnnihilation : public DarkMatter
   public:
 
     DarkAxialsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn=1., double ANuclIn=207., double ZNuclIn=82.,
-                            double DensityIn=11.35, double epsilIn=0.0001, int IDecayIn=0,double rIn=1./3,double alphaDIn=0.5);
+                            double DensityIn=11.35, double epsilIn=0.0001, int IDecayIn=0,double alphaDIn=0.5);
 
     virtual ~DarkAxialsAnnihilation();
 
@@ -30,10 +30,13 @@ class DarkAxialsAnnihilation : public DarkMatter
     virtual void SetMA(double MAIn);
 
   private:
+    DarkMatterParametersFactory* DMpar;
+          int iBranchingType;
 
-    double r;
-    double alphaD;
-    double mChi;
+          double r;
+          double alphaD;
+          double mChi;
+          double mChi1,mChi2,deltaMchi;
 };
 
 #endif /* INCLUDE_DARKAXIALSANNIHILATION_HH_ */

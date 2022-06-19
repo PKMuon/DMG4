@@ -11,18 +11,47 @@
 #include "Utils.hh"
 
 #include "G4Electron.hh" // to get CLHEP constants
-
+#include "DarkMatterParametersFactory.hh"
+#include "G4SystemOfUnits.hh"
 #include <iostream>
 #include <cmath>
 
-DarkAxialsAnnihilation::DarkAxialsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn, double epsilIn, int IDecayIn, double rIn, double alphaDIn) :
-        DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn), r(rIn), alphaD(alphaDIn) {
+DarkAxialsAnnihilation::DarkAxialsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn, double epsilIn, int IDecayIn,double alphaDIn) :
+        DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn), alphaD(alphaDIn) {
     DMType = 3; //A.C.
     ParentPDGID = -11;
     DaughterPDGID = 11;
-    mChi = MA * r;
-    std::cout << "Initialized DarkAxialsAnnihilation (e+ e- -> A' -> DM DM) for material density = " << DensityIn << std::endl;
-    std::cout << std::endl;
+
+    //default values
+      r=1./3;
+      mChi = MAIn/3;
+      mChi1=mChi;
+      mChi2=mChi;
+
+
+      DMpar = DarkMatterParametersFactory::GetInstance();
+      if (DMpar){
+          iBranchingType = (int)(DMpar->GetRegisteredParam("BranchingType", 0));
+      }
+
+      if (iBranchingType!=0){
+          std::cerr <<" DarkAxialAnnihilation iBranchingType!=0 not yet supported"<<std::endl;
+          exit(1);
+      }
+
+      if (iBranchingType==2){
+          mChi1=DMpar->GetRegisteredParam("MassChi1")*GeV;
+          mChi2=DMpar->GetRegisteredParam("MassChi2")*GeV;
+      }else{
+          r=DMpar->GetRegisteredParam("RDM", 1./3);
+          mChi = MA * r;
+          mChi1=mChi;
+          mChi2=mChi;
+      }
+
+      deltaMchi=mChi2-mChi1;
+      std::cout << "Initialized DarkAxialAnnihilation (e+ e- -> A' -> DM DM) for material density = " << DensityIn << std::endl;
+      std::cout << std::endl;
 }
 
 DarkAxialsAnnihilation::~DarkAxialsAnnihilation() {
@@ -33,7 +62,9 @@ DarkAxialsAnnihilation::~DarkAxialsAnnihilation() {
 //output: total annihilation cross-section in pbarn.
 //Since the framework assumes this method is returning the total cross section per nucleous, for the moment I scale this by Z.
 double DarkAxialsAnnihilation::TotalCrossSectionCalc(double E0) {
-    double ss = 2. * Mel * E0;
+    E0=E0*GeV;
+    double ss = 2. * CLHEP::electron_mass_c2 * E0;
+
     if (sqrt(ss) < 2. * mChi) return 0.;   // A.C. e+e- -> A' -> chi chi can happen also for an A' and chi with large mass,
                                            // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
     double qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
@@ -45,7 +76,9 @@ double DarkAxialsAnnihilation::TotalCrossSectionCalc(double E0) {
 
     sigma = sigma * (8. / 3. * qq * qq); // A.C. this is for final state fermions (default)
 
-    sigma = sigma * GeVtoPb;
+    //here sigma is in G4 internal units, 1 /Energy^2. Move to pBarn;
+    sigma = sigma * CLHEP::hbarc_squared;
+    sigma = sigma / CLHEP::picobarn;
 
     //A.C. correct here for atomic effects
     sigma = sigma * ZNucl;
@@ -58,7 +91,7 @@ double DarkAxialsAnnihilation::GetSigmaTot(double E0) {
 
 bool DarkAxialsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
         {
-    if (sqrt(2. * Mel * E0) < 2. * mChi) return false;
+    if (sqrt(2. *CLHEP::electron_mass_c2 * E0) < 2. * mChi) return false;
     if (E0 < EThresh) return false;
     if (NEmissions) return false; // For G4 DM classes
     if (fabs(DensityMat - Density) > 0.1) return false;
@@ -86,6 +119,6 @@ double DarkAxialsAnnihilation::Width() {
 
 void DarkAxialsAnnihilation::SetMA(double MAIn) {
     std::cout << "DarkAxialsAnnihilation::SetMA was called with MAIn = " << MAIn << std::endl;
-    MA = MAIn;
+    MA = MAIn*GeV;
     mChi = MA * r;
 }

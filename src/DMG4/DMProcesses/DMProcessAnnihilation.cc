@@ -5,9 +5,18 @@
 
 #include "DMParticleAPrime.hh"
 
+#include "DMParticleChi.hh"
+#include "DMParticleChi1.hh"
+#include "DMParticleChi2.hh"
+
+
 #include "G4ProcessType.hh"
 #include "G4EmProcessSubType.hh"
 #include "G4SystemOfUnits.hh"
+
+
+#include "DarkMatterParametersFactory.hh"
+
 
 
 DMProcessAnnihilation::DMProcessAnnihilation(DarkMatter* DarkMatterPointerIn, G4ParticleDefinition* theDMParticlePtrIn,
@@ -15,9 +24,27 @@ DMProcessAnnihilation::DMProcessAnnihilation(DarkMatter* DarkMatterPointerIn, G4
 : G4VDiscreteProcess( "DMProcessAnnihilation", fUserDefined ),  // fElectromagnetic
   myDarkMatter(DarkMatterPointerIn),
   theDMParticlePtr(theDMParticlePtrIn),
-  BiasSigmaFactor(BiasSigmaFactorIn)
+  BiasSigmaFactor(BiasSigmaFactorIn),
+  DMpar(0),
+  iBranchingType(0),
+  mChi(0),
+  mChi1(0),
+  mChi2(0)
 {
   SetProcessSubType( 1 ); //fBremsstrahlung? // TODO: verify this
+
+  DMpar = DarkMatterParametersFactory::GetInstance();
+  if (DMpar){
+      iBranchingType=(int)DMpar->GetRegisteredParam("BranchingType");
+
+      if (iBranchingType==0){
+          mChi=DMpar->GetRegisteredParam("RDM")*myDarkMatter->GetMA()*GeV;
+      }
+      else{
+          mChi1=DMpar->GetRegisteredParam("MassChi1")*GeV;
+          mChi2=DMpar->GetRegisteredParam("MassChi2")*GeV;
+      }
+  }
 }
 
 G4bool DMProcessAnnihilation::IsApplicable(const G4ParticleDefinition & pDef)
@@ -51,43 +78,152 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt( const G4Track& aTrack,
   //const G4double DMMass = theDMParticleAPrimePtr->GetPDGMass();
   G4ThreeVector incidentDir = aTrack.GetMomentumDirection();
 
-  G4double XAcc, angles[2];
-  XAcc = myDarkMatter->SimulateEmission(incidentE/GeV, angles);
+  //For the e+e- --> R --> ff process, the only relevant variable is the cosine of the angle of the f in the CM frame.
 
-  // Check if it failed? In this case XAcc = 0
+  //Do not simulate the decay.
+  if(myDarkMatter->Decay()==0) {
+      G4ThreeVector DMDirection=incidentDir;
+      G4double DME = incidentE;
+      G4double DMM = myDarkMatter->GetMA()*GeV;
+      G4double DMKinE = incidentE - DMM;
+      G4DynamicParticle* movingDM = new G4DynamicParticle( theDMParticlePtr,
+                                                            DMDirection,
+                                                            DMKinE );
+       aParticleChange.Initialize( aTrack );
 
-  if(XAcc > 0.001) myDarkMatter->EmissionSimulated();
+       // Set DM:
+       aParticleChange.SetNumberOfSecondaries( 1 );
+       aParticleChange.AddSecondary( movingDM );
+       // Kill projectile:
+       aParticleChange.ProposeEnergy( 0. );
+       aParticleChange.ProposeTrackStatus( fStopAndKill ) ;
 
-  G4double DMTheta = angles[0], DMPhi = angles[1];
-  G4double DME = incidentE * XAcc;
-  G4double DMM = myDarkMatter->GetMA()*GeV;
-  G4double DMKinE = DME - DMM;
-  if(DMKinE < 0.) DMKinE = 0.;
+       std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding()
+                 << " emitted by " << aTrack.GetDefinition()->GetParticleName()
+                 << " with energy = " << incidentE/GeV << " DM energy = " << DME/GeV << std::endl;
 
-  // Initialize DM direction vector:
-  G4ThreeVector DMDirection(0., 0., .1);
-  {
-    DMDirection.setMag(1.);
-    DMDirection.setTheta( DMTheta );
-    DMDirection.setPhi( DMPhi );
-    DMDirection.rotateUz(incidentDir);
+       return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
   }
-  
-  G4DynamicParticle* movingDM = new G4DynamicParticle( theDMParticlePtr,
-                                                       DMDirection,
-                                                       DMKinE );
-  aParticleChange.Initialize( aTrack );
+  else{ //simulate the decay e+e- -->A' -->ff
 
-  // Set DM:
-  aParticleChange.SetNumberOfSecondaries( 1 );
-  aParticleChange.AddSecondary( movingDM );
-  // Kill projectile:
-  aParticleChange.ProposeEnergy( 0. );
-  aParticleChange.ProposeTrackStatus( fStopAndKill ) ;
+      if( myDarkMatter->GetDMType() == 1){ //dark photon
 
-  std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding() 
-            << " emitted by " << aTrack.GetDefinition()->GetParticleName()
-            << " with energy = " << incidentE/GeV << " DM energy = " << DME/GeV << std::endl;
+          //1: Get the cosine of the final state f in the CM frame.
+          G4double DMeta_CM=myDarkMatter->SimulateEmissionResonant(incidentE);
+          //2: Get the phi angle of the final state f in the CM frame
+          G4double DMphi_CM=G4UniformRand()*2*CLHEP::pi;
+          //3: Define the Lorentz Vector of the CM (e+ + e-)
+          G4LorentzVector vCM(aTrack.GetMomentum(),aTrack.GetTotalEnergy()+CLHEP::electron_mass_c2);
 
-  return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
+          G4double ss=2*(incidentE)*CLHEP::electron_mass_c2+2*CLHEP::electron_mass_c2*CLHEP::electron_mass_c2;
+          G4double Pcm,Px_cm,Py_cm,Pz_cm;
+          switch(iBranchingType){
+              case 0: //fermionic and scalar elastic
+              case 1:
+              {
+                  G4double Ecm=sqrt(ss)/2;
+                  Pcm=sqrt(Ecm*Ecm-mChi*mChi);
+
+                  Px_cm=Pcm*sqrt(1-DMeta_CM*DMeta_CM)*sin(DMphi_CM);
+                  Py_cm=Pcm*sqrt(1-DMeta_CM*DMeta_CM)*cos(DMphi_CM);
+                  Pz_cm=Pcm*DMeta_CM;
+
+                  //The two lorentz vectors in the CM frame
+                  G4LorentzVector v1(Px_cm,Py_cm,Pz_cm,Ecm);
+                  G4LorentzVector v2(-Px_cm,-Py_cm,-Pz_cm,Ecm);
+
+                  v1.boost(vCM.boostVector());
+                  v2.boost(vCM.boostVector());
+
+                  G4DynamicParticle* movingDM1 = new G4DynamicParticle(DMParticleChi::Definition(),v1.vect());
+                  G4DynamicParticle* movingDM2 = new G4DynamicParticle(DMParticleChi::Definition(),v2.vect());
+
+                  aParticleChange.Initialize( aTrack );
+
+                  // Set DM:
+                  aParticleChange.SetNumberOfSecondaries( 2 );
+                  aParticleChange.AddSecondary( movingDM1);
+                  aParticleChange.AddSecondary( movingDM2);
+
+                  // Kill projectile:
+                  aParticleChange.ProposeEnergy( 0. );
+                  aParticleChange.ProposeTrackStatus( fStopAndKill ) ;
+
+                  std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding()
+                                         << " emitted by " << aTrack.GetDefinition()->GetParticleName()
+                                 << " with energy = " << incidentE/GeV << " DM total energy = " <<incidentE/GeV << std::endl;
+
+                  return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
+
+                  break;
+              }
+              case 2: //asymmetric DM
+              {
+
+                  G4double Ecm1=(ss+mChi1*mChi1-mChi2*mChi2)/(2*sqrt(ss));
+                  G4double Ecm2=(ss-mChi1*mChi1+mChi2*mChi2)/(2*sqrt(ss));
+
+                  Pcm=sqrt(Ecm1*Ecm1-mChi1*mChi1);
+                  Px_cm=Pcm*sqrt(1-DMeta_CM*DMeta_CM)*sin(DMphi_CM);
+                  Py_cm=Pcm*sqrt(1-DMeta_CM*DMeta_CM)*cos(DMphi_CM);
+                  Pz_cm=Pcm*DMeta_CM;
+
+                  //The two lorentz vectors in the CM frame
+                  G4LorentzVector v1(Px_cm,Py_cm,Pz_cm,Ecm1);
+                  G4LorentzVector v2(-Px_cm,-Py_cm,-Pz_cm,Ecm2);
+
+                  v1.boost(vCM.boostVector());
+                  v2.boost(vCM.boostVector());
+
+                  G4DynamicParticle* movingDM1 = new G4DynamicParticle(DMParticleChi1::Definition(),v1.vect());
+                  G4DynamicParticle* movingDM2 = new G4DynamicParticle(DMParticleChi2::Definition(),v2.vect());
+
+                  aParticleChange.Initialize( aTrack );
+
+                  // Set DM:
+                  aParticleChange.SetNumberOfSecondaries( 2 );
+                  aParticleChange.AddSecondary( movingDM1);
+                  aParticleChange.AddSecondary( movingDM2);
+
+                  // Kill projectile:
+                  aParticleChange.ProposeEnergy( 0. );
+                  aParticleChange.ProposeTrackStatus( fStopAndKill ) ;
+
+                  std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding()
+                            << " emitted by " << aTrack.GetDefinition()->GetParticleName()
+                            << " with energy = " << incidentE/GeV << " DM total energy = " <<incidentE/GeV << std::endl;
+
+                  return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
+
+                  break;
+              }
+          }
+      }//end DMtype==1
+      else{
+          G4cout<<"DMProcessAnnihilation::PostStepDoIt DMType== "<< myDarkMatter->GetDMType()<<G4endl;
+          G4cout<<"The decay to final state LDM particles is not yet implemented "<<G4endl;
+          //revert to Decay()==0a
+          G4ThreeVector DMDirection=incidentDir;
+          G4double DME = incidentE;
+          G4double DMM = myDarkMatter->GetMA()*GeV;
+          G4double DMKinE = incidentE - DMM;
+          G4DynamicParticle* movingDM = new G4DynamicParticle( theDMParticlePtr,
+                                                                      DMDirection,
+                                                                      DMKinE );
+          aParticleChange.Initialize( aTrack );
+
+          // Set DM:
+          aParticleChange.SetNumberOfSecondaries( 1 );
+          aParticleChange.AddSecondary( movingDM );
+          // Kill projectile:
+          aParticleChange.ProposeEnergy( 0. );
+          aParticleChange.ProposeTrackStatus( fStopAndKill ) ;
+
+          std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding()
+                    << " emitted by " << aTrack.GetDefinition()->GetParticleName()
+                    << " with energy = " << incidentE/GeV << " DM energy = " << DME/GeV << std::endl;
+
+          return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
+      }
+  }
 }
