@@ -81,7 +81,9 @@ DMParticleAPrime* DMParticleAPrime::Definition()
       const G4double MChi1 =   DMpar->GetRegisteredParam("MassChi1")*GeV;
       const G4double MChi2 =   DMpar->GetRegisteredParam("MassChi2")*GeV;
       const G4double AlphaD =  DMpar->GetRegisteredParam("AlphaD");
-      const G4double Delta =   DMpar->GetRegisteredParam("MassSplitting")*GeV;
+      const G4double Delta =   DMpar->GetRegisteredParam("MassSplitting")*GeV; //A.C. is this really necessary???
+
+
       if(MassIn > 2.*electron_mass_c2) eWidth = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.+2.*RatioEA2);
       if (MassIn > MChi1+MChi2) {
         Chi12Width = AlphaD*MassIn/6.*sqrt(1.+MChi1*MChi1/(MassIn*MassIn)*(Delta*Delta/(MassIn*MassIn)*(Delta/MChi1+2.)*(Delta/MChi1+2.)-2.*

@@ -164,13 +164,28 @@ void DarkMatterPhysics::ConstructParticle()
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
 
   G4int DMProcessType = DMpar->GetRegisteredParam("DMProcessType");
+  G4int DecayType = DMpar->GetRegisteredParam("DecayType");
   switch(DMProcessType){
-      case 11:
+
+      case 1:  //dark-photon bremmstrahlung
+          if (DecayType==0){ //Only invisible, do nothing
+
+          }
+          else{  //Require final state particles
+              G4int BranchingType = DMpar->GetRegisteredParam("BranchingType");
+              if (BranchingType==2){
+                  DMParticleChi1::Definition();
+                  DMParticleChi2::Definition();
+              }
+          }
+          break;
+
+      case 11: //annihilation processes
       case 12:
       case 13:
       case 14:
       {
-          G4int DecayType = DMpar->GetRegisteredParam("DecayType");
+
           if (DecayType==0){ //Only invisible, do nothing
 
           }

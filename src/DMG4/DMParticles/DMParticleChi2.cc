@@ -39,8 +39,8 @@ DMParticleChi2* DMParticleChi2::Definition()
   // calculate the width
   const G4double K = 0.640;
   G4double WidthIn = K*4.*Epsilon*Epsilon*fine_structure_const*AlphaD*pow(Splitting,5.)/(15.*CLHEP::pi*pow(DMMass,4.));
-  std::cout << "Mass Chi2: " << MassChi2 << std::endl;
-  std::cout << "===> Width Chi2->chi1ee " << WidthIn << std::endl;
+  std::cout << "Mass Chi2: " << MassChi2/MeV << " MeV " <<std::endl;
+  std::cout << "===> Width Chi2->chi1ee " << WidthIn/MeV <<" MeV "<< std::endl;
 
   if( !anInstance ) {
     anInstance = new G4ParticleDefinition(
@@ -70,7 +70,7 @@ DMParticleChi2* DMParticleChi2::Definition()
     ((DMParticle*)anInstance)->CalculateLifeTime();
 
     double lifetime =((DMParticle*)anInstance)->GetPDGLifeTime();
-    std::cout << "===> Lifetime Chi2 " << lifetime/s << std::endl;
+    std::cout << "===> Lifetime Chi2 " << lifetime/s <<" s, c*tau: "<<(lifetime*CLHEP::c_light)/cm <<" cm "<< std::endl;
 
     // create decay table and add modes
     G4DecayTable* table = new G4DecayTable();
