@@ -38,8 +38,9 @@ DarkPhotonsAnnihilation::DarkPhotonsAnnihilation(double MAIn, double EThreshIn, 
       iBranchingType = (int)(DMpar->GetRegisteredParam("BranchingType", 0));
   }
   if (iBranchingType==2){
-      mChi1=DMpar->GetRegisteredParam("MassChi1")*GeV;
-      mChi2=DMpar->GetRegisteredParam("MassChi2")*GeV;
+      r = DMpar->GetRegisteredParam("RDM", 1. / 3);
+      mChi1 = MA * r;
+      mChi2 = (1. + DMpar->GetRegisteredParam("Ffactor")) * mChi1;
   }else{
       r=DMpar->GetRegisteredParam("RDM", 1./3);
       mChi = MA * r;

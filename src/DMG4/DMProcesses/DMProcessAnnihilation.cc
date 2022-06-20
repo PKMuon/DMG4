@@ -41,8 +41,9 @@ DMProcessAnnihilation::DMProcessAnnihilation(DarkMatter* DarkMatterPointerIn, G4
           mChi=DMpar->GetRegisteredParam("RDM")*myDarkMatter->GetMA();
       }
       else{
-          mChi1=DMpar->GetRegisteredParam("MassChi1")*GeV;
-          mChi2=DMpar->GetRegisteredParam("MassChi2")*GeV;
+          double r = DMpar->GetRegisteredParam("RDM", 1. / 3);
+          mChi1 = myDarkMatter->GetMA() * r;
+          mChi2 = (1. + DMpar->GetRegisteredParam("Ffactor")) * mChi1;
       }
   }
 }
