@@ -126,5 +126,15 @@ double DarkPseudoScalarsAnnihilation::Width() {
 void DarkPseudoScalarsAnnihilation::SetMA(double MAIn) {
     std::cout << "DarkPseudoScalarsAnnihilation::SetMA was called with MAIn = " << MAIn << std::endl;
     MA = MAIn*GeV;
-    mChi = MA * r;
+    iBranchingType = (int)(DMpar->GetRegisteredParam("BranchingType", 0));
+    if (iBranchingType==2){
+        r = DMpar->GetRegisteredParam("RDM", 1. / 3);
+        mChi1 = MA * r;
+        mChi2 = (1. + DMpar->GetRegisteredParam("Ffactor")) * mChi1;
+    }else{
+        r=DMpar->GetRegisteredParam("RDM", 1./3);
+        mChi = MA * r;
+        mChi1=mChi;
+        mChi2=mChi;
+    }
 }

@@ -155,5 +155,14 @@ void DarkScalarsAnnihilation::SetMA(double MAIn) {
             << MAIn << std::endl;
 
     MA = MAIn*GeV;
-    mChi = MA * r;
+    if (iBranchingType==2){
+        r = DMpar->GetRegisteredParam("RDM", 1. / 3);
+        mChi1 = MA * r;
+        mChi2 = (1. + DMpar->GetRegisteredParam("Ffactor")) * mChi1;
+    }else{
+        r=DMpar->GetRegisteredParam("RDM", 1./3);
+        mChi = MA * r;
+        mChi1=mChi;
+        mChi2=mChi;
+    }
 }
