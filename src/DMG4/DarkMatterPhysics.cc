@@ -24,6 +24,10 @@
 #include "DMParticlePseudoScalar.hh"
 #include "DMParticleAxial.hh"
 
+#include "DMParticleChi.hh"
+#include "DMParticleChi1.hh"
+#include "DMParticleChi2.hh"
+
 #include "G4Electron.hh"
 #include "G4Positron.hh"
 #include "G4Gamma.hh"
@@ -71,6 +75,7 @@ void DarkMatterPhysics::Init(){
   //call an instance of the class
    DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
 
+
    G4double EThresh = DMpar->GetRegisteredParam("EThresh");
    G4int DMProcessType = DMpar->GetRegisteredParam("DMProcessType");
    double DMMass   = DMpar->GetRegisteredParam("DMMass");
@@ -79,6 +84,9 @@ void DarkMatterPhysics::Init(){
    G4double ZNucl     = DMpar->GetRegisteredParam("ZNucl");
    G4double Density   = DMpar->GetRegisteredParam("Density");
    G4int DecayType = DMpar->GetRegisteredParam("DecayType");
+
+
+
 
    switch(DMProcessType)
      {
@@ -148,6 +156,37 @@ void DarkMatterPhysics::ConstructParticle()
   DMParticleScalar::Definition();
   DMParticlePseudoScalar::Definition();
   DMParticleAxial::Definition();
+
+  /*A.C.
+   * The following lines are necessary to construct the particles that will be propagated for annihilation
+   *
+   */
+  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
+
+  G4int DMProcessType = DMpar->GetRegisteredParam("DMProcessType");
+  switch(DMProcessType){
+      case 11:
+      case 12:
+      case 13:
+      case 14:
+      {
+          G4int DecayType = DMpar->GetRegisteredParam("DecayType");
+          if (DecayType==0){ //Only invisible, do nothing
+
+          }
+          else{  //Require final state particles
+              G4int BranchingType = DMpar->GetRegisteredParam("BranchingType");
+              if ((BranchingType==0)||(BranchingType==1)){
+                  DMParticleChi::Definition();
+              }else
+                  DMParticleChi1::Definition();
+                  DMParticleChi2::Definition();
+          }
+          break;
+      }
+      default:
+          break;
+  }
 }
 
 

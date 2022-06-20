@@ -21,6 +21,8 @@ class DarkMatterParametersFactory
     void PrintListOfRegisteredParams();
     void DumpToFile(std::ofstream*);
 
+    bool ExistsRegisteredParam(std::string);
+
     void SetFactoryName(std::string factoryName) {fFactoryName = factoryName;}
 
   private:

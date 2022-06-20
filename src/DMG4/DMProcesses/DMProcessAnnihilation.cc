@@ -38,7 +38,7 @@ DMProcessAnnihilation::DMProcessAnnihilation(DarkMatter* DarkMatterPointerIn, G4
       iBranchingType=(int)DMpar->GetRegisteredParam("BranchingType");
 
       if (iBranchingType==0){
-          mChi=DMpar->GetRegisteredParam("RDM")*myDarkMatter->GetMA()*GeV;
+          mChi=DMpar->GetRegisteredParam("RDM")*myDarkMatter->GetMA();
       }
       else{
           mChi1=DMpar->GetRegisteredParam("MassChi1")*GeV;
@@ -58,12 +58,14 @@ G4double DMProcessAnnihilation::GetMeanFreePath( const G4Track& aTrack,
 {
   G4double DensityMat = aTrack.GetMaterial()->GetDensity()/(g/cm3);
   G4double ekin = aTrack.GetKineticEnergy()/GeV;
+
+
   if( myDarkMatter->EmissionAllowed(ekin, DensityMat) ) {
 
     G4double XMeanFreePath = myDarkMatter->GetMeanFreePathFactor()/myDarkMatter->GetSigmaTot(ekin);
     XMeanFreePath /= BiasSigmaFactor;
 
-//    std::cout << "DMMeanFreePath = " << XMeanFreePath << std::endl;
+    std::cout << "DMMeanFreePath = " << XMeanFreePath << std::endl;
 
     return XMeanFreePath;
 
@@ -84,8 +86,11 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt( const G4Track& aTrack,
   if(myDarkMatter->Decay()==0) {
       G4ThreeVector DMDirection=incidentDir;
       G4double DME = incidentE;
-      G4double DMM = myDarkMatter->GetMA()*GeV;
+      G4double DMM = myDarkMatter->GetMA();
       G4double DMKinE = incidentE - DMM;
+
+
+
       G4DynamicParticle* movingDM = new G4DynamicParticle( theDMParticlePtr,
                                                             DMDirection,
                                                             DMKinE );
@@ -100,7 +105,7 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt( const G4Track& aTrack,
 
        std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding()
                  << " emitted by " << aTrack.GetDefinition()->GetParticleName()
-                 << " with energy = " << incidentE/GeV << " DM energy = " << DME/GeV << std::endl;
+                 << " with energy = " << incidentE/GeV << " GeV, DM energy = " << DME/GeV <<" GeV "<< std::endl;
 
        return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
   }
@@ -150,8 +155,13 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt( const G4Track& aTrack,
                   aParticleChange.ProposeTrackStatus( fStopAndKill ) ;
 
                   std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding()
-                                         << " emitted by " << aTrack.GetDefinition()->GetParticleName()
-                                 << " with energy = " << incidentE/GeV << " DM total energy = " <<incidentE/GeV << std::endl;
+                                  << " emitted by " << aTrack.GetDefinition()->GetParticleName()
+                                  << " with energy = " << incidentE/GeV << "GeV, DM energy = " << incidentE/GeV <<" GeV "<< std::endl;
+
+                  std::cout <<"Daugther1: "<<DMParticleChi::Definition()->GetPDGEncoding()<<" energy= "<<v1.e()/GeV <<"GeV "<<std::endl;
+                  std::cout <<"Daugther2: "<<DMParticleChi::Definition()->GetPDGEncoding()<<" energy= "<<v2.e()/GeV <<"GeV "<<std::endl;
+
+
 
                   return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
 
@@ -191,7 +201,11 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt( const G4Track& aTrack,
 
                   std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding()
                             << " emitted by " << aTrack.GetDefinition()->GetParticleName()
-                            << " with energy = " << incidentE/GeV << " DM total energy = " <<incidentE/GeV << std::endl;
+                            << " with energy = " << incidentE/GeV << "GeV, DM total energy = " <<incidentE/GeV << std::endl;
+
+                  std::cout <<"Daugther1: "<<DMParticleChi1::Definition()->GetPDGEncoding()<<" energy= "<<v1.e()/GeV <<"GeV "<<std::endl;
+                  std::cout <<"Daugther2: "<<DMParticleChi2::Definition()->GetPDGEncoding()<<" energy= "<<v2.e()/GeV <<"GeV "<<std::endl;
+
 
                   return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
 
@@ -221,7 +235,7 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt( const G4Track& aTrack,
 
           std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding()
                     << " emitted by " << aTrack.GetDefinition()->GetParticleName()
-                    << " with energy = " << incidentE/GeV << " DM energy = " << DME/GeV << std::endl;
+                    << " with energy = " << incidentE/GeV << "GeV, DM total energy = " <<incidentE/GeV << std::endl;
 
           return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
       }

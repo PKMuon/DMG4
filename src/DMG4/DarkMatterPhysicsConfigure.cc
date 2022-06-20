@@ -69,7 +69,7 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
    Setting this to "1" means that the code will produce the "ff" final state, according to Branching type.
   */
 
-  DMpar->RegisterNewParam("DecayType", 0.);
+  DMpar->RegisterNewParam("DecayType", 1.);
 
   /*
    * Optional to make different decay table; Default 0

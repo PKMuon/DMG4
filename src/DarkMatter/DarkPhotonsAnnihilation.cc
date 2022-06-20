@@ -117,6 +117,8 @@ double DarkPhotonsAnnihilation::GetSigmaTot(double E0) {
 
 bool DarkPhotonsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
 {
+
+  E0=E0*GeV;
   if (sqrt(2.*CLHEP::electron_mass_c2*E0) < 2.*mChi) return false;
   if(E0 < EThresh) return false;
   if(NEmissions) return false; // For G4 DM classes
