@@ -19,8 +19,9 @@ DMParticleChi2* DMParticleChi2::Definition()
 
 
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
-  const G4double DMMass =  DMpar->GetRegisteredParam("DMMass")*GeV;
-  const G4double MassChi2 =  DMpar->GetRegisteredParam("MassChi2")*GeV;
+  const G4double DMMass = DMpar->GetRegisteredParam("DMMass")*GeV;
+  const G4double MassChi1 = (DMpar->GetRegisteredParam("DMMass")*GeV) * DMpar->GetRegisteredParam("RDM", 1./3.);
+  const G4double MassChi2 = (1. + DMpar->GetRegisteredParam("Ffactor", 0.4)) * MassChi1;
 
   const G4String name = "DMParticleChi2";
   // search in particle table
@@ -29,12 +30,8 @@ DMParticleChi2* DMParticleChi2::Definition()
 
   // parameters for the width
   G4double Epsilon = DMpar->GetRegisteredParam("Epsilon");
-
-  //A.C. it seems to me the mass splitting parameter is not necessary.
-  //G4double Splitting = DMpar->GetRegisteredParam("MassSplitting")*GeV;
-  G4double Splitting = (DMpar->GetRegisteredParam("MassChi2") - DMpar->GetRegisteredParam("MassChi1"))*GeV;
-
   G4double AlphaD = DMpar->GetRegisteredParam("AlphaD");
+  G4double Splitting = MassChi2 - MassChi1;
 
   // calculate the width
   const G4double K = 0.640;

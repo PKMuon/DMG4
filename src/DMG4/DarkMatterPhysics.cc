@@ -23,6 +23,8 @@
 #include "DMParticleScalar.hh"
 #include "DMParticlePseudoScalar.hh"
 #include "DMParticleAxial.hh"
+#include "DMParticleChi1.hh"
+#include "DMParticleChi2.hh"
 
 #include "DMParticleChi.hh"
 #include "DMParticleChi1.hh"

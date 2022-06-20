@@ -85,5 +85,8 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
   //DMpar->RegisterNewParam("RDM", 1./3.);
   //DMpar->RegisterNewParam("AlphaD", 0.5);
   
+  // additional parameters for semivisible DM, in addition to above parameters for annihilation (if absent the default ones will be used)
+  //DMpar->RegisterNewParam("Ffactor", 0.4);
+
   return true;
 }
