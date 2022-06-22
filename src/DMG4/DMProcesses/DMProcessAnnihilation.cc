@@ -66,7 +66,6 @@ G4double DMProcessAnnihilation::GetMeanFreePath( const G4Track& aTrack,
     G4double XMeanFreePath = myDarkMatter->GetMeanFreePathFactor()/myDarkMatter->GetSigmaTot(ekin);
     XMeanFreePath /= BiasSigmaFactor;
 
-    std::cout << "DMMeanFreePath = " << XMeanFreePath << std::endl;
 
     return XMeanFreePath;
 

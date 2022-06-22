@@ -7,10 +7,8 @@
 #include "DarkVector.hh"
 #include "Utils.hh"
 
-#include "G4MuonMinus.hh"
-#include "G4TauMinus.hh"
-#include "G4SystemOfUnits.hh"
-#include "Randomize.hh"
+
+
 
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_multimin.h>
@@ -22,7 +20,7 @@
 #include <gsl/gsl_rng.h>
 
 #include <iostream>
-#include "G4ios.hh"
+
 
 
 // Auxiliary structures and functions:
@@ -130,7 +128,7 @@ double DarkVector::TotalCrossSectionCalc_WW2(double E0)
 #endif
 
   gsl_rng_free (r);
-  G4cout << "Total CS calc, E = " << E0 << "  M = " << MA << " CS = " << sigmaTot << G4endl;
+  std::cout << "Total CS calc, E = " << E0 << "  M = " << MA << " CS = " << sigmaTot << std::endl;
   return sigmaTot;
 }
 
@@ -226,8 +224,8 @@ double DarkVector::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double E0)
 
 double DarkVector::Width()
 {
-  const double muMass = G4MuonMinus::MuonMinusDefinition()->GetPDGMass()/GeV;
-  const double tauMass = G4TauMinus::TauMinusDefinition()->GetPDGMass()/GeV;
+  const double muMass =  Mmu;
+  const double tauMass = Mtau;
   const double massRatio2 = muMass*muMass/(MA*MA);
   double width          = 0.;
   double nuWidth        = 0.;
@@ -240,7 +238,7 @@ double DarkVector::Width()
     }
     width = nuWidth+muWidth; // in GeV
   } else {
-    G4cout << "DarkZ: width for the mass above 2 Mtau is not implemented, exiting" << G4endl;
+    std::cout << "DarkZ: width for the mass above 2 Mtau is not implemented, exiting" << std::endl;
     exit(1);
   }
   return width;

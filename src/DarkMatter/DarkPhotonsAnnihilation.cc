@@ -10,39 +10,32 @@
 #include "DarkPhotonsAnnihilation.hh"
 #include "Utils.hh"
 
-#include "G4Electron.hh" // to get CLHEP constants
-#include "G4SystemOfUnits.hh"
-#include "DarkMatterParametersFactory.hh"
+
 #include <iostream>
 #include <cmath>
 
 
 DarkPhotonsAnnihilation::DarkPhotonsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn,
-                                                 double DensityIn, double epsilIn, int IDecayIn,double alphaDIn)
+                                                 double DensityIn, double epsilIn, int IDecayIn,int IBranchingIn,double rIn,double fIn,double alphaDIn)
 : DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn),
-  alphaD(alphaDIn),DMpar(0),iBranchingType(0)
+  alphaD(alphaDIn),iBranchingType(0)
 {
   DMType = 1; //A.C.
   ParentPDGID = -11;
   DaughterPDGID = 11;
 
   //default values
-  r=1./3;
+  r=rIn;
+  f=fIn;
   mChi = MAIn/3;
   mChi1=mChi;
   mChi2=mChi;
 
 
-  DMpar = DarkMatterParametersFactory::GetInstance();
-  if (DMpar){
-      iBranchingType = (int)(DMpar->GetRegisteredParam("BranchingType", 0));
-  }
   if (iBranchingType==2){
-      r = DMpar->GetRegisteredParam("RDM", 1. / 3);
       mChi1 = MA * r;
-      mChi2 = (1. + DMpar->GetRegisteredParam("Ffactor")) * mChi1;
+      mChi2 = (1. + f) * mChi1;
   }else{
-      r=DMpar->GetRegisteredParam("RDM", 1./3);
       mChi = MA * r;
       mChi1=mChi;
       mChi2=mChi;
@@ -63,9 +56,7 @@ DarkPhotonsAnnihilation::~DarkPhotonsAnnihilation()
 //Since the framework assumes this method is returning the total cross section per nucleous, for the moment I scale this by Z.
 double DarkPhotonsAnnihilation::TotalCrossSectionCalc(double E0)
 {
-
-  E0 = E0 * GeV;
-  double ss = 2. * CLHEP::electron_mass_c2 * E0;
+  double ss = 2. * Mel * E0;
   double qq,E1,E2;
   switch (iBranchingType){
 
@@ -102,8 +93,8 @@ double DarkPhotonsAnnihilation::TotalCrossSectionCalc(double E0)
   }
 
   //here sigma is in G4 internal units, 1 /Energy^2. Move to pBarn;
-  sigma = sigma * CLHEP::hbarc_squared;
-  sigma = sigma / CLHEP::picobarn;
+  sigma *= GeVtoPb;
+
 
   //A.C. correct here for atomic effects
   sigma = sigma * ZNucl;
@@ -119,8 +110,8 @@ double DarkPhotonsAnnihilation::GetSigmaTot(double E0) {
 bool DarkPhotonsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
 {
 
-  E0=E0*GeV;
-  if (sqrt(2.*CLHEP::electron_mass_c2*E0) < 2.*mChi) return false;
+
+  if (sqrt(2.*Mel*E0) < 2.*mChi) return false;
   if(E0 < EThresh) return false;
   if(NEmissions) return false; // For G4 DM classes
   if(fabs(DensityMat - Density) > 0.1) return false;
@@ -171,15 +162,15 @@ double DarkPhotonsAnnihilation::Width() {
 
 void DarkPhotonsAnnihilation::SetMA(double MAIn) {
   std::cout << "DarkPhotonsAnnihilation::SetMA was called with MAIn = " << MAIn << std::endl;
-  MA = MAIn*GeV;
 
-  iBranchingType = (int)(DMpar->GetRegisteredParam("BranchingType", 0));
+
+
   if (iBranchingType==2){
-       r = DMpar->GetRegisteredParam("RDM", 1. / 3);
+
        mChi1 = MA * r;
-       mChi2 = (1. + DMpar->GetRegisteredParam("Ffactor")) * mChi1;
+       mChi2 = (1. + f) * mChi1;
    }else{
-       r=DMpar->GetRegisteredParam("RDM", 1./3);
+
        mChi = MA * r;
        mChi1=mChi;
        mChi2=mChi;
@@ -192,7 +183,7 @@ void DarkPhotonsAnnihilation::SetMA(double MAIn) {
 double DarkPhotonsAnnihilation::AngularDistributionResonant(double eta,double E0){
 
 
-    double ss = 2. * CLHEP::electron_mass_c2 * E0;
+    double ss = 2. * Mel * E0;
     double qq;
     double val=0;
     switch (iBranchingType){
@@ -204,8 +195,8 @@ double DarkPhotonsAnnihilation::AngularDistributionResonant(double eta,double E0
          }
          qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
 
-         val=s+4*qq*qq*eta*eta+4*mChi*mChi;
-         val/=(s+4*qq*qq+4*mChi*mChi);
+         val=ss+4*qq*qq*eta*eta+4*mChi*mChi;
+         val/=(ss+4*qq*qq+4*mChi*mChi);
          break;
      case 1:
          //Scalar LDM, Angular distribution f(eta) ~ 1-eta*eta. Max: eta=0;

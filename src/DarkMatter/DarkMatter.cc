@@ -137,6 +137,7 @@ double DarkMatter::MaxCrossSectionCalc(double E0)
       if(csi > csmax) csmax = csi;
     }
   }
+  std::cin.get();
   std::cout << " E0 = " << E0 << "  Max cross section = " << csmax << std::endl;
   return 1.1*csmax;
 }
@@ -385,6 +386,8 @@ double DarkMatter::SimulateEmissionWithAngle(double E0, double* angles)
 double DarkMatter::SimulateEmissionWithAngle2(double E0, double* angles)
 {
   double Xmin = MA/E0;
+
+
   if(MA < 0.001 && EThresh/E0 > Xmin) Xmin = EThresh/E0;
 
   if(ParentPDGID == 22) {
@@ -407,6 +410,7 @@ double DarkMatter::SimulateEmissionWithAngle2(double E0, double* angles)
 
     double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MParent/E0;
     if(Xmin > Xmax) return 0.;
+
 
     if(ParentPDGID == 22 || ParentPDGID == -11) {
       Xmin = 0.999;

@@ -9,55 +9,42 @@
 #include "DarkPseudoScalarsAnnihilation.hh"
 #include "Utils.hh"
 
-#include "G4Electron.hh" // to get CLHEP constants
-#include "DarkMatterParametersFactory.hh"
-#include "G4SystemOfUnits.hh"
-
 #include <iostream>
 #include <cmath>
 
-DarkPseudoScalarsAnnihilation::DarkPseudoScalarsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn, double epsilIn, int IDecayIn, double alphaDIn) :
-        DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn),
-        alphaD(alphaDIn) {
+DarkPseudoScalarsAnnihilation::DarkPseudoScalarsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn,
+        double DensityIn, double epsilIn, int IDecayIn, int IBranchingIn, double rIn, double fIn, double alphaDIn) :
+        DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn), iBranchingType(IBranchingIn), r(rIn), f(fIn), alphaD(alphaDIn) {
     DMType = 4; //A.C.
     ParentPDGID = -11;
     DaughterPDGID = 11;
 
-
-
-
-
     //default values
-      r=1./3;
-      mChi = MAIn/3;
-      mChi1=mChi;
-      mChi2=mChi;
+    r = rIn;
+    f = fIn;
+    mChi = MAIn / 3;
+    mChi1 = mChi;
+    mChi2 = mChi;
 
+    if (iBranchingType != 0) {
+        std::cerr << " DarkPseudoScalarAnnihilation iBranchingType!=0 not yet supported" << std::endl;
+        exit(1);
+    }
 
-      DMpar = DarkMatterParametersFactory::GetInstance();
-      if (DMpar){
-          iBranchingType = (int)(DMpar->GetRegisteredParam("BranchingType", 0));
-      }
+    if (iBranchingType == 2) {
 
-      if (iBranchingType!=0){
-          std::cerr <<" DarkPseudoScalarAnnihilation iBranchingType!=0 not yet supported"<<std::endl;
-          exit(1);
-      }
+        mChi1 = MA * r;
+        mChi2 = (1. + f) * mChi1;
+    } else {
 
-      if (iBranchingType==2){
-          r = DMpar->GetRegisteredParam("RDM", 1. / 3);
-          mChi1 = MA * r;
-          mChi2 = (1. + DMpar->GetRegisteredParam("Ffactor")) * mChi1;
-      }else{
-          r=DMpar->GetRegisteredParam("RDM", 1./3);
-          mChi = MA * r;
-          mChi2=mChi;
-          mChi1=mChi;
-      }
+        mChi = MA * r;
+        mChi2 = mChi;
+        mChi1 = mChi;
+    }
 
-      deltaMchi=mChi2-mChi1;
-      std::cout << "Initialized DarkPseudoScalarsAnnihilation (e+ e- -> A' -> DM DM) for material density = " << DensityIn << std::endl;
-      std::cout << std::endl;
+    deltaMchi = mChi2 - mChi1;
+    std::cout << "Initialized DarkPseudoScalarsAnnihilation (e+ e- -> A' -> DM DM) for material density = " << DensityIn << std::endl;
+    std::cout << std::endl;
 }
 
 DarkPseudoScalarsAnnihilation::~DarkPseudoScalarsAnnihilation() {
@@ -68,10 +55,10 @@ DarkPseudoScalarsAnnihilation::~DarkPseudoScalarsAnnihilation() {
 //output: total annihilation cross-section in pbarn.
 //Since the framework assumes this method is returning the total cross section per nucleous, for the moment I scale this by Z.
 double DarkPseudoScalarsAnnihilation::TotalCrossSectionCalc(double E0) {
-    E0=E0*GeV;
-    double ss = 2. * CLHEP::electron_mass_c2 * E0;
-    if (sqrt(ss) < 2. * mChi) return 0.;   // A.C. e+e- -> S -> chi chi can happen also for an S and chi with large mass,
-                                           // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
+    double ss = 2. * Mel * E0;
+    if (sqrt(ss) < 2. * mChi)
+        return 0.;   // A.C. e+e- -> S -> chi chi can happen also for an S and chi with large mass,
+                     // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
     double qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
     double gg = this->Width();
 
@@ -82,8 +69,7 @@ double DarkPseudoScalarsAnnihilation::TotalCrossSectionCalc(double E0) {
     sigma = sigma * (ss / 2);   // A.C. this is for final state fermions (default)
 
     //here sigma is in G4 internal units, 1 /Energy^2. Move to pBarn;
-       sigma = sigma * CLHEP::hbarc_squared;
-       sigma = sigma / CLHEP::picobarn;
+    sigma = sigma * GeVtoPb;
 
     //A.C. correct here for atomic effects
     sigma = sigma * ZNucl;
@@ -96,21 +82,27 @@ double DarkPseudoScalarsAnnihilation::GetSigmaTot(double E0) {
 
 bool DarkPseudoScalarsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
         {
-    E0 = E0 * GeV;
-    if (sqrt(2. * CLHEP::electron_mass_c2 * E0) < 2. * mChi) return false;
-    if (E0 < EThresh) return false;
-    if (NEmissions) return false; // For G4 DM classes
-    if (fabs(DensityMat - Density) > 0.1) return false;
+
+    if (sqrt(2. * Mel * E0) < 2. * mChi)
+        return false;
+    if (E0 < EThresh)
+        return false;
+    if (NEmissions)
+        return false; // For G4 DM classes
+    if (fabs(DensityMat - Density) > 0.1)
+        return false;
     return true;
 }
 
 double DarkPseudoScalarsAnnihilation::CrossSectionDSDX(double XEv, double E0) {
-    if (XEv > 0.9999) return 1.;
+    if (XEv > 0.9999)
+        return 1.;
     return 0.;
 }
 
 double DarkPseudoScalarsAnnihilation::CrossSectionDSDXDU(double XEv, double UThetaEv, double E0) {
-    if (XEv > 0.9999) return 1.;
+    if (XEv > 0.9999)
+        return 1.;
     return 0.;
 }
 
@@ -125,16 +117,12 @@ double DarkPseudoScalarsAnnihilation::Width() {
 
 void DarkPseudoScalarsAnnihilation::SetMA(double MAIn) {
     std::cout << "DarkPseudoScalarsAnnihilation::SetMA was called with MAIn = " << MAIn << std::endl;
-    MA = MAIn*GeV;
-    iBranchingType = (int)(DMpar->GetRegisteredParam("BranchingType", 0));
-    if (iBranchingType==2){
-        r = DMpar->GetRegisteredParam("RDM", 1. / 3);
+    if (iBranchingType == 2) {
         mChi1 = MA * r;
-        mChi2 = (1. + DMpar->GetRegisteredParam("Ffactor")) * mChi1;
-    }else{
-        r=DMpar->GetRegisteredParam("RDM", 1./3);
+        mChi2 = (1. + f) * mChi1;
+    } else {
         mChi = MA * r;
-        mChi1=mChi;
-        mChi2=mChi;
+        mChi1 = mChi;
+        mChi2 = mChi;
     }
 }
