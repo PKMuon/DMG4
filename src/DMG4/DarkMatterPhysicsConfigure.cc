@@ -61,7 +61,8 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
 //  DMpar->RegisterNewParam("ZNucl"   ,74.    );
 //  DMpar->RegisterNewParam("Density" ,19.25  );
 
-  /* 0: invisible (no decays simulated), 1: visible, 2: visible with constraints.
+  /* Comments to "DecayType"
+   0: invisible (no decays simulated), 1: visible, 2: visible with constraints.
    *
    For annihilation, the process reads e+ e- -> R -> ff, where "R" is the intermediate resonance, and ff the final state particles.
    Setting this to "0" means that the code accounts for the total cross-section for e+e- --> R --> ff, but only produces the R in the final state,
@@ -71,9 +72,9 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
 
   DMpar->RegisterNewParam("DecayType", 1.);
 
-  /*
-   * Optional to make different decay table; Default 0
-   * For annihilation e+e- --> R --> ff
+  /* Comments to "BranchingType"
+   * Optional to make different decay table; 0 : invisible decays or SM lepton decays, depending on DecayType; 1 : B - L model; 2 : Semivisible: Inelastic DM
+   * For annihilation e+e- --> R --> ff the meaning is DIFFERENT!
 
      0: default: fermionic ff final state
      1: scalar ff final state

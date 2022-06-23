@@ -185,6 +185,10 @@ void DarkMatterPhysics::ConstructParticle()
         if ((BranchingType == 0) || (BranchingType == 1)) {
           DMParticleChi::Definition();
         } else {
+          if ((BranchingType == 3)) {
+            G4cout << G4endl << "Several decay channels according to BranchingType are not allowed in annihilation, exiting " << G4endl << G4endl;
+            exit(1);
+          }
           DMParticleChi1::Definition();
           DMParticleChi2::Definition();
         }
