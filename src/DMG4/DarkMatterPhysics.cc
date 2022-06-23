@@ -75,66 +75,62 @@ DarkMatterPhysics::~DarkMatterPhysics()
 
 void DarkMatterPhysics::Init(){
   //call an instance of the class
-   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
+  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
 
+  G4double EThresh = DMpar->GetRegisteredParam("EThresh");
+  G4int DMProcessType = DMpar->GetRegisteredParam("DMProcessType");
+  double DMMass   = DMpar->GetRegisteredParam("DMMass");
+  double Epsilon  = DMpar->GetRegisteredParam("Epsilon");
+  G4double ANucl     = DMpar->GetRegisteredParam("ANucl");
+  G4double ZNucl     = DMpar->GetRegisteredParam("ZNucl");
+  G4double Density   = DMpar->GetRegisteredParam("Density");
+  G4int DecayType = DMpar->GetRegisteredParam("DecayType");
 
-   G4double EThresh = DMpar->GetRegisteredParam("EThresh");
-   G4int DMProcessType = DMpar->GetRegisteredParam("DMProcessType");
-   double DMMass   = DMpar->GetRegisteredParam("DMMass");
-   double Epsilon  = DMpar->GetRegisteredParam("Epsilon");
-   G4double ANucl     = DMpar->GetRegisteredParam("ANucl");
-   G4double ZNucl     = DMpar->GetRegisteredParam("ZNucl");
-   G4double Density   = DMpar->GetRegisteredParam("Density");
-   G4int DecayType = DMpar->GetRegisteredParam("DecayType");
-
-
-
-
-   switch(DMProcessType)
-     {
-     case 1:
-       G4cout << "Initialize DarkPhotons\n";
-       myDarkMatter = new DarkPhotons(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType);
-       break;
-     case 2:
-       G4cout << "Initialize DarkScalars\n";
-       myDarkMatter = new DarkScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType);
-       break;
-     case 3:
-       G4cout << "Initialize DarkAxials\n";
-       myDarkMatter = new DarkAxials(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
-       break;
-     case 4:
-       G4cout << "Initialize DarkPseudoScalars\n";
-       myDarkMatter = new DarkPseudoScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
-       break;
-     case 21:
-       G4cout << "Initialize ALP\n";
-       myDarkMatter = new ALP(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
-       break;
-     case 31:
-       G4cout << "Initialize DarkZ\n";
-       myDarkMatter = new DarkZ(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
-       break;
-     case 11:
-       G4cout << "Initialize DarkPhotonsAnnihilation\n";
-       myDarkMatter = new DarkPhotonsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,
-                                                  DMpar->GetRegisteredParam("AlphaD", 0.5) );
-       break;
-     case 12:
-       G4cout << "Initialize DarkScalarsAnnihilation\n";
-       myDarkMatter = new DarkScalarsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,
-                                                  DMpar->GetRegisteredParam("AlphaD", 0.5) );
-       break;
-     case 13:
-       G4cout << "Initialize DarkAxialsAnnihilation\n";
-       myDarkMatter = new DarkAxialsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,
+  switch(DMProcessType)
+    {
+    case 1:
+      G4cout << "Initialize DarkPhotons\n";
+      myDarkMatter = new DarkPhotons(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType);
+      break;
+    case 2:
+      G4cout << "Initialize DarkScalars\n";
+      myDarkMatter = new DarkScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType);
+      break;
+    case 3:
+      G4cout << "Initialize DarkAxials\n";
+      myDarkMatter = new DarkAxials(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+      break;
+    case 4:
+      G4cout << "Initialize DarkPseudoScalars\n";
+      myDarkMatter = new DarkPseudoScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+      break;
+    case 21:
+      G4cout << "Initialize ALP\n";
+      myDarkMatter = new ALP(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+      break;
+    case 31:
+      G4cout << "Initialize DarkZ\n";
+      myDarkMatter = new DarkZ(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+      break;
+    case 11:
+      G4cout << "Initialize DarkPhotonsAnnihilation\n";
+      myDarkMatter = new DarkPhotonsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,
                                                  DMpar->GetRegisteredParam("AlphaD", 0.5) );
-       break;
-     case 14:
-       G4cout << "Initialize DarkPseudoScalarsAnnihilation\n";
-       myDarkMatter = new DarkPseudoScalarsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,
+      break;
+    case 12:
+      G4cout << "Initialize DarkScalarsAnnihilation\n";
+      myDarkMatter = new DarkScalarsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,
+                                                 DMpar->GetRegisteredParam("AlphaD", 0.5) );
+      break;
+    case 13:
+      G4cout << "Initialize DarkAxialsAnnihilation\n";
+      myDarkMatter = new DarkAxialsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,
                                                 DMpar->GetRegisteredParam("AlphaD", 0.5) );
+      break;
+    case 14:
+      G4cout << "Initialize DarkPseudoScalarsAnnihilation\n";
+      myDarkMatter = new DarkPseudoScalarsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,
+                                                       DMpar->GetRegisteredParam("AlphaD", 0.5) );
        break;
      default:
        G4cout << G4endl << "Wrong DM process type specified: " << DMProcessType << " , exiting" << G4endl << G4endl;
@@ -142,9 +138,6 @@ void DarkMatterPhysics::Init(){
      }
 
    BiasSigmaFactor = DMpar->GetRegisteredParam("BiasSigmaFactor0") * 0.0001 * 0.0001 / (myDarkMatter->Getepsil()*myDarkMatter->Getepsil());
-
-
-
 }
 
 
@@ -165,45 +158,41 @@ void DarkMatterPhysics::ConstructParticle()
    */
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
 
-  G4int DMProcessType = DMpar->GetRegisteredParam("DMProcessType");
-  G4int DecayType = DMpar->GetRegisteredParam("DecayType");
-  switch(DMProcessType){
+  G4int DMProcessType = (G4int)(DMpar->GetRegisteredParam("DMProcessType"));
+  G4int DecayType = (G4int)(DMpar->GetRegisteredParam("DecayType"));
+  G4int BranchingType = (G4int)(DMpar->GetRegisteredParam("BranchingType", 0.));
 
-      case 1:  //dark-photon bremmstrahlung
-          if (DecayType==0){ //Only invisible, do nothing
-
-          }
-          else{  //Require final state particles
-              G4int BranchingType = DMpar->GetRegisteredParam("BranchingType");
-              if (BranchingType==2){
-                  DMParticleChi1::Definition();
-                  DMParticleChi2::Definition();
-              }
-          }
-          break;
-
-      case 11: //annihilation processes
-      case 12:
-      case 13:
-      case 14:
-      {
-
-          if (DecayType==0){ //Only invisible, do nothing
-
-          }
-          else{  //Require final state particles
-              G4int BranchingType = DMpar->GetRegisteredParam("BranchingType");
-              if ((BranchingType==0)||(BranchingType==1)){
-                  DMParticleChi::Definition();
-              }else
-                  DMParticleChi1::Definition();
-                  DMParticleChi2::Definition();
-          }
-          break;
+  switch(DMProcessType)
+    {
+    case 1:  //dark-photon bremmstrahlung
+      if (DecayType == 0) { //Only invisible, do nothing
       }
-      default:
-          break;
-  }
+      else {  //Require final state particles
+        if (BranchingType >= 2){
+          DMParticleChi1::Definition();
+          DMParticleChi2::Definition();
+        }
+      }
+      break;
+
+    case 11: //annihilation processes
+    case 12:
+    case 13:
+    case 14:
+      if (DecayType == 0) { //Only invisible, do nothing
+      }
+      else {  //Require final state particles
+        if ((BranchingType == 0) || (BranchingType == 1)) {
+          DMParticleChi::Definition();
+        } else {
+          DMParticleChi1::Definition();
+          DMParticleChi2::Definition();
+        }
+        break;
+      }
+    default:
+      break;
+    }
 }
 
 
