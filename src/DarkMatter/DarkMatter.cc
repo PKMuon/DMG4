@@ -137,7 +137,6 @@ double DarkMatter::MaxCrossSectionCalc(double E0)
       if(csi > csmax) csmax = csi;
     }
   }
-  std::cin.get();
   std::cout << " E0 = " << E0 << "  Max cross section = " << csmax << std::endl;
   return 1.1*csmax;
 }
