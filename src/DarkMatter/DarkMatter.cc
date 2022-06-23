@@ -29,7 +29,7 @@
 DarkMatter::DarkMatter(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
                        double epsilIn, int IDecayIn)
 :MA(MAIn), EThresh(EThreshIn), SigmaNorm(SigmaNormIn),
-ANucl(ANuclIn), ZNucl(ZNuclIn), Density(DensityIn), epsilBench(0.0001), epsil(epsilIn), IDecay(IDecayIn),
+ANucl(ANuclIn), ZNucl(ZNuclIn), Density(DensityIn), epsilBench(0.0001), epsil(epsilIn), IDecay(IDecayIn),ISampler(0),
 AccumulatedProbability(0.), NEmissions(0)
 {
   if(MA > 3.) {std::cout << "Maximal allowed mass is 3 GeV, exiting" << std::endl; exit(1);}
@@ -137,6 +137,7 @@ double DarkMatter::MaxCrossSectionCalc(double E0)
       if(csi > csmax) csmax = csi;
     }
   }
+  std::cin.get();
   std::cout << " E0 = " << E0 << "  Max cross section = " << csmax << std::endl;
   return 1.1*csmax;
 }
@@ -385,6 +386,8 @@ double DarkMatter::SimulateEmissionWithAngle(double E0, double* angles)
 double DarkMatter::SimulateEmissionWithAngle2(double E0, double* angles)
 {
   double Xmin = MA/E0;
+
+
   if(MA < 0.001 && EThresh/E0 > Xmin) Xmin = EThresh/E0;
 
   if(ParentPDGID == 22) {
@@ -407,6 +410,7 @@ double DarkMatter::SimulateEmissionWithAngle2(double E0, double* angles)
 
     double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MParent/E0;
     if(Xmin > Xmax) return 0.;
+
 
     if(ParentPDGID == 22 || ParentPDGID == -11) {
       Xmin = 0.999;
@@ -733,3 +737,34 @@ double DarkMatter::SimulateEmissionVector(double E0, double* angles)
   printf ("Simulation of emission failed after N iterations = %d\n", maxiter);
   return 0.;
 }
+
+
+/*This method returns a random cosine for e+e- --> A' --> ff in the CM frame
+ * E0: positron energy in LAB frame
+ */
+double DarkMatter::SimulateEmissionResonant(double E0){
+
+    int maxiter = 25000000;
+    double eta;
+    double fcomp,frand;
+    for( int iii = 1; iii < maxiter; iii++) {
+        eta = G4UniformRand()*2 -1; //between -1 and 1;
+        fcomp=this->AngularDistributionResonant(eta,E0);
+        frand=G4UniformRand();
+        if (frand<fcomp) return eta;
+     }
+    return 1;
+}
+
+/*This method returns the angular distribution for e+e- --> A' --> ff in the CM frame
+ * It has to be implemented in the derived classes (the default method is a dummy implementation)
+ * eta: cosine of the f in the CM frame
+ * E0: positron beam energy in LAB frame
+ * IMPORTANT: it has to be normalized so that the maximum is one.
+ */
+double DarkMatter::AngularDistributionResonant(double eta,double E0){
+    return (1+eta*eta)/2.;
+}
+
+
+

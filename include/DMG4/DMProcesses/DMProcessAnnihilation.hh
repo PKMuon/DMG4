@@ -4,6 +4,7 @@
 
 class DarkMatter;
 class G4ParticleDefinition;
+class DarkMatterParametersFactory;
 
 
 class DMProcessAnnihilation : public G4VDiscreteProcess
@@ -26,4 +27,8 @@ class DMProcessAnnihilation : public G4VDiscreteProcess
     DarkMatter* myDarkMatter;
     G4ParticleDefinition* theDMParticlePtr;
     G4double BiasSigmaFactor;
+
+    DarkMatterParametersFactory* DMpar;
+    G4int iBranchingType;
+    G4double mChi,mChi1,mChi2;
 };

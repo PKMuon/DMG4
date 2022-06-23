@@ -1,7 +1,8 @@
 #define Mel 5.109989461E-04 // electron mass in GeV
 #define Mmu 0.1056583745 // muon mass in GeV
-//#define alphaEW 1./137.
-#define alphaEW CLHEP::fine_structure_const
+#define Mtau 1.77686     // tau mass in GeV
+#define alphaEW 1./137.
+
 #define MUp 2.79 // protonMu
 #define Mpr 0.938 // proton mass
 #define max_uint 4294967296.0l
@@ -82,6 +83,12 @@ class DarkMatter
     double SimulateEmissionByMuon2(double E0, double* angles);
     double SimulateEmissionByMuon(double E0, double* angles);
     double SimulateEmissionVector(double E0, double* angles);
+
+    //for resonant production e+ e- --> R --> f f, this function returns the cosine of the angle of the f in the CM frame.
+    double SimulateEmissionResonant(double E0); //E0 in GeV
+    virtual double AngularDistributionResonant(double eta,double E0); //E0 in GeV
+
+
     double GetAccumulatedProbability() {return AccumulatedProbability;}
 
   private:
@@ -94,7 +101,8 @@ class DarkMatter
     double Density;
     double epsilBench;
     double epsil;
-    int DMType; // 1 - Dark Photon; 2 - Dark Scalar; 3 - Dark Axials; 4 - Dark Pseudoscalars; 11 - Z'; 21 - ALP
+    int DMType; // 1 - Dark Photon; 2 - Dark Scalar; 3 - Dark Axials; 4 - Dark Pseudoscalars; 11 - Z'; 21 - ALP.
+                // For annihilation, this is the "resonance R" in e+e- --> R --> final-state
     int ParentPDGID;
     double MParent;
     int DaughterPDGID;

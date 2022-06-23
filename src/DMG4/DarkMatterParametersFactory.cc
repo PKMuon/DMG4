@@ -80,6 +80,14 @@ void DarkMatterParametersFactory::DumpToFile(std::ofstream* outFile)
   }
 }
 
+
+bool DarkMatterParametersFactory::ExistsRegisteredParam(std::string name){
+
+    std::map<std::string, double>::iterator it = fFactoryParams.find(name);
+    return (it != fFactoryParams.end());
+}
+
+
 DarkMatterParametersFactory* DarkMatterParametersFactory::GetInstance()
 {
   if (!fFactoryInstance) fFactoryInstance = new DarkMatterParametersFactory("DMParameters");
