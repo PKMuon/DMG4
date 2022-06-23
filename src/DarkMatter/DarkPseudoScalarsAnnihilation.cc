@@ -12,16 +12,14 @@
 #include <iostream>
 #include <cmath>
 
-DarkPseudoScalarsAnnihilation::DarkPseudoScalarsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn,
-        double DensityIn, double epsilIn, int IDecayIn, int IBranchingIn, double rIn, double fIn, double alphaDIn) :
-        DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn), iBranchingType(IBranchingIn), r(rIn), f(fIn), alphaD(alphaDIn) {
+DarkPseudoScalarsAnnihilation::DarkPseudoScalarsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
+        double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
+        DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn), r(rIn), alphaD(alphaDIn), iBranchingType(IBranchingIn), f(fIn) {
     DMType = 4; //A.C.
     ParentPDGID = -11;
     DaughterPDGID = 11;
 
     //default values
-    r = rIn;
-    f = fIn;
     mChi = MAIn / 3;
     mChi1 = mChi;
     mChi2 = mChi;

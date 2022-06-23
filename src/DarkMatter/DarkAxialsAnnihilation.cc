@@ -10,25 +10,20 @@
 #include "DarkAxialsAnnihilation.hh"
 #include "Utils.hh"
 
-
 #include <iostream>
 #include <cmath>
 
 DarkAxialsAnnihilation::DarkAxialsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
-        double epsilIn, int IDecayIn,int IBranchingIn,double rIn,double fIn, double alphaDIn) :
-        DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn),iBranchingType(IBranchingIn), alphaD(alphaDIn) {
+        double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
+        DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn), r(rIn), alphaD(alphaDIn), iBranchingType(IBranchingIn), f(fIn) {
     DMType = 3; //A.C.
     ParentPDGID = -11;
     DaughterPDGID = 11;
 
     //default values
-    r = rIn;
-    f = fIn;
     mChi = MAIn / 3;
     mChi1 = mChi;
     mChi2 = mChi;
-
-
 
     if (iBranchingType != 0) {
         std::cerr << " DarkAxialAnnihilation iBranchingType!=0 not yet supported" << std::endl;
@@ -73,7 +68,6 @@ double DarkAxialsAnnihilation::TotalCrossSectionCalc(double E0) {
 
     //here sigma is 1 /Energy^2. Move to pBarn;
     sigma = sigma * GeVtoPb;
-
 
     //A.C. correct here for atomic effects
     sigma = sigma * ZNucl;
@@ -121,12 +115,12 @@ double DarkAxialsAnnihilation::Width() {
 
 void DarkAxialsAnnihilation::SetMA(double MAIn) {
     std::cout << "DarkAxialsAnnihilation::SetMA was called with MAIn = " << MAIn << std::endl;
-    if (iBranchingType==2){
+    if (iBranchingType == 2) {
         mChi1 = MA * r;
         mChi2 = (1. + f) * mChi1;
-    }else{
+    } else {
         mChi = MA * r;
-        mChi1=mChi;
-        mChi2=mChi;
+        mChi1 = mChi;
+        mChi2 = mChi;
     }
 }
