@@ -33,12 +33,21 @@ G4double DMProcessPrimakoffALP::GetMeanFreePath( const G4Track& aTrack,
   G4double ekin = aTrack.GetKineticEnergy()/GeV;
   if( myDarkMatter->EmissionAllowed(ekin, DensityMat) ) {
 
-    G4double XMeanFreePath = myDarkMatter->GetMeanFreePathFactor()/myDarkMatter->GetSigmaTot(ekin);
-    XMeanFreePath /= BiasSigmaFactor;
+      G4double CrossSection = myDarkMatter->GetSigmaTot(ekin); //A.C. by DarkMatter definition, this is in picobarn
+      CrossSection *= picobarn;
 
-//    std::cout << "DMMeanFreePath = " << XMeanFreePath << std::endl;
+      //The DarkMatter classes compute the cross section for eps = epsilBench. Here, we revert back to epsilon
+      CrossSection *= (myDarkMatter->Getepsil()* myDarkMatter->Getepsil())/(myDarkMatter->GetepsilBench()* myDarkMatter->GetepsilBench());
+      CrossSection /= myDarkMatter->GetSigmaNorm();
 
-    return XMeanFreePath;
+
+      G4double n = aTrack.GetMaterial()->GetTotNbOfAtomsPerVolume();
+      G4double XMeanFreePath = 1./(n*CrossSection);
+
+      XMeanFreePath /= BiasSigmaFactor;
+
+
+      return XMeanFreePath;
 
   }
   return DBL_MAX;

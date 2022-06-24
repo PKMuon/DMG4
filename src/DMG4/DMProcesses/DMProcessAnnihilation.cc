@@ -38,7 +38,7 @@ DMProcessAnnihilation::DMProcessAnnihilation(DarkMatter* DarkMatterPointerIn, G4
       iBranchingType=(int)DMpar->GetRegisteredParam("BranchingType");
 
       if (iBranchingType==0){
-          mChi=DMpar->GetRegisteredParam("RDM")*myDarkMatter->GetMA();
+          mChi=DMpar->GetRegisteredParam("RDM")*myDarkMatter->GetMA(); //A.C. by default, DarkMatter units are GeV
       }
       else{
           double r = DMpar->GetRegisteredParam("RDM", 1. / 3);
@@ -63,7 +63,17 @@ G4double DMProcessAnnihilation::GetMeanFreePath( const G4Track& aTrack,
 
   if( myDarkMatter->EmissionAllowed(ekin, DensityMat) ) {
 
-    G4double XMeanFreePath = myDarkMatter->GetMeanFreePathFactor()/myDarkMatter->GetSigmaTot(ekin);
+    G4double CrossSection = myDarkMatter->GetSigmaTot(ekin); //A.C. by DarkMatter definition, this is in picobarn
+    CrossSection *= picobarn;
+
+    //The DarkMatter classes compute the cross section for eps = epsilBench. Here, we revert back to epsilon
+    CrossSection *= (myDarkMatter->Getepsil()* myDarkMatter->Getepsil())/(myDarkMatter->GetepsilBench()* myDarkMatter->GetepsilBench());
+    CrossSection /= myDarkMatter->GetSigmaNorm();
+
+
+    G4double n = aTrack.GetMaterial()->GetTotNbOfAtomsPerVolume(); //The annihilation cross section already contains a multiplicative factor "Z".
+    G4double XMeanFreePath = 1./(n*CrossSection);
+
     XMeanFreePath /= BiasSigmaFactor;
 
 
@@ -86,7 +96,7 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt( const G4Track& aTrack,
   if(myDarkMatter->Decay()==0) {
       G4ThreeVector DMDirection=incidentDir;
       G4double DME = incidentE;
-      G4double DMM = myDarkMatter->GetMA();
+      G4double DMM = myDarkMatter->GetMA()*GeV; //A.C. Dark Matter units are, by default, GeV
       G4double DMKinE = incidentE - DMM;
 
 

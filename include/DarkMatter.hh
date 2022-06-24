@@ -45,6 +45,7 @@ class DarkMatter
     double GetEThresh() {return EThresh;}
     double GetSigmaNorm() {return SigmaNorm;}
     double Getepsil() {return epsil;}
+    double GetepsilBench() {return epsilBench;}
     double GetDensity() {return Density;}
     int GetDMType() {return DMType;}
     int GetParentPDGID() {return ParentPDGID;}

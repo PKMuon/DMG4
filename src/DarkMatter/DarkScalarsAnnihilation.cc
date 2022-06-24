@@ -70,7 +70,7 @@ double DarkScalarsAnnihilation::TotalCrossSectionCalc(double E0) {
     double qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
     double gg = this->Width();
 
-    double sigma = 4 * M_PI * alphaEW * epsil * epsil * alphaD;
+    double sigma = 4 * M_PI * alphaEW * epsilBench * epsilBench * alphaD;
     sigma = sigma * qq / sqrt(ss);
 
     sigma = sigma / ((ss - MA * MA) * (ss - MA * MA) + MA * MA * gg * gg);

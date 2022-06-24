@@ -7,9 +7,7 @@
 #include "DarkZ.hh"
 #include "Utils.hh"
 
-#include "G4MuonMinus.hh"
-#include "G4TauMinus.hh"
-#include "G4SystemOfUnits.hh"
+
 #include "Randomize.hh"
 
 #include <gsl/gsl_math.h>
@@ -23,7 +21,7 @@
 #include <gsl/gsl_sf_dilog.h>
 
 #include <iostream>
-#include "G4ios.hh"
+
 
 
 // Auxiliary structures and functions:
@@ -152,7 +150,7 @@ double DarkZ::TotalCrossSectionCalc_IWW(double E0)
   double PrefactorMuonZTotCS= 2.0*epsilBench*epsilBench*alphaEW*alphaEW*alphaEW/E0;
 
   double sigmaTot= GeVtoPb*PrefactorMuonZTotCS*fluxAnalytical*IntDsDx;
-  G4cout << "Total CS calc, E = " << E0 << "  M = " << MA << " CS = " << sigmaTot << G4endl;
+  std::cout << "Total CS calc, E = " << E0 << "  M = " << MA << " CS = " << sigmaTot << std::endl;
   return sigmaTot;
 }
 
@@ -187,7 +185,7 @@ double DarkZ::TotalCrossSectionCalc_WW(double E0)
   while(status) {
     status=gsl_integration_qags (&F1, Xmin1, Xmax1, 0, relerr, 1000, w1, &result1, &error1);
     relerr *= 1.2;
-    if(status) G4cout << "Increased tolerance=" << relerr << G4endl;
+    if(status) std::cout << "Increased tolerance=" << relerr << std::endl;
   }
   //if integration routine returns error code, integration is repeated
   //using increased error tolerance, message is printed out
@@ -200,7 +198,7 @@ double DarkZ::TotalCrossSectionCalc_WW(double E0)
   double PrefactorMuonZTotCS = epsilBench*epsilBench*alphaEW*alphaEW*alphaEW*ZNucl*ZNucl;
   sigmaTot= GeVtoPb*PrefactorMuonZTotCS*IntDsDx;
 
-  G4cout << "Total CS calc, E = " << E0 << "  M = " << MA << " CS = " << sigmaTot << G4endl;
+  std::cout << "Total CS calc, E = " << E0 << "  M = " << MA << " CS = " << sigmaTot << std::endl;
 
   return sigmaTot;
 }
@@ -261,7 +259,7 @@ double DarkZ::TotalCrossSectionCalc_WW2(double E0)
 #endif
 
   gsl_rng_free (r);
-  G4cout << "Total CS calc, E = " << E0 << "  M = " << MA << " CS = " << sigmaTot << G4endl;
+  std::cout << "Total CS calc, E = " << E0 << "  M = " << MA << " CS = " << sigmaTot << std::endl;
   return sigmaTot;
 }
 
@@ -320,7 +318,7 @@ double DarkZ::TotalCrossSectionCalc_WW3(double E0)
 #endif
 
   gsl_rng_free (r);
-  G4cout << "Total CS calc, E = " << E0 << "  M = " << MA << " CS = " << sigmaTot << G4endl;
+  std::cout << "Total CS calc, E = " << E0 << "  M = " << MA << " CS = " << sigmaTot << std::endl;
   return sigmaTot;
 }
 
@@ -681,8 +679,8 @@ double DarkZ::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double E0)
 
 double DarkZ::Width()
 {
-  const double muMass = G4MuonMinus::MuonMinusDefinition()->GetPDGMass()/GeV;
-  const double tauMass = G4TauMinus::TauMinusDefinition()->GetPDGMass()/GeV;
+  const double muMass = Mmu;
+  const double tauMass = Mtau;
   const double massRatio2 = muMass*muMass/(MA*MA);
   double width          = 0.;
   double nuWidth        = 0.;
@@ -695,7 +693,7 @@ double DarkZ::Width()
     }
     width = nuWidth+muWidth; // in GeV
   } else {
-    G4cout << "DarkZ: width for the mass above 2 Mtau is not implemented, exiting" << G4endl;
+    std::cout << "DarkZ: width for the mass above 2 Mtau is not implemented, exiting" << std::endl;
     exit(1);
   }
   return width;
