@@ -54,13 +54,14 @@ file(GLOB sources_UtilsDM     ${PROJECT_SOURCE_DIR}/src/UtilsDM/*.cc)
 add_library(UtilsDM SHARED ${sources_UtilsDM})
 set_target_properties(UtilsDM PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
 
-add_library(DMG4 SHARED ${sources_DMG4} ${sources_DMParticles} ${sources_DMProcesses})
-target_link_libraries(DMG4 ${Geant4_LIBRARIES} ${GSL_LIBRARIES} UtilsDM)
-set_target_properties(DMG4 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
-
 add_library(DarkMatter SHARED ${sources_DarkMatter})
 target_link_libraries(DarkMatter ${Geant4_LIBRARIES} ${GSL_LIBRARIES} UtilsDM)
 set_target_properties(DarkMatter PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
+
+add_library(DMG4 SHARED ${sources_DMG4} ${sources_DMParticles} ${sources_DMProcesses})
+target_link_libraries(DMG4 ${Geant4_LIBRARIES} ${GSL_LIBRARIES} UtilsDM DarkMatter)
+set_target_properties(DMG4 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
+
 
 #---Install build products---------------------------------------------------
 install(TARGETS DMG4 DarkMatter UtilsDM DESTINATION lib)
