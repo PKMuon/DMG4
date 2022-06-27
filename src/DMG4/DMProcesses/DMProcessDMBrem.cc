@@ -75,12 +75,13 @@ G4VParticleChange* DMProcessDMBrem::PostStepDoIt( const G4Track& aTrack,
   const G4double incidentKinE = aTrack.GetKineticEnergy();
 
   G4double XAcc=0., angles[2];
-  if(myDarkMatter->GetParentPDGID() == 11)
+  if(myDarkMatter->GetParentPDGID() == 11) {
     if(myDarkMatter->Decay()) {
       XAcc = myDarkMatter->SimulateEmissionWithAngle2(incidentE/GeV, angles);
     } else {
       XAcc = myDarkMatter->SimulateEmission(incidentE/GeV, angles);
     }
+  }
   if(myDarkMatter->GetParentPDGID() == 13) {
     //XAcc = myDarkMatter->SimulateEmissionByMuon(incidentE/GeV, angles);  // 2-dim sampling, angles are for the recoil muon
     XAcc = myDarkMatter->SimulateEmissionByMuon2(incidentE/GeV, angles); // 2-step sampling, angles are for the recoil muon
