@@ -64,12 +64,12 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
   // Initialize for Pb
   DMpar->RegisterNewParam("ANucl"      ,207.   );
   DMpar->RegisterNewParam("ZNucl"      ,82.    );
-  DMpar->RegisterNewParam("Density"    ,11.35 *(g/cm3) );
+  DMpar->RegisterNewParam("Density"    ,11.35*(g/cm3) );
 
   // Initialize for W
 //  DMpar->RegisterNewParam("ANucl"   ,184.   );
 //  DMpar->RegisterNewParam("ZNucl"   ,74.    );
-//  DMpar->RegisterNewParam("Density" ,19.25 *(g/cm3)s );
+//  DMpar->RegisterNewParam("Density" ,19.25*(g/cm3) );
 
   /* Comments to "DecayType"
    0: invisible (no decays simulated), 1: visible, 2: visible with constraints.
