@@ -16,8 +16,8 @@ DMParticleChi2* DMParticleChi2::Definition()
   }
   //get parameters from factory (NOTE: mass is parsed in GeV)
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
-  const G4double DMMass = DMpar->GetRegisteredParam("DMMass")*GeV;
-  const G4double MassChi1 = (DMpar->GetRegisteredParam("DMMass")*GeV) * DMpar->GetRegisteredParam("RDM", 1./3.);
+  const G4double DMMass = DMpar->GetRegisteredParam("DMMass");
+  const G4double MassChi1 = (DMpar->GetRegisteredParam("DMMass")) * DMpar->GetRegisteredParam("RDM", 1./3.);
   const G4double MassChi2 = (1. + DMpar->GetRegisteredParam("Ffactor", 0.4)) * MassChi1;
 
   const G4String name = "DMParticleChi2";

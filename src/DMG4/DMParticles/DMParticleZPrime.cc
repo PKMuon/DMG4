@@ -17,7 +17,7 @@ DMParticleZPrime* DMParticleZPrime::Definition()
   }
   //get parameters from factory (NOTE: mass is parsed in GeV)
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
-  G4double MassIn    = DMpar->GetRegisteredParam("DMMass")*GeV;
+  G4double MassIn    = DMpar->GetRegisteredParam("DMMass");
   G4double epsilIn   = DMpar->GetRegisteredParam("Epsilon");
   G4double DecayType = DMpar->GetRegisteredParam("DecayType");
 

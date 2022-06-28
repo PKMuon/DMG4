@@ -16,8 +16,6 @@ for arg in $* ; do
     echo "--with-geant4=path   : path to the installed Geant4, with directory /bin/geant4.sh, /include etc."
     echo "--with-dmg4=path     : path to the DMG4 package"
     echo "--with-gsl=path      : path to the GSL package"
-    echo "--with-mmkutils=path : path to the MMKUTILS package"
-    echo "--with-hepmc=path    : path to the HepMC package"
     echo "--with-root          : use ROOT as pointed by the ROOTSYS variable"
     echo
     echo "to see the actual compilation commands add argument VERBOSE=1 to make"
@@ -38,10 +36,6 @@ for arg in $* ; do
       DMG4LOCATION=${value}
     elif [ "x${option}" = "x--with-gsl" ] ; then
       GSLLOCATION=${value}
-    elif [ "x${option}" = "x--with-mmkutils" ] ; then
-      MMKUTILSLOCATION=${value}
-    elif [ "x${option}" = "x--with-hepmc" ] ; then
-      HEPMCLOCATION=${value}
     elif [ "x${option}" = "x--buildtype" ] ; then
       if [ "${value}" = "None" ] ; then
         COMPMODE=${value}
@@ -97,17 +91,11 @@ echo "cd -" >> config.csh
 echo "setenv G4ORDPARAMTABLE `pwd`/../../DATA/ordTable_FTFP_BERT.txt" >> config.csh
 
 ARGLIST="-DCMAKE_INSTALL_PREFIX=${PREFIX}"
-if [ "x${MMKUTILSLOCATION}" != "x" ] ; then
-  ARGLIST="${ARGLIST} -DMMKUTILS=${MMKUTILSLOCATION}"
-fi
 if [ "x${DMG4LOCATION}" != "x" ] ; then
   ARGLIST="${ARGLIST} -DDMG4_ROOT_DIR=${DMG4LOCATION}"
 fi
 if [ "x${GSLLOCATION}" != "x" ] ; then
   ARGLIST="${ARGLIST} -DGSL_ROOT_DIR=${GSLLOCATION}"
-fi
-if [ "x${HEPMCLOCATION}" != "x" ] ; then
-  ARGLIST="${ARGLIST} -DHEPMC_ROOT_DIR=${HEPMCLOCATION}"
 fi
 if [ "x${ROOTLOCATION}" != "x" ] ; then
   ARGLIST="${ARGLIST} -DROOTSYS=${ROOTLOCATION}"

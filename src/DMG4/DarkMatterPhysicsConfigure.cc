@@ -34,13 +34,23 @@
 // BiasSigmaFactor Visible mode Vector EThresh=18
 // 16.7  3.4e8
 
+/*
+ *
+ * SYSTEM OF UNITS
+ *
+ * All entered quantities must be accompained by their unit of measurement.
+ *
+ * (ANucl is the atomic number)
+ *
+ */
+
 bool DarkMatterPhysics::DarkMatterPhysicsConfigure() 
 {
   //call an instance of the class
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();  
   
   DMpar->RegisterNewParam("BiasSigmaFactor0", 8.e8);
-  DMpar->RegisterNewParam("EThresh", 35.); // for sensitivity calculations invisible mode
+  DMpar->RegisterNewParam("EThresh", 35.*GeV); // for sensitivity calculations invisible mode
   //G4double EThresh = 18.; // for sensitivity calculations visible mode
   //G4double EThresh = 1.; // for shape studies
   //G4double EThresh = 2000.; // to turn off A emissions  
@@ -48,18 +58,18 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
   //select particle type and details
   DMpar->RegisterNewParam("DMProcessType", 1.); // 1 - 4: Brem. process for Vector, Scalar, Axial, Pseudoscalar, 21 - ALP
                                                 // 31 - ZPrime (muon beams), 11 - 14: Annihilation
-  DMpar->RegisterNewParam("DMMass", 0.0167);
+  DMpar->RegisterNewParam("DMMass", 0.0167*GeV);
   DMpar->RegisterNewParam("Epsilon", 0.0001);
 
   // Initialize for Pb
   DMpar->RegisterNewParam("ANucl"      ,207.   );
   DMpar->RegisterNewParam("ZNucl"      ,82.    );
-  DMpar->RegisterNewParam("Density"    ,11.35  );
+  DMpar->RegisterNewParam("Density"    ,11.35 *(g/cm3) );
 
   // Initialize for W
 //  DMpar->RegisterNewParam("ANucl"   ,184.   );
 //  DMpar->RegisterNewParam("ZNucl"   ,74.    );
-//  DMpar->RegisterNewParam("Density" ,19.25  );
+//  DMpar->RegisterNewParam("Density" ,19.25 *(g/cm3)s );
 
   /* Comments to "DecayType"
    0: invisible (no decays simulated), 1: visible, 2: visible with constraints.

@@ -28,7 +28,7 @@ public:
 private:
       int iBranchingType;
 
-      double f,r;
+      double r,f;
       double alphaD;
       double mChi;
       double mChi1,mChi2,deltaMchi;

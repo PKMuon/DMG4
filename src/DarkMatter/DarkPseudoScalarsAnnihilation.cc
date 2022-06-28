@@ -13,8 +13,10 @@
 #include <cmath>
 
 DarkPseudoScalarsAnnihilation::DarkPseudoScalarsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
-        double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
-        DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn), r(rIn), alphaD(alphaDIn), iBranchingType(IBranchingIn), f(fIn) {
+                                                             double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
+DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn),
+iBranchingType(IBranchingIn), r(rIn), f(fIn), alphaD(alphaDIn)
+{
     DMType = 4; //A.C.
     ParentPDGID = -11;
     DaughterPDGID = 11;
@@ -60,7 +62,7 @@ double DarkPseudoScalarsAnnihilation::TotalCrossSectionCalc(double E0) {
     double qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
     double gg = this->Width();
 
-    double sigma = 4 * M_PI * alphaEW * epsil * epsil * alphaD;
+    double sigma = 4 * M_PI * alphaEW * epsilBench * epsilBench * alphaD;
     sigma = sigma * qq / sqrt(ss);
     sigma = sigma / ((ss - MA * MA) * (ss - MA * MA) + MA * MA * gg * gg);
 
@@ -93,12 +95,15 @@ bool DarkPseudoScalarsAnnihilation::EmissionAllowed(double E0, double DensityMat
 }
 
 double DarkPseudoScalarsAnnihilation::CrossSectionDSDX(double XEv, double E0) {
+    (void)(E0);
     if (XEv > 0.9999)
         return 1.;
     return 0.;
 }
 
 double DarkPseudoScalarsAnnihilation::CrossSectionDSDXDU(double XEv, double UThetaEv, double E0) {
+    (void)(UThetaEv);
+    (void)(E0);
     if (XEv > 0.9999)
         return 1.;
     return 0.;

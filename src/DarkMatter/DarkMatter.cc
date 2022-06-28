@@ -739,7 +739,7 @@ double DarkMatter::SimulateEmissionVector(double E0, double* angles)
 
 
 /*This method returns a random cosine for e+e- --> A' --> ff in the CM frame
- * E0: positron energy in LAB frame
+ * E0: positron energy in LAB frame (GeV units)
  */
 double DarkMatter::SimulateEmissionResonant(double E0){
 
@@ -758,7 +758,7 @@ double DarkMatter::SimulateEmissionResonant(double E0){
 /*This method returns the angular distribution for e+e- --> A' --> ff in the CM frame
  * It has to be implemented in the derived classes (the default method is a dummy implementation)
  * eta: cosine of the f in the CM frame
- * E0: positron beam energy in LAB frame
+ * E0: positron beam energy in LAB frame (GeV units)
  * IMPORTANT: it has to be normalized so that the maximum is one.
  */
 double DarkMatter::AngularDistributionResonant(double eta,double E0){

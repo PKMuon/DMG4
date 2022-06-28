@@ -47,10 +47,21 @@ G4double DMProcessDMBrem::GetMeanFreePath( const G4Track& aTrack,
 
   if( myDarkMatter->EmissionAllowed(ekin, DensityMat) ) {
 
-    G4double XMeanFreePath = myDarkMatter->GetMeanFreePathFactor()/myDarkMatter->GetSigmaTot(ekin);
-    XMeanFreePath /= BiasSigmaFactor;
+      G4double CrossSection = myDarkMatter->GetSigmaTot(ekin); //A.C. by DarkMatter definition, this is in picobarn
+      CrossSection *= picobarn;
 
-    return XMeanFreePath;
+      //The DarkMatter classes compute the cross section for eps = epsilBench. Here, we revert back to epsilon
+      CrossSection *= (myDarkMatter->Getepsil()* myDarkMatter->Getepsil())/(myDarkMatter->GetepsilBench()* myDarkMatter->GetepsilBench());
+      CrossSection /= myDarkMatter->GetSigmaNorm();
+
+
+      G4double n = aTrack.GetMaterial()->GetTotNbOfAtomsPerVolume();
+      G4double XMeanFreePath = 1./(n*CrossSection);
+
+      XMeanFreePath /= BiasSigmaFactor;
+
+
+      return XMeanFreePath;
 
   }
   return DBL_MAX;
@@ -64,12 +75,13 @@ G4VParticleChange* DMProcessDMBrem::PostStepDoIt( const G4Track& aTrack,
   const G4double incidentKinE = aTrack.GetKineticEnergy();
 
   G4double XAcc=0., angles[2];
-  if(myDarkMatter->GetParentPDGID() == 11)
+  if(myDarkMatter->GetParentPDGID() == 11) {
     if(myDarkMatter->Decay()) {
       XAcc = myDarkMatter->SimulateEmissionWithAngle2(incidentE/GeV, angles);
     } else {
       XAcc = myDarkMatter->SimulateEmission(incidentE/GeV, angles);
     }
+  }
   if(myDarkMatter->GetParentPDGID() == 13) {
     //XAcc = myDarkMatter->SimulateEmissionByMuon(incidentE/GeV, angles);  // 2-dim sampling, angles are for the recoil muon
     XAcc = myDarkMatter->SimulateEmissionByMuon2(incidentE/GeV, angles); // 2-step sampling, angles are for the recoil muon

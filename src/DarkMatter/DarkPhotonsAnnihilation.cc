@@ -16,8 +16,10 @@
 
 
 DarkPhotonsAnnihilation::DarkPhotonsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
-        double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
-        DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn), r(rIn), alphaD(alphaDIn), iBranchingType(IBranchingIn), f(fIn) {
+                                                 double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
+DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn),
+iBranchingType(IBranchingIn), r(rIn), f(fIn), alphaD(alphaDIn)
+{
   DMType = 1; //A.C.
   ParentPDGID = -11;
   DaughterPDGID = 11;
@@ -53,8 +55,8 @@ DarkPhotonsAnnihilation::~DarkPhotonsAnnihilation()
 double DarkPhotonsAnnihilation::TotalCrossSectionCalc(double E0)
 {
   double ss = 2. * Mel * E0;
-  double qq,E1,E2;
-  switch (iBranchingType){
+  double qq=0.,E1=0.,E2=0.;
+  switch (iBranchingType) {
 
   case 0:
   case 1:
@@ -72,7 +74,7 @@ double DarkPhotonsAnnihilation::TotalCrossSectionCalc(double E0)
 
   double gg = this->Width();
 
-  double sigma = 4 * M_PI * alphaEW * epsil * epsil * alphaD;
+  double sigma = 4 * M_PI * alphaEW * epsilBench * epsilBench * alphaD;
   sigma = sigma * qq / sqrt(ss);
   sigma = sigma / ((ss - MA * MA) * (ss - MA * MA) + MA * MA * gg * gg);
 
@@ -105,8 +107,6 @@ double DarkPhotonsAnnihilation::GetSigmaTot(double E0) {
 
 bool DarkPhotonsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
 {
-
-
   if (sqrt(2.*Mel*E0) < 2.*mChi) return false;
   if(E0 < EThresh) return false;
   if(NEmissions) return false; // For G4 DM classes
@@ -116,12 +116,15 @@ bool DarkPhotonsAnnihilation::EmissionAllowed(double E0, double DensityMat) // D
 
 
 double DarkPhotonsAnnihilation::CrossSectionDSDX(double XEv, double E0) {
+  (void)(E0);
   if (XEv > 0.9999) return 1.;
   return 0.;
 }
 
 
 double DarkPhotonsAnnihilation::CrossSectionDSDXDU(double XEv, double UThetaEv, double E0) {
+  (void)(UThetaEv);
+  (void)(E0);
   if (XEv > 0.9999) return 1.;
   return 0.;
 }

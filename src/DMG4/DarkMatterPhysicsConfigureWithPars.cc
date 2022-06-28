@@ -35,38 +35,70 @@
 // 16.7  3.4e8
 
 
+
 //A.C. the default version does nothing with ptr
+/*
+ *
+ * SYSTEM OF UNITS
+ *
+ * All entered quantities must be accompained by their unit of measurement.
+ *
+ * (ANucl is the atomic number)
+ *
+ */
 bool DarkMatterPhysics::DarkMatterPhysicsConfigure(void *ptr)
 {
-  //call an instance of the class
-  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
+    //call an instance of the class
+     DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
 
-  DMpar->RegisterNewParam("BiasSigmaFactor0", 8.e8);
-  DMpar->RegisterNewParam("EThresh", 35.); // for sensitivity calculations invisible mode
-  //G4double EThresh = 18.; // for sensitivity calculations visible mode
-  //G4double EThresh = 1.; // for shape studies
-  //G4double EThresh = 2000.; // to turn off A emissions
+     DMpar->RegisterNewParam("BiasSigmaFactor0", 8.e8);
+     DMpar->RegisterNewParam("EThresh", 35.*GeV); // for sensitivity calculations invisible mode
+     //G4double EThresh = 18.; // for sensitivity calculations visible mode
+     //G4double EThresh = 1.; // for shape studies
+     //G4double EThresh = 2000.; // to turn off A emissions
 
-  //select particle type and details
-  DMpar->RegisterNewParam("DMProcessType", 1.);
-  DMpar->RegisterNewParam("DMMass", 0.0167);
-  DMpar->RegisterNewParam("Epsilon", 0.0001);
+     //select particle type and details
+     DMpar->RegisterNewParam("DMProcessType", 1.); // 1 - 4: Brem. process for Vector, Scalar, Axial, Pseudoscalar, 21 - ALP
+                                                   // 31 - ZPrime (muon beams), 11 - 14: Annihilation
+     DMpar->RegisterNewParam("DMMass", 0.0167*GeV);
+     DMpar->RegisterNewParam("Epsilon", 0.0001);
 
-  // Initialize for Pb
-  DMpar->RegisterNewParam("ANucl"      ,207.   );
-  DMpar->RegisterNewParam("ZNucl"      ,82.    );
-  DMpar->RegisterNewParam("Density"    ,11.35  );
+     // Initialize for Pb
+     DMpar->RegisterNewParam("ANucl"      ,207.   );
+     DMpar->RegisterNewParam("ZNucl"      ,82.    );
+     DMpar->RegisterNewParam("Density"    ,11.35 *(g/cm3) );
 
-  // Initialize for W
-//  DMpar->RegisterNewParam("ANucl"   ,184.   );
-//  DMpar->RegisterNewParam("ZNucl"   ,74.    );
-//  DMpar->RegisterNewParam("Density" ,19.25  );
+     // Initialize for W
+   //  DMpar->RegisterNewParam("ANucl"   ,184.   );
+   //  DMpar->RegisterNewParam("ZNucl"   ,74.    );
+   //  DMpar->RegisterNewParam("Density" ,19.25 *(g/cm3)s );
 
-  DMpar->RegisterNewParam("DecayType", 0.); // 0 invisible, 2 visible
+     /* Comments to "DecayType"
+      0: invisible (no decays simulated), 1: visible, 2: visible with constraints.
+      *
+      For annihilation, the process reads e+ e- -> R -> ff, where "R" is the intermediate resonance, and ff the final state particles.
+      Setting this to "0" means that the code accounts for the total cross-section for e+e- --> R --> ff, but only produces the R in the final state,
+      with a fully invisible energy (the missing energy is properly accounted for, since the e+ is killed).
+      Setting this to "1" means that the code will produce the "ff" final state, according to Branching type.
+     */
 
-  // additional parameters for annihilation
-//  DMpar->RegisterNewParam("RDM", 1./3.);
-//  DMpar->RegisterNewParam("AlphaD", 0.5);
+     DMpar->RegisterNewParam("DecayType", 1.);
 
+     /* Comments to "BranchingType"
+      * Optional to make different decay table; 0 : invisible decays or SM lepton decays, depending on DecayType; 1 : B - L model; 2 : Semivisible: Inelastic DM
+      * For annihilation e+e- --> R --> ff the meaning is DIFFERENT!
+
+        0: default: fermionic ff final state
+        1: scalar ff final state
+        2: asymmetric fermionic DM final state produced
+      */
+     //DMpar->RegisterNewParam("BranchingType", 0.);
+
+     // additional parameters for annihilation (if absent the default ones will be used)
+     //DMpar->RegisterNewParam("RDM", 1./3.);
+     //DMpar->RegisterNewParam("AlphaD", 0.5);
+
+     // additional parameters for semivisible DM, in addition to above parameters for annihilation (if absent the default ones will be used)
+     //DMpar->RegisterNewParam("Ffactor", 0.4);
   return true;
 }
