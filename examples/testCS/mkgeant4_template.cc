@@ -6,8 +6,8 @@
 #define nPointsMass 62
 #define RELATIVE_DELTA 0.005 // 0.5% delta to check if calculated tot cs is 'equal' to reference cs
 
-#include "DarkPhotons.hh"
-#include "DarkPhotonsSigmaTotETL.inc" // include file with ETL reference values
+#include "DM_TYPE_NAME.hh"
+#include "DM_TYPE_NAMESigmaTotETL.inc" // include file with ETL reference values
 
 using std::cout;
 using std::endl;
@@ -28,7 +28,7 @@ int main() {
          double* pETLii = pdataETL[ii];
          for(int jj=0; jj<nPointsMass; jj++) {
            massTested = testMassValues[jj]/1000.;                             //convert mass to GeV    
-           DarkMatter* myDarkMatter = new DarkPhotons(massTested, EThresh);  //Initialize DM by default for Pb with eps=0.0001
+           DarkMatter* myDarkMatter = new DM_TYPE_NAME(massTested, EThresh);  //Initialize DM by default for Pb with eps=0.0001
            csCalcResult = myDarkMatter->TotalCrossSectionCalc(E0);            //get calculated ETL cs from DMG4       
            csRefResult = (*pETLii); pETLii++;                                 //get reference ETL cs from include file
 
