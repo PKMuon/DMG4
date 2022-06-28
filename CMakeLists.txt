@@ -62,7 +62,6 @@ add_library(DMG4 SHARED ${sources_DMG4} ${sources_DMParticles} ${sources_DMProce
 target_link_libraries(DMG4 ${Geant4_LIBRARIES} ${GSL_LIBRARIES} UtilsDM DarkMatter)
 set_target_properties(DMG4 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
 
-
 #---Install build products---------------------------------------------------
 install(TARGETS DMG4 DarkMatter UtilsDM DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include FILES_MATCHING PATTERN *.hh PATTERN .svn EXCLUDE)
