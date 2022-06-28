@@ -1,0 +1,22 @@
+To prepare correct 'mkgeant4.cc' for specific type of mediator use one of these commands before 'make':
+  sed -r 's#DM_TYPE_NAME#DarkPhotons#g' mkgeant4_template.cc > mkgeant4.cc
+  sed -r 's#DM_TYPE_NAME#DarkScalars#g' mkgeant4_template.cc > mkgeant4.cc  
+  sed -r 's#DM_TYPE_NAME#DarkPseudoScalars#g' mkgeant4_template.cc > mkgeant4.cc
+  sed -r 's#DM_TYPE_NAME#DarkAxials#g' mkgeant4_template.cc > mkgeant4.cc
+Then launch as ususal:
+  make
+  ./mkgeant4
+In case any deviations from reference total cs values are found the output will be a table such as this:
+MA(MeV)  OK - 0, ERR - 1  
+0.7 	 0 0 0 0 0 0 0 0 
+0.8 	 0 0 0 0 0 0 0 0 
+0.9 	 0 0 1 1 1 0 0 0 
+1   	 0 0 0 0 1 0 0 0 
+2	     0 0 0 0 1 0 0 0 
+4   	 0 0 1 0 0 0 1 0 
+6   	 0 0 0 0 1 0 0 0 
+
+Each row is for fixed MA mass(MeV) and E0 energy(GeV) values from {20, 40, 60, 80, 100, 120, 140, 160} range.
+1 - difference between reference and DMG4 calculated total cs is more than relative delta specified in mkgeant4.cc
+0 - difference is within relative delta 
+
