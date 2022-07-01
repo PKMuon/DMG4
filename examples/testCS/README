@@ -1,8 +1,8 @@
 To prepare correct 'mkgeant4.cc' for specific type of mediator use one of these commands before 'make':
-  sed -r 's#DM_TYPE_NAME#DarkPhotons#g' mkgeant4_template.cc > mkgeant4.cc
-  sed -r 's#DM_TYPE_NAME#DarkScalars#g' mkgeant4_template.cc > mkgeant4.cc  
-  sed -r 's#DM_TYPE_NAME#DarkPseudoScalars#g' mkgeant4_template.cc > mkgeant4.cc
-  sed -r 's#DM_TYPE_NAME#DarkAxials#g' mkgeant4_template.cc > mkgeant4.cc
+  sed -r 's#DM_TYPE_NAME#DarkPhotons#g' mkgeant4.cc.template > mkgeant4.cc
+  sed -r 's#DM_TYPE_NAME#DarkScalars#g' mkgeant4.cc.template > mkgeant4.cc  
+  sed -r 's#DM_TYPE_NAME#DarkPseudoScalars#g' mkgeant4.cc.template > mkgeant4.cc
+  sed -r 's#DM_TYPE_NAME#DarkAxials#g' mkgeant4.cc.template > mkgeant4.cc
 Then launch as ususal:
   make
   ./mkgeant4

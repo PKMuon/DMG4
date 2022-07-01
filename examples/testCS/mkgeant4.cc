@@ -11,6 +11,7 @@
 
 using std::cout;
 using std::endl;
+using std::cerr;
 
 int main() {
 
@@ -27,7 +28,7 @@ int main() {
          E0 = valuesE0[ii];
          double* pETLii = pdataETL[ii];
          for(int jj=0; jj<nPointsMass; jj++) {
-           massTested = testMassValues[jj]/1000.;                             //convert mass to GeV    
+           massTested = 0.001*testMassValues[jj];                             //convert mass to GeV    
            DarkMatter* myDarkMatter = new DarkPhotons(massTested, EThresh);  //Initialize DM by default for Pb with eps=0.0001
            csCalcResult = myDarkMatter->TotalCrossSectionCalc(E0);            //get calculated ETL cs from DMG4       
            csRefResult = (*pETLii); pETLii++;                                 //get reference ETL cs from include file
@@ -36,11 +37,13 @@ int main() {
          }
        }
        if(countNotEqual) {
-         for(int jj=0; jj<nPointsMass; jj++) {cout<<testMassValues[jj]<<"\t"; 
-           for(int ii=0; ii<nPointsE0; ii++){cout<<arrayNotEqual[jj][ii]<<" ";}
-           cout<<endl;
+         for(int jj=0; jj<nPointsMass; jj++) {cerr<<testMassValues[jj]<<"\t"; 
+           for(int ii=0; ii<nPointsE0; ii++){cerr<<arrayNotEqual[jj][ii]<<" ";}
+           cerr<<endl;
          }
-         cout<<" Error: Found "<<countNotEqual<<" deviation(s) from "<<nPointsMass*nPointsE0<<" reference points, exiting..."<<endl; exit(1);
+         cerr<<" Error: Cross section test for DarkPhotons failed!"<<endl; 
+         cerr<<"        Found "<<countNotEqual<<" deviation(s) from "<<nPointsMass*nPointsE0<<" reference points, exiting..."<<endl;
+         exit(1);
        }
        else cout<<" All OK!:"<<endl;
        return 0;
