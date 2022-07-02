@@ -28,7 +28,7 @@ int main() {
          E0 = valuesE0[ii];
          double* pETLii = pdataETL[ii];
          for(int jj=0; jj<nPointsMass; jj++) {
-           massTested = 0.001*testMassValues[jj];                             //convert mass to GeV    
+           massTested = testMassValues[jj]/1000.;                             //convert mass to GeV    
            DarkMatter* myDarkMatter = new DarkPhotons(massTested, EThresh);  //Initialize DM by default for Pb with eps=0.0001
            csCalcResult = myDarkMatter->TotalCrossSectionCalc(E0);            //get calculated ETL cs from DMG4       
            csRefResult = (*pETLii); pETLii++;                                 //get reference ETL cs from include file
