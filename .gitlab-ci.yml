@@ -43,22 +43,22 @@ build:
     - sed -r 's#DM_TYPE_NAME#DarkPhotons#g' mkgeant4.cc.template > mkgeant4.cc
     - make
     - mv mkgeant4.cc mkgeant4DP
-    - ./mkgeant4 > testDP.log
+    - ./mkgeant4DP > testDP.log
 
     - sed -r 's#DM_TYPE_NAME#DarkScalars#g' mkgeant4.cc.template > mkgeant4.cc
     - make
     - mv mkgeant4.cc mkgeant4SC
-    - ./mkgeant4 > testSC.log
+    - ./mkgeant4SC > testSC.log
     
     - sed -r 's#DM_TYPE_NAME#DarkPseudoScalars#g' mkgeant4.cc.template > mkgeant4.cc
     - make
     - mv mkgeant4.cc mkgeant4PS
-    - ./mkgeant4 > testPS.log
+    - ./mkgeant4PS > testPS.log
     
     - sed -r 's#DM_TYPE_NAME#DarkAxials#g' mkgeant4.cc.template > mkgeant4.cc
     - make
     - mv mkgeant4.cc mkgeant4AX
-    - ./mkgeant4 > testAX.log
+    - ./mkgeant4AX > testAX.log
 
 check-tabs:
   stage: test
