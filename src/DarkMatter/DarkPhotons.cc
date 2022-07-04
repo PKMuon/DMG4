@@ -7,7 +7,7 @@
 #include "DarkPhotons.hh"
 #include "Utils.hh"
 
-#include <math.h>
+#include <cmath>
 #include <iostream>
 
 #include "KFactors.code"

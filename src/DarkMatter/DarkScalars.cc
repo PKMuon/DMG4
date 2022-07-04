@@ -7,8 +7,7 @@
 #include "DarkScalars.hh"
 #include "Utils.hh"
 
-#include "G4Electron.hh" // to get CLHEP constants
-
+#include <cmath>
 #include <iostream>
 
 #include "KFactorsScalars.code"
