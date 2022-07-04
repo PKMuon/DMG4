@@ -7,8 +7,7 @@
 #include "DarkAxials.hh"
 #include "Utils.hh"
 
-#include "G4Electron.hh" // to get CLHEP constants
-
+#include <math.h>
 #include <iostream>
 
 #include "KFactorsAxials.code"

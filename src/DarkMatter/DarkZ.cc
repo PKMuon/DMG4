@@ -7,9 +7,6 @@
 #include "DarkZ.hh"
 #include "Utils.hh"
 
-
-#include "Randomize.hh"
-
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_multimin.h>
 #include <gsl/gsl_monte.h>
@@ -21,7 +18,6 @@
 #include <gsl/gsl_sf_dilog.h>
 
 #include <iostream>
-
 
 
 // Auxiliary structures and functions:
