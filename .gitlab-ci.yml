@@ -36,6 +36,12 @@ build:
     - ./mkgeant4
     - cd ../..
     
+    - cd examples/example11
+    - ./runconfigure
+    - make
+    - ./mkgeant4 cardg_test.g4mac
+    - cd ../..
+
     # test DMG4 cross section stability
     - cd examples/testCS
     - ./runconfigure
