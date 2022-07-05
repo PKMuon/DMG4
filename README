@@ -48,6 +48,7 @@ by gamma can be also simulated, usually gammas are secondary particles produced 
  III. Compilation of internal examples and user applications
 
 1. example1 is a test of DarkMatter subpackage only. Run script runconfigure, then make. The executable is mkgeant4.
+2. example11 is an exampleof building Geant4 application. Run script runconfigure, then make. The executable is mkgeant4.
 2. For your Geant4 application: compile it together with 3 libraries that are put in the subdirectory /lib when "make install" is executed
    Example of Dark Matter physics inclusion can be found in examples/mkgeant4.cc denoted by ""extension" part"
    Example of DarkMatterPhysicsConfigure.cc to simulate ALP is in examples/example1022
