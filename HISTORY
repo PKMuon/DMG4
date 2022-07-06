@@ -1,3 +1,10 @@
+06.07.2022   Version 2.1      Consistent usage of Geant4 system of units in the DMG4 part, in particular in DarkMatterPhysicsConfigure
+                              Fix bug in the calculation of MeanFreePath, which increases the yield of DM by 10%
+                              Fix units in subpackage DarkMatter, remove its dependency on Geant4 (but it still depends on CLHEP taken through Geant4)
+                              Add example11 which builds a Geant4 application with DMG4
+                              Add possibility of semivisible DM production (inelastic DM with the new DM particles Chi2 and Chi1)
+                              Clean some warnings and code style
+
 02.06.2022   Version 2.0      Reorganization of the DMG4 code. The number of DM particle singletons is reduced, the corresponding codes put in a subdirectory.
                               The class DarkMatterParametersFactory is added in order to specify different decay options in the same particle constructor.
                               This way a possibility of a B-L vector particle is added (can decay to SM particles, for example e+e-, mu+mu-).
