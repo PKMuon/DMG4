@@ -56,9 +56,7 @@ int main(int argc,char** argv) {
 #endif
    
   // UserAction classes
-//  NA64::RunAction* runAction = new NA64::RunActionDMG4(mkexp, myPhysics->GetDarkMatterPointer(),
-//                                                              myPhysics->GetBiasSigmaFactor() );
-//  runManager->SetUserAction(runAction);
+  //runManager->SetUserAction(runAction);
   runManager->SetUserAction(new PrimaryGeneratorAction(mkexp));
 
   EventAction* myEA = new EventAction(mkexp, myPhysics->GetDarkMatterPointer());

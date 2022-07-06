@@ -1,7 +1,7 @@
 # Setup the project
 #
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
-project(NA64simulation)
+project(DMG4examples)
 
 #----------------------------------------------------------------------------
 # Find Geant4 package, activating all available UI and Vis drivers by default
