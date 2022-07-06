@@ -17,12 +17,17 @@
 
 
 EventAction::EventAction(DetectorConstruction* myDC, DarkMatter* DMPointer)
-: myDetector(myDC), myDarkMatter(DMPointer)
+: myDetector(myDC), myDarkMatter(DMPointer), NEmissions(0)
 {;}
 
 
 EventAction::~EventAction()
-{}
+{
+  G4cout << "Total number of DM emissions = " << NEmissions << G4endl;
+  ofstream outFile("Report.txt");
+  if(NEmissions >= 3) outFile << "Total number of DM emissions = " << NEmissions << G4endl;
+  outFile.close();
+}
 
 
 void EventAction::BeginOfEventAction(const G4Event* event)

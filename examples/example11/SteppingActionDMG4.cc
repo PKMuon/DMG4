@@ -48,15 +48,15 @@ SteppingActionDMG4::SteppingActionDMG4(DetectorConstruction* myDC, EventAction* 
 void SteppingActionDMG4::UserSteppingAction(const G4Step* aStep)
 {
   G4StepPoint* SPointPreStep = aStep->GetPreStepPoint();
-  G4StepPoint* SPointPostStep = aStep->GetPostStepPoint();
-  G4double ekin = aStep->GetTrack()->GetKineticEnergy()/GeV;
-  G4double ekinprestep = SPointPreStep->GetKineticEnergy()/GeV;
-  G4ParticleDefinition* theParticleDefinition = aStep->GetTrack()->GetDefinition();
+  //G4StepPoint* SPointPostStep = aStep->GetPostStepPoint();
+  //G4double ekin = aStep->GetTrack()->GetKineticEnergy()/GeV;
+  //G4double ekinprestep = SPointPreStep->GetKineticEnergy()/GeV;
+  //G4ParticleDefinition* theParticleDefinition = aStep->GetTrack()->GetDefinition();
 
   if(aStep->GetPostStepPoint()->GetProcessDefinedStep() != 0) {
     if((aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()).find(string("DMProcess")) != string::npos) {
 
-      //((NA64::RunActionDMG4*)(GetEventAction()->GetRunAction()))->CountEmission();
+      eventAction->CountEmission();
 
       G4cout << "Dark Matter production at E = " << SPointPreStep->GetKineticEnergy()/GeV << G4endl;
     }

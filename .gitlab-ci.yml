@@ -41,6 +41,7 @@ build:
     - make
     - source config.sh
     - ./mkgeant4 cardg_test.g4mac
+    - cp Report.txt Report.txtSV
     - cd ../..
 
     # test DMG4 cross section stability

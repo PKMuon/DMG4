@@ -21,9 +21,12 @@ class EventAction : public G4UserEventAction
     void EndOfEventAction(const G4Event*);
     void SetSteppingAction(SteppingActionDMG4* action) {theSteppingAction = action;}
     DarkMatter* GetDarkMatterPointer() {return myDarkMatter;}
+    void CountEmission() {NEmissions++;}
 
   private:
     DetectorConstruction* myDetector;
     SteppingActionDMG4* theSteppingAction;
     DarkMatter* myDarkMatter;
+
+    G4int NEmissions;
 };
