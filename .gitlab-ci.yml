@@ -39,6 +39,7 @@ build:
     - cd examples/example11
     - ./runconfigure
     - make
+    - source config.sh
     - ./mkgeant4 cardg_test.g4mac
     - cd ../..
 
