@@ -46,8 +46,13 @@ G4ForceCondition* /*condition*/) {
 
   if (myDarkMatter->EmissionAllowed(ekin, DensityMat)) {
 
+
+
     G4double CrossSection = myDarkMatter->GetSigmaTot(ekin); //A.C. by DarkMatter definition, this is in picobarn
     CrossSection *= picobarn;
+
+
+
 
     //The DarkMatter classes compute the cross section for eps = epsilBench. Here, we revert back to epsilon
     CrossSection *= (myDarkMatter->Getepsil() * myDarkMatter->Getepsil()) / (myDarkMatter->GetepsilBench() * myDarkMatter->GetepsilBench());
@@ -141,6 +146,7 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
 
         std::cout << "Daugther1: " << DMParticleChi::Definition()->GetPDGEncoding() << " energy= " << v1.e() / GeV << "GeV " << std::endl;
         std::cout << "Daugther2: " << DMParticleChi::Definition()->GetPDGEncoding() << " energy= " << v2.e() / GeV << "GeV " << std::endl;
+        std::cout << "cos(angle) CM wrt e+: "<<DMeta_CM<<std::endl;
 
         return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
 
@@ -183,6 +189,7 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
 
         std::cout << "Daugther1: " << DMParticleChi1::Definition()->GetPDGEncoding() << " energy= " << v1.e() / GeV << "GeV " << std::endl;
         std::cout << "Daugther2: " << DMParticleChi2::Definition()->GetPDGEncoding() << " energy= " << v2.e() / GeV << "GeV " << std::endl;
+        std::cout << "cos(angle) CM wrt e+: "<<DMeta_CM<<std::endl;
 
         return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
 
