@@ -18,7 +18,7 @@
 #include <gsl/gsl_sf_dilog.h>
 
 #include <iostream>
-
+#include <cmath>
 
 // Auxiliary structures and functions:
 
