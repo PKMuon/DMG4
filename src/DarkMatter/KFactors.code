@@ -119,5 +119,5 @@ double KfactorApproximate(double MAtest, double E0test)
   if (MAtest >= MMAA[nMA-1] )
     MAtest  = 0.995 * MMAA[nMA-1]; // Upper limit for mass
 
-  return 1.1 * BilinearInterpolation<nE0> (MAtest, E0test, MMAA, EE00, KKffactor, nMA, 1);
+  return BilinearInterpolation<nE0> (MAtest, E0test, MMAA, EE00, KKffactor, nMA, 1);
 }
