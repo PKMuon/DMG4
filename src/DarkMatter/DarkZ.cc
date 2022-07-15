@@ -50,6 +50,7 @@ static double _DarkZDsDxMuon_WW(double x1, void * parms_) {
 
 // A callback wrapping function for DarkZ::CrossSectionDSDXDTheta()
 static double _DarkZDsDxDThetaMuon(double x[], size_t dim, void * parms_) {
+    (void)dim; // to avoid warning
     BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
     // Forward invocation to target method
     return parms->this_->CrossSectionDSDXDTheta( x[0], x[1], parms->E0 );
@@ -57,6 +58,7 @@ static double _DarkZDsDxDThetaMuon(double x[], size_t dim, void * parms_) {
 
 // A callback wrapping function for DarkZ::CrossSectionDSDXDpsi()
 static double _DarkZDsDxDPsiMuon(double x[], size_t dim, void * parms_) {
+    (void)dim; // to avoid warning
     BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
     // Forward invocation to target method
     return parms->this_->CrossSectionDSDXDPSI_WW( x[0], x[1], parms->E0 );

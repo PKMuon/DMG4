@@ -79,7 +79,6 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
   //Do not simulate the decay.
   if (myDarkMatter->Decay() == 0) {
     G4ThreeVector DMDirection = incidentDir;
-    G4double DME = incidentE;
     G4double DMM = myDarkMatter->GetMA() * GeV; //A.C. Dark Matter units are, by default, GeV
     G4double DMKinE = incidentE - DMM;
 
@@ -94,7 +93,7 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
     aParticleChange.ProposeTrackStatus(fStopAndKill);
 
     std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding() << " emitted by " << aTrack.GetDefinition()->GetParticleName() << " with energy = "
-        << incidentE / GeV << " GeV, DM energy = " << DME / GeV << " GeV " << std::endl;
+        << incidentE / GeV << " GeV, DM energy = " << incidentE / GeV << " GeV " << std::endl;
 
     return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
   } else { //simulate the decay e+e- -->A' -->ff
@@ -202,7 +201,6 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
       G4cout << "The decay to final state LDM particles is not yet implemented " << G4endl;
       //revert to Decay()==0a
       G4ThreeVector DMDirection = incidentDir;
-      G4double DME = incidentE;
       G4double DMM = myDarkMatter->GetMA() * GeV;
       G4double DMKinE = incidentE - DMM;
       G4DynamicParticle *movingDM = new G4DynamicParticle(theDMParticlePtr, DMDirection, DMKinE);
@@ -221,4 +219,5 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
       return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
     }
   }
+  return 0;
 }
