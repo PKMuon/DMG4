@@ -37,10 +37,26 @@ iBranchingType(IBranchingIn), r(rIn), f(fIn), alphaD(alphaDIn)
       mChi = MA * r;
       mChi1=mChi;
       mChi2=mChi;
+
   }
 
+
   deltaMchi=mChi2-mChi1;
+
+
+
   std::cout << "Initialized DarkPhotonsAnnihilation (e+ e- -> A' -> DM DM) for material density = " << DensityIn << std::endl;
+  std::cout << "mA: "<<MA<<std::endl;
+  std::cout << "IbranchingType: "<<iBranchingType<<std::endl;
+  if (iBranchingType==2){
+    std::cout<<"mChi1: "<<mChi1<<std::endl;
+    std::cout<<"mChi2: "<<mChi2<<std::endl;
+  }else{
+    std::cout<<"mChi: "<<mChi<<std::endl;
+  }
+  std::cout<<"Width: "<<this->Width()<<std::endl;
+
+
   std::cout << std::endl;
 }
 
@@ -78,6 +94,8 @@ double DarkPhotonsAnnihilation::TotalCrossSectionCalc(double E0)
   sigma = sigma * qq / sqrt(ss);
   sigma = sigma / ((ss - MA * MA) * (ss - MA * MA) + MA * MA * gg * gg);
 
+
+
   switch (iBranchingType){
   case 0:
       sigma = sigma * (ss - 4. / 3. * qq * qq); // A.C. this is for final state fermions (default)
@@ -86,9 +104,11 @@ double DarkPhotonsAnnihilation::TotalCrossSectionCalc(double E0)
       sigma = sigma * (2./3. * qq * qq);      // A.C. this is for final state scalars
       break;
   case 2:
-      sigma = sigma * 1./2*(mChi1 * mChi2 + E1*E2+qq*qq/3);                      //inelastic DM
+      sigma = sigma *2*(mChi1 * mChi2 + E1*E2+qq*qq/3);                      //inelastic DM
       break;
   }
+
+
 
   //here sigma is in G4 internal units, 1 /Energy^2. Move to pBarn;
   sigma *= GeVtoPb;
@@ -146,7 +166,7 @@ double DarkPhotonsAnnihilation::Width() {
       break;
   case 2:
       if (MA > (mChi1+mChi2)){
-          double E1=(MA*MA-mChi2*mChi2+mChi1*mChi1)/(2*sqrt(MA));
+          double E1=(MA*MA-mChi2*mChi2+mChi1*mChi1)/(2*MA);
           double qq=sqrt(E1*E1-mChi1*mChi1);
           ret+= alphaD*2*qq/(3*MA*MA)*(3*mChi1*mChi2+MA*MA-mChi1*mChi1/2-mChi2*mChi2/2-pow(mChi1*mChi1-mChi2*mChi2,2)/(2*MA*MA));
       }
