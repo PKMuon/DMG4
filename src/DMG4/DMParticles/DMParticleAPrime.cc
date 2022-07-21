@@ -78,12 +78,12 @@ DMParticleAPrime* DMParticleAPrime::Definition()
       IDPDG = 5500222;
       name = "DMParticleB-LBoson";
     } else if (BranchingType == 2) { // Inelastic DM: decay to Chi2 + Chi1
-      const G4double MChi1 = (DMpar->GetRegisteredParam("DMMass")*GeV) * DMpar->GetRegisteredParam("RDM", 1./3.);
+      const G4double MChi1 = (DMpar->GetRegisteredParam("DMMass")) * DMpar->GetRegisteredParam("RDM", 1./3.);
       const G4double MChi2 = (1. + DMpar->GetRegisteredParam("Ffactor", 0.4)) * MChi1;
       const G4double AlphaD = DMpar->GetRegisteredParam("AlphaD");
       const G4double Delta = MChi2 - MChi1;
       if(MassIn > 2.*electron_mass_c2) eWidth = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.+2.*RatioEA2);
-      if (MassIn > MChi1+MChi2) {
+      if(MassIn > MChi1+MChi2) {
         Chi12Width = AlphaD*MassIn/6.*sqrt(1.+MChi1*MChi1/(MassIn*MassIn)*(Delta*Delta/(MassIn*MassIn)*(Delta/MChi1+2.)*(Delta/MChi1+2.)-2.*
                      (1.+(1.+Delta/MChi1)*(1.+Delta/MChi1))))*(2.-MChi1*MChi1/(MassIn*MassIn)*(1.+Delta*Delta/(MassIn*MassIn)*(2.+Delta/MChi1)*
                      (2.+Delta/MChi1)+(1.+Delta/MChi1)*(1.+Delta/MChi1)-6.*(1.+Delta/MChi1)));
