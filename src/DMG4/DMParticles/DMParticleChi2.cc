@@ -28,7 +28,7 @@ DMParticleChi2* DMParticleChi2::Definition()
   // parameters for the width
   G4double Epsilon = DMpar->GetRegisteredParam("Epsilon");
   G4double AlphaD = DMpar->GetRegisteredParam("AlphaD");
-  G4double Theta = DMpar->GetRegisteredParam("Theta");
+  G4double Theta = DMpar->GetRegisteredParam("Theta", 1.e-3);
   G4double BranchingType = DMpar->GetRegisteredParam("BranchingType", 0);
   G4double Splitting = MassChi2 - MassChi1;
 
