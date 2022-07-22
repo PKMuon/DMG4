@@ -37,6 +37,8 @@ DMParticleChi2* DMParticleChi2::Definition()
   // calculate the width
   const G4double K = 0.640;
   G4double WidthIn = K*4.*Epsilon*Epsilon*fine_structure_const*AlphaD*pow(Splitting,5.)/(15.*CLHEP::pi*pow(DMMass,4.));
+  G4double y = Epsilon*Epsilon*AlphaD*pow((MassChi1/DMMass),4.);
+  G4double WidthInDirac =4.*fine_structure_const*pow(tan(Theta),2.)*pow(cos(Theta),4.)*y*MassChi1*pow(Splitting,5.); 
   std::cout << "Mass Chi2: " << MassChi2/MeV << " MeV " <<std::endl;
   std::cout << "===> Width Chi2->chi1ee " << WidthIn/MeV <<" MeV "<< std::endl;
 
