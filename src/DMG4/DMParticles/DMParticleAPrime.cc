@@ -21,12 +21,12 @@ DMParticleAPrime* DMParticleAPrime::Definition()
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
   G4double MassIn    = DMpar->GetRegisteredParam("DMMass");
   G4double epsilIn   = DMpar->GetRegisteredParam("Epsilon");
-  G4double DecayType = DMpar->GetRegisteredParam("DecayType");  
+  G4double DecayType = DMpar->GetRegisteredParam("DecayType");
   G4double BranchingType = DMpar->GetRegisteredParam("BranchingType", 0);
 
   G4String name = "DMParticleAPrime";
   const G4String nameSubType = "DMParticleAPrime";
-  // search in particle table]
+  // search in particle table
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition * anInstance = pTable->FindParticle(name);
   const G4double muMass = G4MuonMinus::MuonMinusDefinition()->GetPDGMass();

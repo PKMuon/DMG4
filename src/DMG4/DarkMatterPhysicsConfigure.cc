@@ -47,7 +47,7 @@
 bool DarkMatterPhysics::DarkMatterPhysicsConfigure() 
 {
   //call an instance of the class
-  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();  
+  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
   
   DMpar->RegisterNewParam("BiasSigmaFactor0", 8.e8);
   DMpar->RegisterNewParam("EThresh", 35.*GeV); // for sensitivity calculations invisible mode
