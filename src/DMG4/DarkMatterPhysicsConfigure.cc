@@ -88,7 +88,8 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
 
      0: default: fermionic ff final state
      1: scalar ff final state
-     2: asymmetric fermionic DM final state produced
+     2: asymmetric fermionic DM final state produced (iDM)
+     3: Dirac DM final state produced (i2DM)
    */
   //DMpar->RegisterNewParam("BranchingType", 0.);
 
@@ -98,6 +99,8 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
   
   // additional parameters for semivisible DM, in addition to above parameters for annihilation (if absent the default ones will be used)
   //DMpar->RegisterNewParam("Ffactor", 0.4);
+  // additional parameter for Dirac DM, describing the dark fermion mixing (if absent the default ones will be used)
+  //DMpar->RegisterNewParam("Theta", 1.e-3);
 
   return true;
 }

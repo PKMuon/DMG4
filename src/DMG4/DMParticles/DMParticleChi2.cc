@@ -28,8 +28,12 @@ DMParticleChi2* DMParticleChi2::Definition()
   // parameters for the width
   G4double Epsilon = DMpar->GetRegisteredParam("Epsilon");
   G4double AlphaD = DMpar->GetRegisteredParam("AlphaD");
+  G4double Theta = DMpar->GetRegisteredParam("Theta");
   G4double Splitting = MassChi2 - MassChi1;
 
+  std::cout << "Mass Chi2: " << MassChi2 <<std::endl;
+  std::cout << "Mass Chi1: " << MassChi1 <<std::endl;
+  std::cout << "Splitting: " << Splitting<<std::endl;
   // calculate the width
   const G4double K = 0.640;
   G4double WidthIn = K*4.*Epsilon*Epsilon*fine_structure_const*AlphaD*pow(Splitting,5.)/(15.*CLHEP::pi*pow(DMMass,4.));

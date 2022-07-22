@@ -40,11 +40,15 @@ DMParticleAPrime* DMParticleAPrime::Definition()
   G4double muWidth = 0.;
   G4double hWidth = 0.;
   G4double Chi12Width = 0.;
+  G4double Chi11Width = 0.;
+  G4double Chi22Width = 0.;
   G4double nuBrRatio = 0.;
   G4double eBrRatio = 0.;
   G4double muBrRatio = 0.;
   G4double hBrRatio = 0.;
   G4double Chi12BrRatio = 0.;
+  G4double Chi11BrRatio = 0.;
+  G4double Chi22BrRatio = 0.;
   G4int IDPDG = 5500022; // Totally invisible A' PDG ID, can be redefined below for different decays
                          // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
   if(DecayType) {
@@ -94,6 +98,16 @@ DMParticleAPrime* DMParticleAPrime::Definition()
       Chi12BrRatio = Chi12Width/WidthIn;
       IDPDG = 5500322;
       name = "DMParticleInelasticBoson";
+    } else if (BranchingType == 3) { // Dirac inelastic DM: decay to Chi2 + Chi1, Chi1 + Chi1, Chi2 + Chi2                                                                  
+      if(WidthIn == 0.) isStable = true;
+      // branching ratio
+      IDPDG = 5500322;
+      name = "DMParticleInelasticBoson";
+
+      std::cout << "===> Width dark photon to chi2chi2 " << Chi22Width << std::endl;
+      std::cout << "===> Width dark photon to chi1chi1 " << Chi11Width << std::endl;
+      std::cout << "===> Width dark photon to chi1chi2 " << Chi12Width << std::endl;
+
     } else {
       G4cout << "BranchingType = " << BranchingType << " is not implemented, exiting" << G4endl;
       exit(1);
@@ -168,6 +182,20 @@ DMParticleAPrime* DMParticleAPrime::Definition()
         mode[0] = new G4PhaseSpaceDecayChannel(name, eBrRatio, 2, "e+", "e-");
         mode[1] = new G4PhaseSpaceDecayChannel(name, Chi12BrRatio, 2, "DMParticleChi1", "DMParticleChi2");
         for (G4int index = 0; index < 2; index++) table->Insert(mode[index]);
+        delete [] mode;
+      }
+
+      if (BranchingType == 3) { // Inelastic DM: decay to Chi1 + Chi1, Chi1 + Chi2, Chi2 + Chi2
+        // TODO: implement the correct branching ratio, for now we only assume
+        // that A'->chi1+chi2, so Br(A' -> everything else) = 0.
+
+        G4VDecayChannel** mode = new G4VDecayChannel*[4];
+        // DMParticleZPrime -> e+ + e-
+        mode[0] = new G4PhaseSpaceDecayChannel(name, eBrRatio, 2, "e+", "e-");
+        mode[1] = new G4PhaseSpaceDecayChannel(name, Chi12BrRatio, 2, "DMParticleChi1", "DMParticleChi2");
+        mode[2] = new G4PhaseSpaceDecayChannel(name, Chi11BrRatio, 2, "DMParticleChi1", "DMParticleChi1");
+        mode[3] = new G4PhaseSpaceDecayChannel(name, Chi22BrRatio, 2, "DMParticleChi2", "DMParticleChi2");
+        for (G4int index = 0; index < 4; index++) table->Insert(mode[index]);
         delete [] mode;
       }
 
