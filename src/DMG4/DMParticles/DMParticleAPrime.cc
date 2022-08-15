@@ -106,17 +106,17 @@ DMParticleAPrime* DMParticleAPrime::Definition()
       const G4double Theta = DMpar->GetRegisteredParam("Theta");
       if(MassIn > 2.*electron_mass_c2) eWidth = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.+2.*RatioEA2);
       if (MassIn > MChi1+MChi2) {
-        Chi12Width = AlphaD*MassIn/6.*sqrt(1.+MChi1*MChi1/(MassIn*MassIn)*(Delta*Delta/(MassIn*MassIn)*(Delta/MChi1+2.)*(Delta/MChi1+2.)-2.*
+        Chi12Width = pow(sin(2*Theta),2.) * AlphaD*MassIn/6.*sqrt(1.+MChi1*MChi1/(MassIn*MassIn)*(Delta*Delta/(MassIn*MassIn)*(Delta/MChi1+2.)*(Delta/MChi1+2.)-2.*
                     (1.+(1.+Delta/MChi1)*(1.+Delta/MChi1))))*(2.-MChi1*MChi1/(MassIn*MassIn)*(1.+Delta*Delta/(MassIn*MassIn)*(2.+Delta/MChi1)*
                     (2.+Delta/MChi1)+(1.+Delta/MChi1)*(1.+Delta/MChi1)-6.*(1.+Delta/MChi1)));
       }
       if (MassIn > 2.*MChi1) {
-        Chi11Width = AlphaD/3.*MassIn*(1.+2*MChi1*MChi1/(MassIn*MassIn))*sqrt(1.-4*MChi1*MChi1/(MassIn*MassIn));
+        Chi11Width = pow(sin(Theta),4) * AlphaD/3.*MassIn*(1.+2*MChi1*MChi1/(MassIn*MassIn))*sqrt(1.-4*MChi1*MChi1/(MassIn*MassIn));
       }
       if (MassIn > 2.*MChi2) {
-        Chi22Width = AlphaD/3.*MassIn*(1.+2*MChi2*MChi2/(MassIn*MassIn))*sqrt(1.-4*MChi2*MChi2/(MassIn*MassIn));
+        Chi22Width = pow(cos(Theta),4) * AlphaD/3.*MassIn*(1.+2*MChi2*MChi2/(MassIn*MassIn))*sqrt(1.-4*MChi2*MChi2/(MassIn*MassIn));
       }
-      WidthIn = eWidth + pow(sin(2*Theta),2.)*Chi12Width+pow(sin(Theta),4.)*Chi11Width+pow(cos(Theta),4.)*Chi22Width;
+      WidthIn = eWidth + Chi12Width + Chi11Width + Chi22Width;
       if(WidthIn == 0.) isStable = true;
       // branching ratio
       eBrRatio = eWidth/WidthIn;
