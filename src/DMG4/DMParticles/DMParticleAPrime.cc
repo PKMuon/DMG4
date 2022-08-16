@@ -63,8 +63,8 @@ DMParticleAPrime* DMParticleAPrime::Definition()
     } else if (BranchingType == 1) { // B-L Z' boson with coupling to all SM particles
       if(MassIn > 600.) {G4cout << "Branching ratios for this BranchingType and this mass are not yet implemented, exiting" << G4endl; exit(1);}
       nuWidth = epsilIn*epsilIn*CLHEP::fine_structure_const*MassIn;
-      if(MassIn > 2.*electron_mass_c2) eWidth = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.+2.*RatioEA2);
-      if(MassIn > 2.*muMass) muWidth = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*massRatio2)*(1.+2.*massRatio2);
+      if(MassIn > 2.*electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(electron_mass_c2, electron_mass_c2, MassIn);
+      if(MassIn > 2.*muMass) muWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(muMass, muMass, MassIn);
       if(MassIn > pi0Mass) {
         hWidth = (CLHEP::fine_structure_const*fine_structure_const*epsilIn*epsilIn*MassIn*MassIn*MassIn) /
                  (96.*3.141*3.141*3.141*0.93*0.93*pi0Mass*pi0Mass);
@@ -86,11 +86,9 @@ DMParticleAPrime* DMParticleAPrime::Definition()
       const G4double MChi2 = (1. + DMpar->GetRegisteredParam("Ffactor", 0.4)) * MChi1;
       const G4double AlphaD = DMpar->GetRegisteredParam("AlphaD");
       const G4double Delta = MChi2 - MChi1;
-      if(MassIn > 2.*electron_mass_c2) eWidth = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.+2.*RatioEA2);
+      if(MassIn > 2.*electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(electron_mass_c2, electron_mass_c2, MassIn);
       if(MassIn > MChi1+MChi2) {
-        Chi12Width = AlphaD*MassIn/6.*sqrt(1.+MChi1*MChi1/(MassIn*MassIn)*(Delta*Delta/(MassIn*MassIn)*(Delta/MChi1+2.)*(Delta/MChi1+2.)-2.*
-                     (1.+(1.+Delta/MChi1)*(1.+Delta/MChi1))))*(2.-MChi1*MChi1/(MassIn*MassIn)*(1.+Delta*Delta/(MassIn*MassIn)*(2.+Delta/MChi1)*
-                     (2.+Delta/MChi1)+(1.+Delta/MChi1)*(1.+Delta/MChi1)-6.*(1.+Delta/MChi1)));
+        Chi12Width = APrimeWidth(MChi1, MChi2, AlphaD, MassIn);
       }
       WidthIn = eWidth + Chi12Width;
       if(WidthIn == 0.) isStable = true;
@@ -104,17 +102,15 @@ DMParticleAPrime* DMParticleAPrime::Definition()
       const G4double AlphaD = DMpar->GetRegisteredParam("AlphaD");
       const G4double Delta = MChi2 - MChi1;
       const G4double Theta = DMpar->GetRegisteredParam("Theta");
-      if(MassIn > 2.*electron_mass_c2) eWidth = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.+2.*RatioEA2);
+      if(MassIn > 2.*electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(electron_mass_c2, electron_mass_c2, MassIn);
       if (MassIn > MChi1+MChi2) {
-        Chi12Width = pow(sin(2*Theta),2.) * AlphaD*MassIn/6.*sqrt(1.+MChi1*MChi1/(MassIn*MassIn)*(Delta*Delta/(MassIn*MassIn)*(Delta/MChi1+2.)*(Delta/MChi1+2.)-2.*
-                    (1.+(1.+Delta/MChi1)*(1.+Delta/MChi1))))*(2.-MChi1*MChi1/(MassIn*MassIn)*(1.+Delta*Delta/(MassIn*MassIn)*(2.+Delta/MChi1)*
-                    (2.+Delta/MChi1)+(1.+Delta/MChi1)*(1.+Delta/MChi1)-6.*(1.+Delta/MChi1)));
+        Chi12Width = pow(sin(2*Theta),2.) * AlphaD * APrimeWidth(MChi1, MChi2, MassIn);
       }
       if (MassIn > 2.*MChi1) {
-        Chi11Width = pow(sin(Theta),4) * AlphaD/3.*MassIn*(1.+2*MChi1*MChi1/(MassIn*MassIn))*sqrt(1.-4*MChi1*MChi1/(MassIn*MassIn));
+        Chi11Width = pow(sin(Theta),4) * AlphaD * APrimeWidth(MChi1, MChi1, MassIn);
       }
       if (MassIn > 2.*MChi2) {
-        Chi22Width = pow(cos(Theta),4) * AlphaD/3.*MassIn*(1.+2*MChi2*MChi2/(MassIn*MassIn))*sqrt(1.-4*MChi2*MChi2/(MassIn*MassIn));
+        Chi22Width = pow(cos(Theta),4) * AlphaD * APrimeWidth(MChi2, MChi2, MassIn);
       }
       WidthIn = eWidth + Chi12Width + Chi11Width + Chi22Width;
       if(WidthIn == 0.) isStable = true;
@@ -227,4 +223,14 @@ DMParticleAPrime* DMParticleAPrime::Definition()
   }
   theInstance = reinterpret_cast<DMParticleAPrime*>(anInstance);
   return theInstance;
+}
+
+double DMParticleAPrime::APrimeWidth(double mass1, double mass2, double MassIn) {
+  if (mass1 == mass2)
+    return MassIn/3.*
+            sqrt(1.-4*mass1*mass1/(MassIn*MassIn))*
+            (1.+2*mass1*mass1/(MassIn*MassIn));
+  return MassIn/3.*
+          sqrt((1.-pow((mass1+mass2),2.)/(MassIn*MassIn))*(1.-pow((mass1-mass2),2.)/(MassIn*MassIn)))*
+          (1-(pow((mass1-mass2),2.)-4.*mass1*mass2)/(2*MassIn*MassIn)-((pow(mass1*mass1-mass2*mass2,2.)/(2*pow(MassIn,4.))
 }
