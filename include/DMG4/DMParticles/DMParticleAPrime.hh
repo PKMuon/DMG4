@@ -7,7 +7,6 @@ class DMParticleAPrime : public DMParticle {
     static DMParticleAPrime * theInstance;
     DMParticleAPrime();
     ~DMParticleAPrime();
-    double APrimeWidth(double, double, double);
   public:
     static DMParticleAPrime * Definition();
 };

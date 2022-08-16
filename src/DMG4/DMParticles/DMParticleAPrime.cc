@@ -12,11 +12,26 @@
 
 DMParticleAPrime * DMParticleAPrime::theInstance = nullptr;
 
+
 DMParticleAPrime* DMParticleAPrime::Definition()
 {
   if( theInstance ) {
     return theInstance;
   }
+
+  // Function to calculate widths for dark photon
+  auto APrimeWidth = [](double mass1, double mass2, double MassIn) {
+    // Reduce the formula to the case where the two masses are equal
+    if (mass1 == mass2)
+      return MassIn/3.*
+        sqrt(1.-4*mass1*mass1/(MassIn*MassIn))*
+        (1.+2*mass1*mass1/(MassIn*MassIn));
+    // Full expression for the general case
+    return MassIn/3.*
+      sqrt((1.-pow((mass1+mass2),2.)/(MassIn*MassIn))*(1.-pow((mass1-mass2),2.)/(MassIn*MassIn)))*
+      (1-(pow((mass1-mass2),2.)-4.*mass1*mass2)/(2*MassIn*MassIn)-(pow(mass1*mass1-mass2*mass2,2.)/(2*pow(MassIn,4.))));
+  };
+
   //get parameters from factory (NOTE: mass is parsed in GeV)
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
   G4double MassIn    = DMpar->GetRegisteredParam("DMMass");
@@ -31,8 +46,6 @@ DMParticleAPrime* DMParticleAPrime::Definition()
   G4ParticleDefinition * anInstance = pTable->FindParticle(name);
   const G4double muMass = G4MuonMinus::MuonMinusDefinition()->GetPDGMass();
   const G4double pi0Mass = G4PionZero::PionZeroDefinition()->GetPDGMass();
-  G4double RatioEA2 = electron_mass_c2*electron_mass_c2/(MassIn*MassIn);
-  G4double massRatio2 = muMass*muMass/(MassIn*MassIn);
   G4bool isStable = true;
   G4double WidthIn = 0.;
   G4double nuWidth = 0.;
@@ -56,7 +69,7 @@ DMParticleAPrime* DMParticleAPrime::Definition()
     if (BranchingType == 0) { // X boson with visible decays
       if(MassIn < 2.001*electron_mass_c2) isStable = true;
       if(!isStable) {
-        WidthIn = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.+2.*RatioEA2);
+        WidthIn = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(electron_mass_c2, electron_mass_c2, MassIn);
         IDPDG = 5500122;
         name = "DMParticleXBoson";
       }
@@ -84,11 +97,9 @@ DMParticleAPrime* DMParticleAPrime::Definition()
     } else if (BranchingType == 2) { // Inelastic DM: decay to Chi2 + Chi1
       const G4double MChi1 = (DMpar->GetRegisteredParam("DMMass")) * DMpar->GetRegisteredParam("RDM", 1./3.);
       const G4double MChi2 = (1. + DMpar->GetRegisteredParam("Ffactor", 0.4)) * MChi1;
-      const G4double AlphaD = DMpar->GetRegisteredParam("AlphaD");
-      const G4double Delta = MChi2 - MChi1;
       if(MassIn > 2.*electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(electron_mass_c2, electron_mass_c2, MassIn);
       if(MassIn > MChi1+MChi2) {
-        Chi12Width = APrimeWidth(MChi1, MChi2, AlphaD, MassIn);
+        Chi12Width = APrimeWidth(MChi1, MChi2, MassIn);
       }
       WidthIn = eWidth + Chi12Width;
       if(WidthIn == 0.) isStable = true;
@@ -100,7 +111,6 @@ DMParticleAPrime* DMParticleAPrime::Definition()
       const G4double MChi1 = (DMpar->GetRegisteredParam("DMMass")) * DMpar->GetRegisteredParam("RDM", 1./3.);
       const G4double MChi2 = (1. + DMpar->GetRegisteredParam("Ffactor", 0.4)) * MChi1;
       const G4double AlphaD = DMpar->GetRegisteredParam("AlphaD");
-      const G4double Delta = MChi2 - MChi1;
       const G4double Theta = DMpar->GetRegisteredParam("Theta");
       if(MassIn > 2.*electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(electron_mass_c2, electron_mass_c2, MassIn);
       if (MassIn > MChi1+MChi2) {
@@ -223,14 +233,4 @@ DMParticleAPrime* DMParticleAPrime::Definition()
   }
   theInstance = reinterpret_cast<DMParticleAPrime*>(anInstance);
   return theInstance;
-}
-
-double DMParticleAPrime::APrimeWidth(double mass1, double mass2, double MassIn) {
-  if (mass1 == mass2)
-    return MassIn/3.*
-            sqrt(1.-4*mass1*mass1/(MassIn*MassIn))*
-            (1.+2*mass1*mass1/(MassIn*MassIn));
-  return MassIn/3.*
-          sqrt((1.-pow((mass1+mass2),2.)/(MassIn*MassIn))*(1.-pow((mass1-mass2),2.)/(MassIn*MassIn)))*
-          (1-(pow((mass1-mass2),2.)-4.*mass1*mass2)/(2*MassIn*MassIn)-((pow(mass1*mass1-mass2*mass2,2.)/(2*pow(MassIn,4.))
 }
