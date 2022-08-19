@@ -97,44 +97,48 @@ DMParticleAPrime* DMParticleAPrime::Definition()
     } else if (BranchingType == 2) { // Inelastic DM: decay to Chi2 + Chi1
       const G4double MChi1 = (DMpar->GetRegisteredParam("DMMass")) * DMpar->GetRegisteredParam("RDM", 1./3.);
       const G4double MChi2 = (1. + DMpar->GetRegisteredParam("Ffactor", 0.4)) * MChi1;
+      const G4double AlphaD = DMpar->GetRegisteredParam("AlphaD");
+      //Partial widths
       if(MassIn > 2.*electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(electron_mass_c2, electron_mass_c2, MassIn);
-      if(MassIn > MChi1+MChi2) {
-        Chi12Width = APrimeWidth(MChi1, MChi2, MassIn);
-      }
+      if(MassIn > MChi1+MChi2) Chi12Width = AlphaD * APrimeWidth(MChi1, MChi2, MassIn);
+      //Total width
       WidthIn = eWidth + Chi12Width;
       if(WidthIn == 0.) isStable = true;
+      //Branching ratios
       eBrRatio = eWidth/WidthIn;
       Chi12BrRatio = Chi12Width/WidthIn;
+      
       IDPDG = 5500322;
       name = "DMParticleInelasticBoson";
+
+      std::cout << "===> Width dark photon to X1X2 " << Chi12Width << std::endl;
+      std::cout << "===> Width dark photon to e+e- " << eWidth << std::endl;
+
     } else if (BranchingType == 3) { // Dirac inelastic DM: decay to Chi2 + Chi1, Chi1 + Chi1, Chi2 + Chi2                                                                  
       const G4double MChi1 = (DMpar->GetRegisteredParam("DMMass")) * DMpar->GetRegisteredParam("RDM", 1./3.);
       const G4double MChi2 = (1. + DMpar->GetRegisteredParam("Ffactor", 0.4)) * MChi1;
       const G4double AlphaD = DMpar->GetRegisteredParam("AlphaD");
       const G4double Theta = DMpar->GetRegisteredParam("Theta");
+      //Partial widths
       if(MassIn > 2.*electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(electron_mass_c2, electron_mass_c2, MassIn);
-      if (MassIn > MChi1+MChi2) {
-        Chi12Width = pow(sin(2*Theta),2.) * AlphaD * APrimeWidth(MChi1, MChi2, MassIn);
-      }
-      if (MassIn > 2.*MChi1) {
-        Chi11Width = pow(sin(Theta),4) * AlphaD * APrimeWidth(MChi1, MChi1, MassIn);
-      }
-      if (MassIn > 2.*MChi2) {
-        Chi22Width = pow(cos(Theta),4) * AlphaD * APrimeWidth(MChi2, MChi2, MassIn);
-      }
+      if (MassIn > MChi1+MChi2) Chi12Width = pow(sin(2*Theta),2.) * AlphaD * APrimeWidth(MChi1, MChi2, MassIn);
+      if (MassIn > 2.*MChi1) Chi11Width = pow(sin(Theta),4) * AlphaD * APrimeWidth(MChi1, MChi1, MassIn);
+      if (MassIn > 2.*MChi2) Chi22Width = pow(cos(Theta),4) * AlphaD * APrimeWidth(MChi2, MChi2, MassIn);
+      //Total width
       WidthIn = eWidth + Chi12Width + Chi11Width + Chi22Width;
       if(WidthIn == 0.) isStable = true;
-      // branching ratio
+      //Branching ratios
       eBrRatio = eWidth/WidthIn;
       Chi12BrRatio = Chi12Width/WidthIn;
       Chi11BrRatio = Chi11Width/WidthIn;
       Chi22BrRatio = Chi22Width/WidthIn;
+      
       IDPDG = 5500322;
       name = "DMParticleInelasticBoson";
 
-      std::cout << "===> Width dark photon to chi2chi2 " << Chi22Width << std::endl;
-      std::cout << "===> Width dark photon to chi1chi1 " << Chi11Width << std::endl;
-      std::cout << "===> Width dark photon to chi1chi2 " << Chi12Width << std::endl;
+      std::cout << "===> Width dark photon to X2X2 " << Chi22Width << std::endl;
+      std::cout << "===> Width dark photon to X1X1 " << Chi11Width << std::endl;
+      std::cout << "===> Width dark photon to X1X2 " << Chi12Width << std::endl;
 
     } else {
       G4cout << "BranchingType = " << BranchingType << " is not implemented, exiting" << G4endl;
