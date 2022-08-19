@@ -40,7 +40,7 @@ DMParticleChi2* DMParticleChi2::Definition()
   G4double WidthIn = K*4.*Epsilon*Epsilon*fine_structure_const*AlphaD*pow(Splitting,5.)/(15.*CLHEP::pi*pow(DMMass,4.));
   if(BranchingType == 3) {
     G4double y = Epsilon*Epsilon*AlphaD*pow((MassChi1/DMMass),4.);
-    WidthIn =4.*fine_structure_const*pow(tan(Theta),2.)*pow(cos(Theta),4.)*y*MassChi1*pow(Splitting,5.);
+    WidthIn =4.*fine_structure_const*pow(tan(Theta),2.)*pow(cos(Theta),4.)*y*MassChi1*pow(Splitting/MassChi1,5.)/(15*CLHEP::pi);
   }
   std::cout << "Mass Chi2: " << MassChi2/MeV << " MeV " <<std::endl;
   std::cout << "===> Width Chi2->chi1ee " << WidthIn/MeV <<" MeV "<< std::endl;
