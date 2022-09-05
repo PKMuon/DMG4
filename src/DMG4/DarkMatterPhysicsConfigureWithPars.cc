@@ -85,7 +85,7 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure(void *ptr)
      DMpar->RegisterNewParam("DecayType", 1.);
 
      /* Comments to "BranchingType"
-      * Optional to make different decay table; 0 : invisible decays or SM lepton decays, depending on DecayType; 1 : B - L model; 2 : Semivisible: Inelastic DM
+      * Optional to make different decay table; 0 : invisible decays or SM lepton decays, depending on DecayType; 1 : B - L model; 2 : Semivisible: Inelastic DM; 3 : Semivisible: Dirac Inelastic DM    
       * For annihilation e+e- --> R --> ff the meaning is DIFFERENT!
 
         0: default: fermionic ff final state

@@ -32,17 +32,19 @@ DMParticleChi2* DMParticleChi2::Definition()
   G4double BranchingType = DMpar->GetRegisteredParam("BranchingType", 0);
   G4double Splitting = MassChi2 - MassChi1;
 
-  std::cout << "Mass Chi2: " << MassChi2 <<std::endl;
-  std::cout << "Mass Chi1: " << MassChi1 <<std::endl;
-  std::cout << "Splitting: " << Splitting<<std::endl;
+  std::cout << "Mass Chi2: " << MassChi2/MeV << " MeV " << std::endl;
+  std::cout << "Mass Chi1: " << MassChi1/MeV << " MeV " << std::endl;
+  std::cout << "Splitting: " << Splitting/MeV << " MeV " << std::endl;
+
   // calculate the width
   const G4double K = 0.640;
+  //inelastic DM (iDM)
   G4double WidthIn = K*4.*Epsilon*Epsilon*fine_structure_const*AlphaD*pow(Splitting,5.)/(15.*CLHEP::pi*pow(DMMass,4.));
+  //Dirac inelastic DM (i2DM)
   if(BranchingType == 3) {
     G4double y = Epsilon*Epsilon*AlphaD*pow((MassChi1/DMMass),4.);
     WidthIn =4.*fine_structure_const*pow(tan(Theta),2.)*pow(cos(Theta),4.)*y*MassChi1*pow(Splitting/MassChi1,5.)/(15*CLHEP::pi);
   }
-  std::cout << "Mass Chi2: " << MassChi2/MeV << " MeV " <<std::endl;
   std::cout << "===> Width Chi2->chi1ee " << WidthIn/MeV <<" MeV "<< std::endl;
 
   if( !anInstance ) {
@@ -86,6 +88,6 @@ DMParticleChi2* DMParticleChi2::Definition()
 
   }
   theInstance = reinterpret_cast<DMParticleChi2*>(anInstance);
-  G4cout << "The particle: " << theInstance->GetParticleName() << " mass is: " << theInstance->GetPDGMass()/GeV << "\n";
+  G4cout << "The particle: " << theInstance->GetParticleName() << " mass in GeV is: " << theInstance->GetPDGMass()/GeV << "\n";
   return theInstance;
 }
