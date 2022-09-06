@@ -4,6 +4,7 @@
 #include "DarkMatter.hh"
 #include "DarkPhotons.hh"
 #include "DarkZ.hh"
+#include "DarkMuPhilicPseudoScalars.hh"
 #include "ALP.hh"
 #include "DarkPhotonsAnnihilation.hh"
 #include "DarkScalarsAnnihilation.hh"
@@ -130,6 +131,14 @@ void DarkMatterPhysics::Init(){
     case 31:
       G4cout << "Initialize DarkZ\n";
       myDarkMatter = new DarkZ(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+      break;
+    case 34:
+      G4cout << "Initialize DarkMuPhilicPseudoScalars\n";
+      if(DecayType) { // Temporary plug
+        G4cout << G4endl << "DarkMuPhilicPseudoScalar with decays is not yet implemented, exiting" << G4endl << G4endl;
+        exit(1);
+      }
+      myDarkMatter = new DarkMuPhilicPseudoScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
       break;
     case 11:
       G4cout << "Initialize DarkPhotonsAnnihilation\n";
