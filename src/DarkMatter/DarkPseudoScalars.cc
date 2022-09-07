@@ -155,5 +155,5 @@ double DarkPseudoScalars::CrossSectionDSDXDU(double XEv, double UThetaEv, double
 
 double DarkPseudoScalars::Width()
 {
-  return 1./2.*alphaEW*MA*epsil*epsil*sqrt(1.-4.*Mel*Mel/(MA*MA));
+  return (1./2.)*MA*alphaEW*epsil*epsil*sqrt(1.-4.*Mel*Mel/(MA*MA));
 }

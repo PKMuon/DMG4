@@ -718,9 +718,9 @@ double DarkMuPhilicPseudoScalars::Width()
   double nuWidth        = 0.;
   double muWidth        = 0.;
   if (MA < 2.*tauMass) {
-    nuWidth = epsil*epsil*alphaEW*(1./3.)*MA;
+    nuWidth = (1./2.)*MA*alphaEW*epsil*epsil;
     if (MA > 2.*muMass) {
-      double factor = (1.+2.*massRatio2)*sqrt(1.-4.*massRatio2);
+      double factor = sqrt(1.-4.*massRatio2);
       muWidth = nuWidth*factor;
     }
     width = nuWidth+muWidth; // in GeV

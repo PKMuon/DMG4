@@ -152,5 +152,5 @@ double DarkPhotons::CrossSectionDSDXDU(double XEv, double UThetaEv, double E0)
 
 double DarkPhotons::Width()
 {
-  return 1./3.*alphaEW*MA*epsil*epsil*(1.+2.*Mel*Mel/(MA*MA))*sqrt(1.-4.*Mel*Mel/(MA*MA));
+  return (1./3.)*MA*alphaEW*epsil*epsil*(1.+2.*Mel*Mel/(MA*MA))*sqrt(1.-4.*Mel*Mel/(MA*MA));
 }
