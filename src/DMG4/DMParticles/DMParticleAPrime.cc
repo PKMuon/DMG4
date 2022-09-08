@@ -109,7 +109,7 @@ DMParticleAPrime* DMParticleAPrime::Definition()
       //Branching ratios
       eBrRatio = eWidth/WidthIn;
       Chi12BrRatio = Chi12Width/WidthIn;
-      
+
       IDPDG = 5500322;
       name = "DMParticleInelasticBoson";
 
@@ -134,7 +134,7 @@ DMParticleAPrime* DMParticleAPrime::Definition()
       Chi12BrRatio = Chi12Width/WidthIn;
       Chi11BrRatio = Chi11Width/WidthIn;
       Chi22BrRatio = Chi22Width/WidthIn;
-      
+
       IDPDG = 5500322;
       name = "DMParticleInelasticBoson";
 
@@ -205,8 +205,8 @@ DMParticleAPrime* DMParticleAPrime::Definition()
         // DMParticleZPrime -> pi0 + gamma
         mode[5] = new G4PhaseSpaceDecayChannel(name, hBrRatio, 2, "pi0", "gamma");
 
-       for (G4int index = 0; index < 6; index++) table->Insert(mode[index]);
-       delete [] mode;
+        for (G4int index = 0; index < 6; index++) table->Insert(mode[index]);
+        delete [] mode;
       }
 
       if (BranchingType == 2) { // Inelastic DM: decay to Chi2 + Chi1
@@ -215,7 +215,7 @@ DMParticleAPrime* DMParticleAPrime::Definition()
         // DMParticleAPrime -> e+ + e-
         mode[0] = new G4PhaseSpaceDecayChannel(name, eBrRatio, 2, "e+", "e-");
         // DMParticleAPrime -> Chi1 + Chi2 
-	mode[1] = new G4PhaseSpaceDecayChannel(name, Chi12BrRatio, 2, "DMParticleChi1", "DMParticleChi2");
+        mode[1] = new G4PhaseSpaceDecayChannel(name, Chi12BrRatio, 2, "DMParticleChi1", "DMParticleChi2");
 
         for (G4int index = 0; index < 2; index++) table->Insert(mode[index]);
         delete [] mode;
@@ -224,13 +224,13 @@ DMParticleAPrime* DMParticleAPrime::Definition()
       if (BranchingType == 3) { // Inelastic Dirac DM: decay to Chi1 + Chi1, Chi1 + Chi2, Chi2 + Chi2
 
         G4VDecayChannel** mode = new G4VDecayChannel*[4];
-       	// DMParticleAPrime -> e+ + e- 
+        // DMParticleAPrime -> e+ + e-
         mode[0] = new G4PhaseSpaceDecayChannel(name, eBrRatio, 2, "e+", "e-");
-	// DMParticleAPrime -> Chi1 + Chi2 
-	mode[1] = new G4PhaseSpaceDecayChannel(name, Chi12BrRatio, 2, "DMParticleChi1", "DMParticleChi2");
-        // DMParticleAPrime -> Chi1 + Chi1 
-	mode[2] = new G4PhaseSpaceDecayChannel(name, Chi11BrRatio, 2, "DMParticleChi1", "DMParticleChi1");
-	// DMParticleAPrime -> Chi2 + Chi2 
+        // DMParticleAPrime -> Chi1 + Chi2
+        mode[1] = new G4PhaseSpaceDecayChannel(name, Chi12BrRatio, 2, "DMParticleChi1", "DMParticleChi2");
+        // DMParticleAPrime -> Chi1 + Chi1
+        mode[2] = new G4PhaseSpaceDecayChannel(name, Chi11BrRatio, 2, "DMParticleChi1", "DMParticleChi1");
+        // DMParticleAPrime -> Chi2 + Chi2
         mode[3] = new G4PhaseSpaceDecayChannel(name, Chi22BrRatio, 2, "DMParticleChi2", "DMParticleChi2");
 
         for (G4int index = 0; index < 4; index++) table->Insert(mode[index]);
