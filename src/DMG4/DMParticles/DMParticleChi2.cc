@@ -28,12 +28,23 @@ DMParticleChi2* DMParticleChi2::Definition()
   // parameters for the width
   G4double Epsilon = DMpar->GetRegisteredParam("Epsilon");
   G4double AlphaD = DMpar->GetRegisteredParam("AlphaD");
+  G4double Theta = DMpar->GetRegisteredParam("Theta", 1.e-3);
+  G4double BranchingType = DMpar->GetRegisteredParam("BranchingType", 0);
   G4double Splitting = MassChi2 - MassChi1;
+
+  std::cout << "Mass Chi2: " << MassChi2/MeV << " MeV " << std::endl;
+  std::cout << "Mass Chi1: " << MassChi1/MeV << " MeV " << std::endl;
+  std::cout << "Splitting: " << Splitting/MeV << " MeV " << std::endl;
 
   // calculate the width
   const G4double K = 0.640;
+  //inelastic DM (iDM)
   G4double WidthIn = K*4.*Epsilon*Epsilon*fine_structure_const*AlphaD*pow(Splitting,5.)/(15.*CLHEP::pi*pow(DMMass,4.));
-  std::cout << "Mass Chi2: " << MassChi2/MeV << " MeV " <<std::endl;
+  //Dirac inelastic DM (i2DM)
+  if(BranchingType == 3) {
+    G4double y = Epsilon*Epsilon*AlphaD*pow((MassChi1/DMMass),4.);
+    WidthIn =4.*fine_structure_const*pow(tan(Theta),2.)*pow(cos(Theta),4.)*y*MassChi1*pow(Splitting/MassChi1,5.)/(15*CLHEP::pi);
+  }
   std::cout << "===> Width Chi2->chi1ee " << WidthIn/MeV <<" MeV "<< std::endl;
 
   if( !anInstance ) {
@@ -66,18 +77,17 @@ DMParticleChi2* DMParticleChi2::Definition()
     double lifetime =((DMParticle*)anInstance)->GetPDGLifeTime();
     std::cout << "===> Lifetime Chi2 " << lifetime/s <<" s, c*tau: "<<(lifetime*CLHEP::c_light)/cm <<" cm "<< std::endl;
 
-    // create decay table and add modes
+    // create decay table and add mode
     G4DecayTable* table = new G4DecayTable();
-    G4VDecayChannel** mode = new G4VDecayChannel*[1];
-    mode[0] = new G4PhaseSpaceDecayChannel(name, 1., 3, "DMParticleChi1", "e+", "e-");
-    for (G4int index = 0; index < 1; index++) table->Insert(mode[index]);
-    delete [] mode;
+    // create decay channel to chi1 + e+ + e-
+    G4VDecayChannel* mode = new G4PhaseSpaceDecayChannel(name, 1., 3, "DMParticleChi1", "e+", "e-");
+    table->Insert(mode);
 
     anInstance->SetDecayTable(table);
     anInstance->DumpTable();
 
   }
   theInstance = reinterpret_cast<DMParticleChi2*>(anInstance);
-  G4cout << "The particle: " << theInstance->GetParticleName() << " mass is: " << theInstance->GetPDGMass()/GeV << "\n";
+  G4cout << "The particle: " << theInstance->GetParticleName() << " mass in GeV is: " << theInstance->GetPDGMass()/GeV << "\n";
   return theInstance;
 }

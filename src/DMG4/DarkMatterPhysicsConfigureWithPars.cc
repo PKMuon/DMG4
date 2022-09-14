@@ -85,12 +85,13 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure(void *ptr)
      DMpar->RegisterNewParam("DecayType", 1.);
 
      /* Comments to "BranchingType"
-      * Optional to make different decay table; 0 : invisible decays or SM lepton decays, depending on DecayType; 1 : B - L model; 2 : Semivisible: Inelastic DM
+      * Optional to make different decay table; 0 : invisible decays or SM lepton decays, depending on DecayType; 1 : B - L model; 2 : Semivisible: Inelastic DM; 3 : Semivisible: Dirac Inelastic DM    
       * For annihilation e+e- --> R --> ff the meaning is DIFFERENT!
 
         0: default: fermionic ff final state
         1: scalar ff final state
-        2: asymmetric fermionic DM final state produced
+        2: asymmetric fermionic DM final state produced (iDM)
+        3: Dirac DM final state produced (i2DM)
       */
      //DMpar->RegisterNewParam("BranchingType", 0.);
 
@@ -100,5 +101,8 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure(void *ptr)
 
      // additional parameters for semivisible DM, in addition to above parameters for annihilation (if absent the default ones will be used)
      //DMpar->RegisterNewParam("Ffactor", 0.4);
+     // additional parameter for Dirac DM, describing the dark fermion mixing (if absent the default ones will be used)
+     //DMpar->RegisterNewParam("Theta", 1.e-3);
+
   return true;
 }

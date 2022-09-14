@@ -48,6 +48,6 @@ DMParticleChi1* DMParticleChi1::Definition()
           );
   }
   theInstance = reinterpret_cast<DMParticleChi1*>(anInstance);
-  G4cout << "The particle: " << theInstance->GetParticleName() << " mass is: " << theInstance->GetPDGMass()/GeV << "\n";
+  G4cout << "The particle: " << theInstance->GetParticleName() << " mass in GeV is: " << theInstance->GetPDGMass()/GeV << "\n";
   return theInstance;
 }

@@ -12,27 +12,40 @@
 
 DMParticleAPrime * DMParticleAPrime::theInstance = nullptr;
 
+
 DMParticleAPrime* DMParticleAPrime::Definition()
 {
   if( theInstance ) {
     return theInstance;
   }
+
+  // Function to calculate widths for dark photon
+  auto APrimeWidth = [](double mass1, double mass2, double MassIn) {
+    // Reduce the formula to the case where the two masses are equal
+    if (mass1 == mass2)
+      return MassIn/3.*
+        sqrt(1.-4*mass1*mass1/(MassIn*MassIn))*
+        (1.+2*mass1*mass1/(MassIn*MassIn));
+    // Full expression for the general case
+    return MassIn/3.*
+      sqrt((1.-pow((mass1+mass2),2.)/(MassIn*MassIn))*(1.-pow((mass1-mass2),2.)/(MassIn*MassIn)))*
+      (1-(pow((mass1-mass2),2.)-4.*mass1*mass2)/(2*MassIn*MassIn)-(pow(mass1*mass1-mass2*mass2,2.)/(2*pow(MassIn,4.))));
+  };
+
   //get parameters from factory (NOTE: mass is parsed in GeV)
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
   G4double MassIn    = DMpar->GetRegisteredParam("DMMass");
   G4double epsilIn   = DMpar->GetRegisteredParam("Epsilon");
-  G4double DecayType = DMpar->GetRegisteredParam("DecayType");  
+  G4double DecayType = DMpar->GetRegisteredParam("DecayType");
   G4double BranchingType = DMpar->GetRegisteredParam("BranchingType", 0);
 
   G4String name = "DMParticleAPrime";
   const G4String nameSubType = "DMParticleAPrime";
-  // search in particle table]
+  // search in particle table
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition * anInstance = pTable->FindParticle(name);
   const G4double muMass = G4MuonMinus::MuonMinusDefinition()->GetPDGMass();
   const G4double pi0Mass = G4PionZero::PionZeroDefinition()->GetPDGMass();
-  G4double RatioEA2 = electron_mass_c2*electron_mass_c2/(MassIn*MassIn);
-  G4double massRatio2 = muMass*muMass/(MassIn*MassIn);
   G4bool isStable = true;
   G4double WidthIn = 0.;
   G4double nuWidth = 0.;
@@ -40,11 +53,15 @@ DMParticleAPrime* DMParticleAPrime::Definition()
   G4double muWidth = 0.;
   G4double hWidth = 0.;
   G4double Chi12Width = 0.;
+  G4double Chi11Width = 0.;
+  G4double Chi22Width = 0.;
   G4double nuBrRatio = 0.;
   G4double eBrRatio = 0.;
   G4double muBrRatio = 0.;
   G4double hBrRatio = 0.;
   G4double Chi12BrRatio = 0.;
+  G4double Chi11BrRatio = 0.;
+  G4double Chi22BrRatio = 0.;
   G4int IDPDG = 5500022; // Totally invisible A' PDG ID, can be redefined below for different decays
                          // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
   if(DecayType) {
@@ -52,15 +69,15 @@ DMParticleAPrime* DMParticleAPrime::Definition()
     if (BranchingType == 0) { // X boson with visible decays
       if(MassIn < 2.001*electron_mass_c2) isStable = true;
       if(!isStable) {
-        WidthIn = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.+2.*RatioEA2);
+        WidthIn = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(electron_mass_c2, electron_mass_c2, MassIn);
         IDPDG = 5500122;
         name = "DMParticleXBoson";
       }
     } else if (BranchingType == 1) { // B-L Z' boson with coupling to all SM particles
       if(MassIn > 600.) {G4cout << "Branching ratios for this BranchingType and this mass are not yet implemented, exiting" << G4endl; exit(1);}
       nuWidth = epsilIn*epsilIn*CLHEP::fine_structure_const*MassIn;
-      if(MassIn > 2.*electron_mass_c2) eWidth = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.+2.*RatioEA2);
-      if(MassIn > 2.*muMass) muWidth = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*massRatio2)*(1.+2.*massRatio2);
+      if(MassIn > 2.*electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(electron_mass_c2, electron_mass_c2, MassIn);
+      if(MassIn > 2.*muMass) muWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(muMass, muMass, MassIn);
       if(MassIn > pi0Mass) {
         hWidth = (CLHEP::fine_structure_const*fine_structure_const*epsilIn*epsilIn*MassIn*MassIn*MassIn) /
                  (96.*3.141*3.141*3.141*0.93*0.93*pi0Mass*pi0Mass);
@@ -77,23 +94,54 @@ DMParticleAPrime* DMParticleAPrime::Definition()
       hBrRatio = hWidth/WidthIn;
       IDPDG = 5500222;
       name = "DMParticleB-LBoson";
+
     } else if (BranchingType == 2) { // Inelastic DM: decay to Chi2 + Chi1
+
       const G4double MChi1 = (DMpar->GetRegisteredParam("DMMass")) * DMpar->GetRegisteredParam("RDM", 1./3.);
       const G4double MChi2 = (1. + DMpar->GetRegisteredParam("Ffactor", 0.4)) * MChi1;
       const G4double AlphaD = DMpar->GetRegisteredParam("AlphaD");
-      const G4double Delta = MChi2 - MChi1;
-      if(MassIn > 2.*electron_mass_c2) eWidth = (1./3.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.+2.*RatioEA2);
-      if(MassIn > MChi1+MChi2) {
-        Chi12Width = AlphaD*MassIn/6.*sqrt(1.+MChi1*MChi1/(MassIn*MassIn)*(Delta*Delta/(MassIn*MassIn)*(Delta/MChi1+2.)*(Delta/MChi1+2.)-2.*
-                     (1.+(1.+Delta/MChi1)*(1.+Delta/MChi1))))*(2.-MChi1*MChi1/(MassIn*MassIn)*(1.+Delta*Delta/(MassIn*MassIn)*(2.+Delta/MChi1)*
-                     (2.+Delta/MChi1)+(1.+Delta/MChi1)*(1.+Delta/MChi1)-6.*(1.+Delta/MChi1)));
-      }
+      //Partial widths
+      if(MassIn > 2.*electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(electron_mass_c2, electron_mass_c2, MassIn);
+      if(MassIn > MChi1+MChi2) Chi12Width = AlphaD * APrimeWidth(MChi1, MChi2, MassIn);
+      //Total width
       WidthIn = eWidth + Chi12Width;
       if(WidthIn == 0.) isStable = true;
+      //Branching ratios
       eBrRatio = eWidth/WidthIn;
       Chi12BrRatio = Chi12Width/WidthIn;
+
       IDPDG = 5500322;
       name = "DMParticleInelasticBoson";
+
+      std::cout << "===> Width dark photon to X1X2 " << Chi12Width << std::endl;
+      std::cout << "===> Width dark photon to e+e- " << eWidth << std::endl;
+
+    } else if (BranchingType == 3) { // Dirac inelastic DM: decay to Chi2 + Chi1, Chi1 + Chi1, Chi2 + Chi2                                                                  
+      const G4double MChi1 = (DMpar->GetRegisteredParam("DMMass")) * DMpar->GetRegisteredParam("RDM", 1./3.);
+      const G4double MChi2 = (1. + DMpar->GetRegisteredParam("Ffactor", 0.4)) * MChi1;
+      const G4double AlphaD = DMpar->GetRegisteredParam("AlphaD");
+      const G4double Theta = DMpar->GetRegisteredParam("Theta");
+      //Partial widths
+      if(MassIn > 2.*electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(electron_mass_c2, electron_mass_c2, MassIn);
+      if (MassIn > MChi1+MChi2) Chi12Width = pow(sin(2*Theta),2.) * AlphaD * APrimeWidth(MChi1, MChi2, MassIn);
+      if (MassIn > 2.*MChi1) Chi11Width = pow(sin(Theta),4) * AlphaD * APrimeWidth(MChi1, MChi1, MassIn);
+      if (MassIn > 2.*MChi2) Chi22Width = pow(cos(Theta),4) * AlphaD * APrimeWidth(MChi2, MChi2, MassIn);
+      //Total width
+      WidthIn = eWidth + Chi12Width + Chi11Width + Chi22Width;
+      if(WidthIn == 0.) isStable = true;
+      //Branching ratios
+      eBrRatio = eWidth/WidthIn;
+      Chi12BrRatio = Chi12Width/WidthIn;
+      Chi11BrRatio = Chi11Width/WidthIn;
+      Chi22BrRatio = Chi22Width/WidthIn;
+
+      IDPDG = 5500322;
+      name = "DMParticleInelasticBoson";
+
+      std::cout << "===> Width dark photon to X2X2 " << Chi22Width << std::endl;
+      std::cout << "===> Width dark photon to X1X1 " << Chi11Width << std::endl;
+      std::cout << "===> Width dark photon to X1X2 " << Chi12Width << std::endl;
+
     } else {
       G4cout << "BranchingType = " << BranchingType << " is not implemented, exiting" << G4endl;
       exit(1);
@@ -157,17 +205,35 @@ DMParticleAPrime* DMParticleAPrime::Definition()
         // DMParticleZPrime -> pi0 + gamma
         mode[5] = new G4PhaseSpaceDecayChannel(name, hBrRatio, 2, "pi0", "gamma");
 
-       for (G4int index = 0; index < 6; index++) table->Insert(mode[index]);
-       delete [] mode;
+        for (G4int index = 0; index < 6; index++) table->Insert(mode[index]);
+        delete [] mode;
       }
 
       if (BranchingType == 2) { // Inelastic DM: decay to Chi2 + Chi1
 
         G4VDecayChannel** mode = new G4VDecayChannel*[2];
-        // DMParticleZPrime -> e+ + e-
+        // DMParticleAPrime -> e+ + e-
         mode[0] = new G4PhaseSpaceDecayChannel(name, eBrRatio, 2, "e+", "e-");
+        // DMParticleAPrime -> Chi1 + Chi2 
         mode[1] = new G4PhaseSpaceDecayChannel(name, Chi12BrRatio, 2, "DMParticleChi1", "DMParticleChi2");
+
         for (G4int index = 0; index < 2; index++) table->Insert(mode[index]);
+        delete [] mode;
+      }
+
+      if (BranchingType == 3) { // Inelastic Dirac DM: decay to Chi1 + Chi1, Chi1 + Chi2, Chi2 + Chi2
+
+        G4VDecayChannel** mode = new G4VDecayChannel*[4];
+        // DMParticleAPrime -> e+ + e-
+        mode[0] = new G4PhaseSpaceDecayChannel(name, eBrRatio, 2, "e+", "e-");
+        // DMParticleAPrime -> Chi1 + Chi2
+        mode[1] = new G4PhaseSpaceDecayChannel(name, Chi12BrRatio, 2, "DMParticleChi1", "DMParticleChi2");
+        // DMParticleAPrime -> Chi1 + Chi1
+        mode[2] = new G4PhaseSpaceDecayChannel(name, Chi11BrRatio, 2, "DMParticleChi1", "DMParticleChi1");
+        // DMParticleAPrime -> Chi2 + Chi2
+        mode[3] = new G4PhaseSpaceDecayChannel(name, Chi22BrRatio, 2, "DMParticleChi2", "DMParticleChi2");
+
+        for (G4int index = 0; index < 4; index++) table->Insert(mode[index]);
         delete [] mode;
       }
 
