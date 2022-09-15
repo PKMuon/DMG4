@@ -28,7 +28,7 @@ DMParticleChi2* DMParticleChi2::Definition()
   // parameters for the width
   G4double Epsilon = DMpar->GetRegisteredParam("Epsilon");
   G4double AlphaD = DMpar->GetRegisteredParam("AlphaD");
-  G4double Theta = DMpar->GetRegisteredParam("Theta", 1.e-3);
+  G4double IDMTheta = DMpar->GetRegisteredParam("IDMTheta", 1.e-3);
   G4double BranchingType = DMpar->GetRegisteredParam("BranchingType", 0);
   G4double Splitting = MassChi2 - MassChi1;
 
@@ -43,7 +43,7 @@ DMParticleChi2* DMParticleChi2::Definition()
   //Dirac inelastic DM (i2DM)
   if(BranchingType == 3) {
     G4double y = Epsilon*Epsilon*AlphaD*pow((MassChi1/DMMass),4.);
-    WidthIn =4.*fine_structure_const*pow(tan(Theta),2.)*pow(cos(Theta),4.)*y*MassChi1*pow(Splitting/MassChi1,5.)/(15*CLHEP::pi);
+    WidthIn =4.*fine_structure_const*pow(tan(IDMTheta),2.)*pow(cos(IDMTheta),4.)*y*MassChi1*pow(Splitting/MassChi1,5.)/(15*CLHEP::pi);
   }
   std::cout << "===> Width Chi2->chi1ee " << WidthIn/MeV <<" MeV "<< std::endl;
 

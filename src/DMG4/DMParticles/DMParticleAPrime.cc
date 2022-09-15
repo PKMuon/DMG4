@@ -120,12 +120,12 @@ DMParticleAPrime* DMParticleAPrime::Definition()
       const G4double MChi1 = (DMpar->GetRegisteredParam("DMMass")) * DMpar->GetRegisteredParam("RDM", 1./3.);
       const G4double MChi2 = (1. + DMpar->GetRegisteredParam("Ffactor", 0.4)) * MChi1;
       const G4double AlphaD = DMpar->GetRegisteredParam("AlphaD");
-      const G4double Theta = DMpar->GetRegisteredParam("Theta");
+      const G4double IDMTheta = DMpar->GetRegisteredParam("IDMTheta");
       //Partial widths
       if(MassIn > 2.*electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(electron_mass_c2, electron_mass_c2, MassIn);
-      if (MassIn > MChi1+MChi2) Chi12Width = pow(sin(2*Theta),2.) * AlphaD * APrimeWidth(MChi1, MChi2, MassIn);
-      if (MassIn > 2.*MChi1) Chi11Width = pow(sin(Theta),4) * AlphaD * APrimeWidth(MChi1, MChi1, MassIn);
-      if (MassIn > 2.*MChi2) Chi22Width = pow(cos(Theta),4) * AlphaD * APrimeWidth(MChi2, MChi2, MassIn);
+      if (MassIn > MChi1+MChi2) Chi12Width = pow(sin(2*IDMTheta),2.) * AlphaD * APrimeWidth(MChi1, MChi2, MassIn);
+      if (MassIn > 2.*MChi1) Chi11Width = pow(sin(IDMTheta),4) * AlphaD * APrimeWidth(MChi1, MChi1, MassIn);
+      if (MassIn > 2.*MChi2) Chi22Width = pow(cos(IDMTheta),4) * AlphaD * APrimeWidth(MChi2, MChi2, MassIn);
       //Total width
       WidthIn = eWidth + Chi12Width + Chi11Width + Chi22Width;
       if(WidthIn == 0.) isStable = true;

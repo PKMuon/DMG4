@@ -102,7 +102,7 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure(void *ptr)
      // additional parameters for semivisible DM, in addition to above parameters for annihilation (if absent the default ones will be used)
      //DMpar->RegisterNewParam("Ffactor", 0.4);
      // additional parameter for Dirac DM, describing the dark fermion mixing (if absent the default ones will be used)
-     //DMpar->RegisterNewParam("Theta", 1.e-3);
+     //DMpar->RegisterNewParam("IDMTheta", 1.e-3);
 
   return true;
 }

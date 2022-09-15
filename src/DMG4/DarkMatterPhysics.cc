@@ -89,7 +89,7 @@ void DarkMatterPhysics::Init(){
 
   G4double RDM =  DMpar->GetRegisteredParam("RDM",1./3);
   G4double fFactor = DMpar->GetRegisteredParam("Ffactor",0.1);
-  G4double Theta = DMpar->GetRegisteredParam("Theta",1.e-3);
+  //G4double IDMTheta = DMpar->GetRegisteredParam("IDMTheta",1.e-3); // is it to be used somewhere as argument?
   G4int BranchingType = DMpar->GetRegisteredParam("BranchingType",0);
 
 /*
