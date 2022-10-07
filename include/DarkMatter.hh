@@ -22,6 +22,7 @@ class DarkMatter
   friend class DarkPseudoScalars;
   friend class DarkAxials;
   friend class DarkZ;
+  friend class DarkMuPhilicScalars;
   friend class DarkMuPhilicPseudoScalars;
   friend class DarkVector;
   friend class ALP;

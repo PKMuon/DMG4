@@ -1,10 +1,10 @@
-// This is a class to simulate dark Z' mu-philic pseudoscalarscalar particle production by muons in matter muN -> muNZ'
+// This is a class to simulate dark mu-philic scalar particle production by muons in matter muN -> muNZ'
 // Description is in the base class DarkMatter code
 // To be used in a Geant4 application.
 //
 //
 #include "DarkMatter.hh"
-#include "DarkMuPhilicPseudoScalars.hh"
+#include "DarkMuPhilicScalars.hh"
 #include "Utils.hh"
 
 #include <gsl/gsl_math.h>
@@ -25,13 +25,13 @@
 
 // Additional structure holding E0 value to be passed into GSL callbacks.
 struct BoundParms {
-    DarkMuPhilicPseudoScalars * this_;
+    DarkMuPhilicScalars * this_;
     double E0;
 };
 
 
-// A callback wrapping function for DarkMuPhilicPseudoScalar::CrossSectionDSDX_IWW()
-//static double _DarkMuPhilicPseudoScalarsDsDxMuon(double x1, void * parms_) {
+// A callback wrapping function for DarkMuPhilicScalar::CrossSectionDSDX_IWW()
+//static double _DarkMuPhilicScalarsDsDxMuon(double x1, void * parms_) {
 //    //BoundParms * parms = (BoundParms*) parms_;  // or, equivalently, in C++ style
 //    BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
 //    // Forward invocation to target method
@@ -39,8 +39,8 @@ struct BoundParms {
 //}
 
 
-// A callback wrapping function for DarkMuPhilicPseudoScalars::CrossSectionDSDX_WW()
-static double _DarkMuPhilicPseudoScalarsDsDxMuon_WW(double x1, void * parms_) {
+// A callback wrapping function for DarkMuPhilicScalars::CrossSectionDSDX_WW()
+static double _DarkMuPhilicScalarsDsDxMuon_WW(double x1, void * parms_) {
     //BoundParms * parms = (BoundParms*) parms_;  // or, equivalently, in C++ style
     BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
     // Forward invocation to target method
@@ -48,16 +48,16 @@ static double _DarkMuPhilicPseudoScalarsDsDxMuon_WW(double x1, void * parms_) {
 }
 
 
-// A callback wrapping function for DarkMuPhilicPseudoScalars::CrossSectionDSDXDTheta()
-static double _DarkMuPhilicPseudoScalarsDsDxDThetaMuon(double x[], size_t dim, void * parms_) {
+// A callback wrapping function for DarkMuPhilicScalars::CrossSectionDSDXDTheta()
+static double _DarkMuPhilicScalarsDsDxDThetaMuon(double x[], size_t dim, void * parms_) {
     (void)dim; // to avoid warning
     BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
     // Forward invocation to target method
     return parms->this_->CrossSectionDSDXDTheta( x[0], x[1], parms->E0 );
 }
 
-// A callback wrapping function for DarkMuPhilicPseudoScalars::CrossSectionDSDXDpsi()
-static double _DarkMuPhilicPseudoScalarsDsDxDPsiMuon(double x[], size_t dim, void * parms_) {
+// A callback wrapping function for DarkMuPhilicScalars::CrossSectionDSDXDpsi()
+static double _DarkMuPhilicScalarsDsDxDPsiMuon(double x[], size_t dim, void * parms_) {
     (void)dim; // to avoid warning
     BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
     // Forward invocation to target method
@@ -68,7 +68,7 @@ static double _DarkMuPhilicPseudoScalarsDsDxDPsiMuon(double x[], size_t dim, voi
 // Class methods:  ---------------
 
 
-DarkMuPhilicPseudoScalars::DarkMuPhilicPseudoScalars(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
+DarkMuPhilicScalars::DarkMuPhilicScalars(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
                          double epsilIn, int IDecayIn)
 : DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn)
 {
@@ -93,24 +93,24 @@ DarkMuPhilicPseudoScalars::DarkMuPhilicPseudoScalars(double MAIn, double EThresh
 }
 
 
-DarkMuPhilicPseudoScalars::~DarkMuPhilicPseudoScalars()
+DarkMuPhilicScalars::~DarkMuPhilicScalars()
 {;}
 
 
-double DarkMuPhilicPseudoScalars::TotalCrossSectionCalc(double E0)
+double DarkMuPhilicScalars::TotalCrossSectionCalc(double E0)
 {
   if(IApprox == 1) {
-    std::cout << "DarkMuPhilicPseudoScalars: IApprox = 1 meaning IWW is not implemented for pseudoscalars, exiting" << std::endl;
+    std::cout << "DarkMuPhilicScalars: IApprox = 1 meaning IWW is not implemented for scalars, exiting" << std::endl;
     exit(1);
   }
   if(IApprox == 2) {
     if(IMethodTotalCS == 1) return TotalCrossSectionCalc_WW2(E0); // Integral of ds/dxdTheta
     if(IMethodTotalCS == 2) return TotalCrossSectionCalc_WW3(E0); // Integral of ds/dxdPsi
     if(IMethodTotalCS == 3) return TotalCrossSectionCalc_WW(E0);  // Integral of ds/dx
-    std::cout << "DarkMuPhilicPseudoScalars: wrong value of IMethodTotalCS, exiting" << std::endl;
+    std::cout << "DarkMuPhilicScalars: wrong value of IMethodTotalCS, exiting" << std::endl;
     exit(1);
   } else {
-    std::cout << "DarkMuPhilicPseudoScalars: wrong value of IApprox, exiting" << std::endl;
+    std::cout << "DarkMuPhilicScalars: wrong value of IApprox, exiting" << std::endl;
   }
   exit(1);
 }
@@ -118,7 +118,7 @@ double DarkMuPhilicPseudoScalars::TotalCrossSectionCalc(double E0)
 
 // Below is the integration of WW ds/dx
 //
-double DarkMuPhilicPseudoScalars::TotalCrossSectionCalc_WW(double E0)
+double DarkMuPhilicScalars::TotalCrossSectionCalc_WW(double E0)
 {
   double sigmaTot;
 
@@ -137,7 +137,7 @@ double DarkMuPhilicPseudoScalars::TotalCrossSectionCalc_WW(double E0)
 
   gsl_function F1;
   BoundParms parms = {this, E0};
-  F1.function = _DarkMuPhilicPseudoScalarsDsDxMuon_WW;
+  F1.function = _DarkMuPhilicScalarsDsDxMuon_WW;
   F1.params = &parms;
 
   //gsl_integration_qags (&F1, Xmin1, Xmax1, 0, 1e-7, 1000, w1, &result1, &error1);
@@ -167,7 +167,7 @@ double DarkMuPhilicPseudoScalars::TotalCrossSectionCalc_WW(double E0)
 
 // Below is the 2 - dimensional integration of WW ds/dxdTheta
 //
-double DarkMuPhilicPseudoScalars::TotalCrossSectionCalc_WW2(double E0)
+double DarkMuPhilicScalars::TotalCrossSectionCalc_WW2(double E0)
 {
   if(E0 < 2.*MA) return 0.;
 
@@ -186,7 +186,7 @@ double DarkMuPhilicPseudoScalars::TotalCrossSectionCalc_WW2(double E0)
 
   gsl_monte_function G;
   BoundParms parms = {this, E0};
-  G.f = _DarkMuPhilicPseudoScalarsDsDxDThetaMuon;
+  G.f = _DarkMuPhilicScalarsDsDxDThetaMuon;
   G.dim = 2;
   G.params = &parms;
 
@@ -226,7 +226,7 @@ double DarkMuPhilicPseudoScalars::TotalCrossSectionCalc_WW2(double E0)
 
 // Below is the 2 - dimensional integration of WW ds/dxdPsi
 //
-double DarkMuPhilicPseudoScalars::TotalCrossSectionCalc_WW3(double E0)
+double DarkMuPhilicScalars::TotalCrossSectionCalc_WW3(double E0)
 {
   if(E0 < 2.*MA) return 0.;
 
@@ -245,7 +245,7 @@ double DarkMuPhilicPseudoScalars::TotalCrossSectionCalc_WW3(double E0)
 
   gsl_monte_function G;
   BoundParms parms = {this, E0};
-  G.f = _DarkMuPhilicPseudoScalarsDsDxDPsiMuon;
+  G.f = _DarkMuPhilicScalarsDsDxDPsiMuon;
   G.dim = 2;
   G.params = &parms;
 
@@ -284,28 +284,28 @@ double DarkMuPhilicPseudoScalars::TotalCrossSectionCalc_WW3(double E0)
 }
 
 
-double DarkMuPhilicPseudoScalars::GetSigmaTot(double E0)
+double DarkMuPhilicScalars::GetSigmaTot(double E0)
 {
   return GetSigmaTot0(E0);
 }
 
 
-double DarkMuPhilicPseudoScalars::CrossSectionDSDX(double XEv, double E0)
+double DarkMuPhilicScalars::CrossSectionDSDX(double XEv, double E0)
 {
   if(IApprox == 1) return CrossSectionDSDX_IWW(XEv, E0);
   if(IApprox == 2) return CrossSectionDSDX_WW(XEv, E0);
-  std::cout << "DarkMuPhilicPseudoScalars: wrong value of IApprox, exiting" << std::endl;
+  std::cout << "DarkMuPhilicScalars: wrong value of IApprox, exiting" << std::endl;
   exit(1);
 }
 
 
 // See ArXiv:1705.01633, second line of Eq.(30)
 //
-double DarkMuPhilicPseudoScalars::CrossSectionDSDX_IWW(double XEv, double E0)
+double DarkMuPhilicScalars::CrossSectionDSDX_IWW(double XEv, double E0)
 {
   (void)(XEv);
   (void)(E0);
-  std::cout << "DarkMuPhilicPseudoScalars: IApprox = 1 meaning IWW is not implemented for pseudoscalars, exiting" << std::endl;
+  std::cout << "DarkMuPhilicScalars: IApprox = 1 meaning IWW is not implemented for scalars, exiting" << std::endl;
   exit(1);
 }
 
@@ -315,7 +315,7 @@ double DarkMuPhilicPseudoScalars::CrossSectionDSDX_IWW(double XEv, double E0)
 // for references see e.g. https://www.overleaf.com/8686251169nmvbnqfszfxs.
 // It is unstable, works only for very small M/E
 //
-double DarkMuPhilicPseudoScalars::CrossSectionDSDX_WW(double XEv, double E0)
+double DarkMuPhilicScalars::CrossSectionDSDX_WW(double XEv, double E0)
 {
   double TempThetaMax= 0.07; //is the typical maximum angle from NA64mu design (We should disciss that value)
   double TempThetaMax2=TempThetaMax*TempThetaMax;
@@ -363,7 +363,7 @@ double DarkMuPhilicPseudoScalars::CrossSectionDSDX_WW(double XEv, double E0)
 
 // Below is cross section obtained by integration of ds/dxdTheta
 //
-double DarkMuPhilicPseudoScalars::CrossSectionDSDX_WW(double XEv, double E0)
+double DarkMuPhilicScalars::CrossSectionDSDX_WW(double XEv, double E0)
 {
   // return ds/sx = 0 if energy Z' less mass rest
   if( XEv*E0 <= MA ){ return 0.0; }
@@ -389,10 +389,10 @@ double DarkMuPhilicPseudoScalars::CrossSectionDSDX_WW(double XEv, double E0)
   // Conversion coefficient from tmin to u varible
   double gZ   = 1.0 / ( 2.0*E0*(1.0 - XEv) ), gZ2 = gZ*gZ;
 
-  // Type dependence 1: Coefficients in amplitude for the Case Pseudo Scalar:
+  // Type dependence 1: Coefficients in the amplitude for the Scalar Case:
   double JZ   =  XEv2 / (1.0 - XEv)
-       , K    = 2.0 * MA2 * XEv
-       , LZ   = 2.0 * MA2 * (MA2*(1.0 - XEv) + Mmu2*XEv2 );
+       , K    = 2.0 * (MA2-4.0*Mmu2) * XEv
+       , LZ   = 2.0 * (MA2 - 4.0*Mmu2) * (MA2*(1.0 - XEv) + Mmu2*XEv2 );
 
   // Coefficients in photon flux
   double 
@@ -499,7 +499,7 @@ double DarkMuPhilicPseudoScalars::CrossSectionDSDX_WW(double XEv, double E0)
 // Below is the IWW formula for the double differential cross-section
 // from 1705.01633, see e.g. corresponding second line of Eq.(25)
 //
-double DarkMuPhilicPseudoScalars::CrossSectionDSDXDU(double XEv, double UThetaEv, double E0)
+double DarkMuPhilicScalars::CrossSectionDSDXDU(double XEv, double UThetaEv, double E0)
 {
   if(XEv*E0 <= MA) return 0.;
   double Uxtheta = E0*E0*2.*UThetaEv*XEv + MA*MA*(1.0-XEv)/XEv + Mmu*Mmu*XEv;
@@ -511,16 +511,16 @@ double DarkMuPhilicPseudoScalars::CrossSectionDSDXDU(double XEv, double UThetaEv
 }
 
 
-double DarkMuPhilicPseudoScalars::CrossSectionDSDXDPSI(double XEv, double auxpsi, double E0)
+double DarkMuPhilicScalars::CrossSectionDSDXDPSI(double XEv, double auxpsi, double E0)
 {
   if(IApprox == 1) return CrossSectionDSDXDPSI_IWW(XEv, auxpsi, E0);
   if(IApprox == 2) return CrossSectionDSDXDPSI_WW(XEv, auxpsi, E0);
-  std::cout << "DarkMuPhilicPseudoScalars: wrong value of IApprox, exiting" << std::endl;
+  std::cout << "DarkMuPhilicScalars: wrong value of IApprox, exiting" << std::endl;
   exit(1);
 }
 
 
-double DarkMuPhilicPseudoScalars::CrossSectionDSDXDPSI_IWW(double XEv, double auxpsi, double E0)
+double DarkMuPhilicScalars::CrossSectionDSDXDPSI_IWW(double XEv, double auxpsi, double E0)
 {
   // In IWW approach we suppose that flux factor \chi doesn't depend on y and psi
   // in that method y=Emu'/Emu is muon energy fraction and auxpsi=psi^2/2 is an auxiliar variable
@@ -532,9 +532,9 @@ double DarkMuPhilicPseudoScalars::CrossSectionDSDXDPSI_IWW(double XEv, double au
   // ds/dpprime
   double fac1 = (1.-y)/(t*t);
 
-  // Type dependence 2: For the Case Pseudo Scalar:
+  // Type dependence 2: This is for the Scalar Case:
   double fac2 = 1./(4.*y) + y/4. - 1./2.;
-  double fac3 = 1./2.*(MA*MA)*(1.-y)*(1.-y)/(t*t*y);
+  double fac3 = 1./2.*(MA*MA - 4.0*Mmu*Mmu)*(1.-y)*(1.-y)/(t*t*y);
   double fac4 = Mmu*Mmu*(1.-y)*(1.-y)/y + MA*MA - t;
 
   double part1 = fac1*(fac2+fac3*fac4);
@@ -544,7 +544,7 @@ double DarkMuPhilicPseudoScalars::CrossSectionDSDXDPSI_IWW(double XEv, double au
 }
 
 
-double DarkMuPhilicPseudoScalars::CrossSectionDSDXDPSI_WW(double XEv, double auxpsi, double E0)
+double DarkMuPhilicScalars::CrossSectionDSDXDPSI_WW(double XEv, double auxpsi, double E0)
 {
   if(E0*XEv < EThresh) return 0.;
   double Xmin = MA/E0;
@@ -568,9 +568,9 @@ double DarkMuPhilicPseudoScalars::CrossSectionDSDXDPSI_WW(double XEv, double aux
   // ds/dpprime
   double fac1 = (1.-y)/(t*t);
 
-  // Type dependence 3: For the Case Pseudo Scalar:
+  // Type dependence 3: This is for the Scalar Case:
   double fac2 = 1./(4.*y) + y/4. - 1./2.;
-  double fac3 = 1./2.*(MA*MA)*(1.-y)*(1.-y)/(t*t*y);
+  double fac3 = 1./2.*(MA*MA - 4.0*Mmu*Mmu)*(1.-y)*(1.-y)/(t*t*y);
   double fac4 = Mmu*Mmu*(1.-y)*(1.-y)/y + MA*MA - t;
 
   double part1 = fac1*(fac2 + fac3*fac4);
@@ -589,7 +589,7 @@ double DarkMuPhilicPseudoScalars::CrossSectionDSDXDPSI_WW(double XEv, double aux
 
 // WW cross section for the total cross section
 //
-double DarkMuPhilicPseudoScalars::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double E0)
+double DarkMuPhilicScalars::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double E0)
 {
   if(E0*XEv < EThresh) return 0.;
   double x2=XEv*XEv;
@@ -611,9 +611,9 @@ double DarkMuPhilicPseudoScalars::CrossSectionDSDXDTheta(double XEv, double Thet
   double ChiWWAnalytical = -ZNucl*ZNucl*((td*td*(((ta - td)*(ta + td + 2.0*tmax)*(tmax - tmin))/((ta + tmax)*(td + tmax)) + (ta + td + 2.0*tmin)*(log(ta + tmax)
                            - log(td + tmax) - log(ta + tmin) + log(td + tmin))))/((ta-td)*(ta-td)*(ta-td)));
 
-  // Type dependence 4: For the Case Pseudo Scalar:
+  // Type dependence 4: For the Scalar Case of hidden boson:
   double Factor1 = x2/(1.0-XEv);
-  double Factor2 = 2.0*MA2/utilde2;
+  double Factor2 = 2.0*(MA2-4.0*Mmu2)/utilde2;
   double Factor3 = utilde*XEv + MA2*(1.0-XEv) + Mmu2*x2;
 
   double AmplZpr2WWVEGAS = Factor1+Factor2*Factor3;
@@ -633,7 +633,7 @@ double DarkMuPhilicPseudoScalars::CrossSectionDSDXDTheta(double XEv, double Thet
 }
 
 
-double DarkMuPhilicPseudoScalars::Width()
+double DarkMuPhilicScalars::Width()
 {
   const double muMass = Mmu;
   const double tauMass = Mtau;
@@ -644,12 +644,12 @@ double DarkMuPhilicPseudoScalars::Width()
   if (MA < 2.*tauMass) {
     nuWidth = (1./2.)*MA*alphaEW*epsil*epsil;
     if (MA > 2.*muMass) {
-      double factor = sqrt(1.-4.*massRatio2);
+      double factor = sqrt(1.-4.*massRatio2)*(1.-4.*massRatio2);
       muWidth = nuWidth*factor;
     }
     width = nuWidth+muWidth; // in GeV
   } else {
-    std::cout << "DarkMuPhilicPseudoScalars: width for the mass above 2 Mtau is not implemented, exiting" << std::endl;
+    std::cout << "DarkMuPhilicScalars: width for the mass above 2 Mtau is not implemented, exiting" << std::endl;
     exit(1);
   }
   return width;
