@@ -4,6 +4,7 @@
 #include "DarkMatter.hh"
 #include "DarkPhotons.hh"
 #include "DarkZ.hh"
+#include "DarkMuPhilicScalars.hh"
 #include "DarkMuPhilicPseudoScalars.hh"
 #include "ALP.hh"
 #include "DarkPhotonsAnnihilation.hh"
@@ -132,6 +133,14 @@ void DarkMatterPhysics::Init(){
     case 31:
       G4cout << "Initialize DarkZ\n";
       myDarkMatter = new DarkZ(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+      break;
+    case 32:
+      G4cout << "Initialize DarkMuPhilicScalars\n";
+      if(DecayType) { // Temporary plug
+        G4cout << G4endl << "DarkMuPhilicScalar with decays is not yet implemented, exiting" << G4endl << G4endl;
+        exit(1);
+      }
+      myDarkMatter = new DarkMuPhilicScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
       break;
     case 34:
       G4cout << "Initialize DarkMuPhilicPseudoScalars\n";
@@ -262,7 +271,7 @@ void DarkMatterPhysics::ConstructProcess()
     }
   }
   if(myDarkMatter->GetParentPDGID() == 13) {
-    theDMParticlePtr = DMParticleZPrime::Definition(); // Decay to SM particles
+    theDMParticlePtr = DMParticleZPrime::Definition(); // Always Z' for the moment, scalar etc. particles from muons not yet implemented
   }
   if(myDarkMatter->GetParentPDGID() == 22) {
     theDMParticlePtr = DMParticleALP::Definition();

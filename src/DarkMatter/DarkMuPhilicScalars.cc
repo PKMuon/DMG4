@@ -72,7 +72,7 @@ DarkMuPhilicScalars::DarkMuPhilicScalars(double MAIn, double EThreshIn, double S
                          double epsilIn, int IDecayIn)
 : DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn)
 {
-  DMType = 14;
+  DMType = 12;
   ParentPDGID = 13;
   DaughterPDGID = 0;
 
