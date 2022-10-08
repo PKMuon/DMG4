@@ -1,18 +1,4 @@
 #include "DarkMatterPhysics.hh"
-
-#include "DarkMatter.hh"
-#include "DarkPhotons.hh"
-#include "DarkScalars.hh"
-#include "DarkPseudoScalars.hh"
-#include "DarkAxials.hh"
-#include "ALP.hh"
-#include "DarkZ.hh"
-#include "DarkPhotonsAnnihilation.hh"
-#include "DarkScalarsAnnihilation.hh"
-#include "DarkPseudoScalarsAnnihilation.hh"
-#include "DarkAxialsAnnihilation.hh"
-
-
 #include "DarkMatterParametersFactory.hh"
 
 #include "G4SystemOfUnits.hh"
@@ -83,9 +69,12 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
   DMpar->RegisterNewParam("DecayType", 1.);
 
   /* Comments to "BranchingType"
-   * Optional to make different decay table; 0 : invisible decays or SM lepton decays, depending on DecayType; 1 : B - L model; 2 : Semivisible: Inelastic DM; 3 : Semivisible: Dirac Inelastic DM
-   * For annihilation e+e- --> R --> ff the meaning is DIFFERENT!
+   * Optional to make different decay table; 0 : invisible decays or SM lepton decays, depending on DecayType;
+                                             1 : B - L model;
+                                             2 : Semivisible: Inelastic DM;
+                                             3 : Semivisible: Dirac Inelastic DM
 
+   * For annihilation e+e- --> R --> ff the meaning is DIFFERENT!
      0: default: fermionic ff final state
      1: scalar ff final state
      2: asymmetric fermionic DM final state produced (iDM)
