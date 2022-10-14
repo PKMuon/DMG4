@@ -24,6 +24,8 @@ class DarkMatter
   friend class DarkZ;
   friend class DarkMuPhilicScalars;
   friend class DarkMuPhilicPseudoScalars;
+  friend class DarkMuPhilicPseudoScalars;
+  friend class DarkMassSpin2;
   friend class DarkVector;
   friend class ALP;
   friend class DarkPhotonsAnnihilation;
