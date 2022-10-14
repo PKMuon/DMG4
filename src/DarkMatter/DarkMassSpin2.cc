@@ -8,9 +8,9 @@
 #include <gsl/gsl_multimin.h>
 #include <gsl/gsl_integration.h>
 
-#define LIM_ITER_QAGS 20000
-#define REL_ERR_QAGS 1.0e-10
-#define REL_ERR_QAGS_MIN 1.0e-6
+#define LIM_ITER_QAGS 25000
+#define REL_ERR_QAGS 1.0e-8
+#define REL_ERR_QAGS_MIN 1.0e-4
 #define ABS_ERR_QAGS 0.0
 #define REL_ERR_QAGS_STEP 1.2
 
@@ -168,9 +168,9 @@ double DarkMassSpin2::CrossSectionDSDX_WW( double XEv, double E0 ){
     relerr *= REL_ERR_QAGS_STEP;
   }
   gsl_set_error_handler(old_handler);
-  if(relerr > REL_ERR_QAGS_MIN ){ 
-    std::cout << "DsDx, DarkMassSpin2, relerr "<< relerr << std::endl; 
-  }
+  //if(relerr > REL_ERR_QAGS_MIN ){ 
+  //  std::cout << "DsDx, DarkMassSpin2, relerr "<< relerr << std::endl; 
+  //}
   gsl_integration_workspace_free( w ); 
   return res;
 }
@@ -200,9 +200,9 @@ double DarkMassSpin2::TotalCrossSectionCalc_WW( double E0 ){
     relerr *= REL_ERR_QAGS_STEP;
   }
   gsl_set_error_handler(old_handler);
-    if(relerr > REL_ERR_QAGS_MIN ){ 
-    std::cout << "Ds, DarkMassSpin2, relerr "<< relerr << std::endl; 
-  }
+  //  if(relerr > REL_ERR_QAGS_MIN ){ 
+  //  std::cout << "Ds, DarkMassSpin2, relerr "<< relerr << std::endl; 
+  //}
   gsl_integration_workspace_free( w ); 
   return res;
 }
