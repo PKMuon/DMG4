@@ -20,35 +20,35 @@
 
 // Additional structure holding E0 value to be passed into GSL callbacks.
 struct BoundParmsDs {
-    DarkMassSpin2 * this_;
-    double E0;
+  DarkMassSpin2 * this_;
+  double E0;
 };
 
 
 // Additional structure holding E0, xEv values to be passed into GSL callbacks.
 struct BoundParmsDsDx {
-    DarkMassSpin2 * this_;
-    double E0;
-    double xEv;
+  DarkMassSpin2 * this_;
+  double E0;
+  double xEv;
 };
 
 
 // A callback wrapping function for single differential cross-section as 
 // function fraction of energy
 static double _DarkMassSpin2DsDx(double x, void* parms_) {
-    // Geting parameters
-    BoundParmsDsDx* parms = reinterpret_cast< BoundParmsDsDx* >( parms_ );
-    // Forward invocation to target method
-    return parms->this_->CrossSectionDSDXDTheta( parms->xEv, x, parms->E0 );
+  // Geting parameters
+  BoundParmsDsDx* parms = reinterpret_cast< BoundParmsDsDx* >( parms_ );
+  // Forward invocation to target method
+  return parms->this_->CrossSectionDSDXDTheta( parms->xEv, x, parms->E0 );
 }
 
 // A callback wrapping function for total differential cross-section as 
 // function energy
 static double _DarkMassSpin2Ds(double x, void* parms_) {
-    // Geting parameters
-    BoundParmsDs* parms = reinterpret_cast< BoundParmsDs* >( parms_ );
-    // Forward invocation to target method
-    return parms->this_->CrossSectionDSDX( x, parms->E0 );
+  // Geting parameters
+  BoundParmsDs* parms = reinterpret_cast< BoundParmsDs* >( parms_ );
+  // Forward invocation to target method
+  return parms->this_->CrossSectionDSDX( x, parms->E0 );
 }
 
 
@@ -175,7 +175,9 @@ double DarkMassSpin2::CrossSectionDSDX_WW( double XEv, double E0 ){
   return res;
 }
 
-
+// Calculation  total cross-section as function of energy of radiation particle 
+// in WW approximation. Using GSL method QAGS intagrate single differential 
+// cross-section
 double DarkMassSpin2::TotalCrossSectionCalc_WW( double E0 ){
   // Checking correct the low limit of fraction of energy
   if( E0 < 2.0 * MA ) { return 0.0; }
@@ -188,7 +190,7 @@ double DarkMassSpin2::TotalCrossSectionCalc_WW( double E0 ){
        , xMin = MA/E0, xMax = 1.0 - mInit/E0;
   // Setting function of integrand with parameters
   gsl_function F;
-  BoundParmsDs parms = { this, E0};
+  BoundParmsDs parms = { this, E0 };
   F.function = &_DarkMassSpin2Ds;
   F.params = &parms;
   // Starting integration with increase relative error in case fall
@@ -210,6 +212,13 @@ double DarkMassSpin2::TotalCrossSectionCalc_WW( double E0 ){
 
 double DarkMassSpin2::GetSigmaTot( double E0 ){
   return GetSigmaTot0( E0 );
+}
+
+
+double DarkMassSpin2::CrossSectionDSDXDU( double XEv, double UThetaEv
+                                        , double E0 ){
+  (void) XEv; (void) UThetaEv; (void) E0;
+  return 0;
 }
 
 

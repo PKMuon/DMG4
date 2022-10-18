@@ -1,3 +1,5 @@
+class DarkMatter;
+
 class DarkMassSpin2 : public DarkMatter {
   public:
     
@@ -12,7 +14,7 @@ class DarkMassSpin2 : public DarkMatter {
     virtual double GetSigmaTot( double E0 );
     virtual double CrossSectionDSDX( double XEv, double E0 );
     virtual double CrossSectionDSDXDTheta( double XEv, double Theta, double E0 );
-    virtual double CrossSectionDSDXDU(double XEv, double UThetaEv, double E0){}; 
+    virtual double CrossSectionDSDXDU(double XEv, double UThetaEv, double E0); 
     virtual double Width();
 
     double TotalCrossSectionCalc_WW( double E0 );

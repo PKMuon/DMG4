@@ -4,7 +4,7 @@
 
 #include "DarkMatter.hh"
 #include "DarkMassSpin2.hh"
-
+#include "DarkMassSpin2Annihilation.hh"
 
 #include "Randomize.hh"
 
@@ -33,5 +33,14 @@ int main() {
               << TCSWM[i]
               <<  std::endl;
   }
+
+  DarkMatter* myDarkMatter2 = new DarkMassSpin2Annihilation( MA, EThresh, SigmaNorm );
+
+  std::cout << "E0" << "\t" << "AnnihilationDMG4" <<  std::endl;
+  for(int i = 0; i < 9; i++){
+    std::cout << E0Tab[i] << "\t" 
+              << myDarkMatter2->TotalCrossSectionCalc(E0Tab[i]) << std::endl;
+  }
+
   return 0;
 }
