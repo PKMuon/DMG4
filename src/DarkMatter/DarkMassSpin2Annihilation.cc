@@ -28,7 +28,7 @@ DarkMassSpin2Annihilation::DarkMassSpin2Annihilation( double MAIn
                                                       iBranchingType(IBranchingIn)
                                                       , r( rIn ), f( fIn )
                                                       , alphaD( alphaDIn ){
-  DMType = 2; //A.C.
+  DMType = 55;
   ParentPDGID = -11;
   DaughterPDGID = 11;
 
@@ -45,8 +45,8 @@ DarkMassSpin2Annihilation::DarkMassSpin2Annihilation( double MAIn
 DarkMassSpin2Annihilation::~DarkMassSpin2Annihilation(  ){ ; }
 
 
-//Input: E0, positron energy in GeV
-//output: total annihilation cross-section in pbarn.
+// Calculation total differential cross-section as function fraction of energy
+// in pBarn
 double DarkMassSpin2Annihilation::TotalCrossSectionCalc( double E0 ){  
   // Invariant mass 
   double ss = 2.0 * Mel * E0
@@ -64,7 +64,7 @@ double DarkMassSpin2Annihilation::TotalCrossSectionCalc( double E0 ){
   sigma = sigma / ( (ss - MA*MA)*(ss - MA*MA) + MA*MA * gg*gg );
   
   // here sigma is in  1 /Energy^2. Move to pBarn
-  //sigma = sigma * GeVtoPb;
+  sigma = sigma * GeVtoPb;
 
   // A.C. correct here for atomic effects
   sigma = sigma * ZNucl;
@@ -77,11 +77,11 @@ double DarkMassSpin2Annihilation::GetSigmaTot( double E0 ){
 }
 
 
- // Different kinematic limit here
+// Different kinematic limit here
 bool DarkMassSpin2Annihilation::EmissionAllowed( double E0, double DensityMat ){
   if ( sqrt(2. * Mel * E0) < 2.0 * mChi ){ return false; }
   if ( E0 < EThresh ){ return false; }
-  //if ( NEmissions ){ return false; }   // For G4 DM classes
+  if ( NEmissions ){ return false; }   // For G4 DM classes
   if ( fabs(DensityMat - Density) > 0.1 ){ return false; } 
   return true;
 }

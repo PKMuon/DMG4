@@ -177,7 +177,7 @@ double DarkMassSpin2::CrossSectionDSDX_WW( double XEv, double E0 ){
 
 // Calculation  total cross-section as function of energy of radiation particle 
 // in WW approximation. Using GSL method QAGS intagrate single differential 
-// cross-section
+// cross-section in pBarn
 double DarkMassSpin2::TotalCrossSectionCalc_WW( double E0 ){
   // Checking correct the low limit of fraction of energy
   if( E0 < 2.0 * MA ) { return 0.0; }
@@ -206,7 +206,7 @@ double DarkMassSpin2::TotalCrossSectionCalc_WW( double E0 ){
   //  std::cout << "Ds, DarkMassSpin2, relerr "<< relerr << std::endl; 
   //}
   gsl_integration_workspace_free( w ); 
-  return res;
+  return GeVtoPb * res;
 }
 
 
