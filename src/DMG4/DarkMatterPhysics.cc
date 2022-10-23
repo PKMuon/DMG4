@@ -127,6 +127,14 @@ void DarkMatterPhysics::Init(){
       G4cout << "Initialize DarkPseudoScalars\n";
       myDarkMatter = new DarkPseudoScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
       break;
+    case 5:
+      G4cout << "Initialize DarkMassSpin2\n";
+      if(DecayType) { // Temporary plug
+        G4cout << G4endl << "DarkMassSpin2 with decays is not yet implemented, exiting" << G4endl << G4endl;
+        exit(1);
+      }
+      myDarkMatter = new DarkMassSpin2(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+      break;
     case 21:
       G4cout << "Initialize ALP\n";
       myDarkMatter = new ALP(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
@@ -150,14 +158,6 @@ void DarkMatterPhysics::Init(){
         exit(1);
       }
       myDarkMatter = new DarkMuPhilicPseudoScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
-      break;
-    case 55:
-      G4cout << "Initialize DarkMassSpin2\n";
-      if(DecayType) { // Temporary plug
-        G4cout << G4endl << "DarkMassSpin2 with decays is not yet implemented, exiting" << G4endl << G4endl;
-        exit(1);
-      }
-      myDarkMatter = new DarkMassSpin2(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
       break;
     case 11:
       G4cout << "Initialize DarkPhotonsAnnihilation\n";

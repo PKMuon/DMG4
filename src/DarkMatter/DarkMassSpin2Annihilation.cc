@@ -28,7 +28,7 @@ DarkMassSpin2Annihilation::DarkMassSpin2Annihilation( double MAIn
                                                       iBranchingType(IBranchingIn)
                                                       , r( rIn ), f( fIn )
                                                       , alphaD( alphaDIn ){
-  DMType = 55;
+  DMType = 5;
   ParentPDGID = -11;
   DaughterPDGID = 11;
 
@@ -45,9 +45,9 @@ DarkMassSpin2Annihilation::DarkMassSpin2Annihilation( double MAIn
 DarkMassSpin2Annihilation::~DarkMassSpin2Annihilation(  ){ ; }
 
 
-// Calculation total differential cross-section as function fraction of energy
-// in pBarn
-double DarkMassSpin2Annihilation::TotalCrossSectionCalc( double E0 ){  
+// Total cross-section in pBarn
+double DarkMassSpin2Annihilation::TotalCrossSectionCalc( double E0 )
+{
   // Invariant mass 
   double ss = 2.0 * Mel * E0
        , rsChi = mChi*mChi / ss, rsEl = Mel*Mel / ss;
@@ -72,13 +72,15 @@ double DarkMassSpin2Annihilation::TotalCrossSectionCalc( double E0 ){
 }
 
 
-double DarkMassSpin2Annihilation::GetSigmaTot( double E0 ){
+double DarkMassSpin2Annihilation::GetSigmaTot( double E0 )
+{
   return TotalCrossSectionCalc( E0 );
 }
 
 
 // Different kinematic limit here
-bool DarkMassSpin2Annihilation::EmissionAllowed( double E0, double DensityMat ){
+bool DarkMassSpin2Annihilation::EmissionAllowed( double E0, double DensityMat )
+{
   if ( sqrt(2. * Mel * E0) < 2.0 * mChi ){ return false; }
   if ( E0 < EThresh ){ return false; }
   if ( NEmissions ){ return false; }   // For G4 DM classes
@@ -87,7 +89,8 @@ bool DarkMassSpin2Annihilation::EmissionAllowed( double E0, double DensityMat ){
 }
 
 
-double DarkMassSpin2Annihilation::CrossSectionDSDX( double XEv, double E0 ){
+double DarkMassSpin2Annihilation::CrossSectionDSDX( double XEv, double E0 )
+{
   (void)(E0);
   if ( XEv > 0.9999 ){ return 1.; }   
   return 0.;
@@ -96,15 +99,17 @@ double DarkMassSpin2Annihilation::CrossSectionDSDX( double XEv, double E0 ){
 
 double DarkMassSpin2Annihilation::CrossSectionDSDXDU( double XEv
                                                     , double UThetaEv
-                                                    , double E0 ){
+                                                    , double E0 )
+{
   (void)(UThetaEv); (void)(E0);
   if ( XEv > 0.9999 ){ return 1.; }   
   return 0.;
 }
 
 
-// Calculation decay width of particle into pair of dark fermoin
-double DarkMassSpin2Annihilation::Width(){
+// decay width of decay into a pair of dark fermions
+double DarkMassSpin2Annihilation::Width()
+{
   return  ( 1.0/(160.0*M_PI) ) * MA*MA*MA * epsil*epsil
         * pow( 1.0 - 4.0 * r*r, 3.0/2.0 )
         * ( 1.0 + ( 8.0 / 3.0 ) * r*r );

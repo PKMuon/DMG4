@@ -62,11 +62,11 @@ DarkMassSpin2::DarkMassSpin2( double MAIn, double EThreshIn
                                           , ANuclIn, ZNuclIn, DensityIn
                                           , epsilIn, IDecayIn){
   // Setting id for type particle 
-  DMType = 55;
+  DMType = 5;
   ParentPDGID = 11;
   DaughterPDGID = 11;
 
-  mInit = Mel;          // mass initial particle
+  mInit = Mel;          // mass of initial particle
   tMax =         100.;  // tmax initial; tmax = E0*E0 will be taken
   ThetaMax =      0.1;  // Max. angle of radiation
   //PsiMax =        1.0;  // Max. angle of recoil lepton
@@ -76,31 +76,31 @@ DarkMassSpin2::DarkMassSpin2( double MAIn, double EThreshIn
 DarkMassSpin2::~DarkMassSpin2(  ){ ; }
 
 
-// Calculation double differential cross-section as function angle and fraction 
-// of energy of radiation particle
-double DarkMassSpin2::CrossSectionDSDXDTheta( double XEv, double Theta
-                                             , double E0 ){
+// Double differential cross-section as a function of angle and energy fraction of radiated particle
+double DarkMassSpin2::CrossSectionDSDXDTheta( double XEv, double Theta, double E0 )
+{
   return CrossSectionDSDXDTheta_WW( XEv, Theta, E0 );
 }
 
 
-// Calculation single differential cross-section as function fraction of energy
-double DarkMassSpin2::CrossSectionDSDX( double XEv, double E0 ){
+// Single differential cross-section as a function of energy fraction
+double DarkMassSpin2::CrossSectionDSDX( double XEv, double E0 )
+{
   return CrossSectionDSDX_WW( XEv, E0 );
 }
 
 
-// Calculation total differential cross-section as function fraction of energy
+// Total cross-section
 double DarkMassSpin2::TotalCrossSectionCalc( double E0 ){
   return TotalCrossSectionCalc_WW( E0 );
 }
 
 
-// Calculation double differential cross-section as function angle and fraction 
-// of energy of radiation particle in WW approximation. Formula for the double 
+// Double differential cross-section as a function of angle and fraction 
+// of energy of emitted particle in WW approximation. Formula for the double 
 // differential cross-section from 2210.00751 ( mass of lepton is zero )
-double DarkMassSpin2::CrossSectionDSDXDTheta_WW( double XEv, double Theta
-                                               , double E0 ){
+double DarkMassSpin2::CrossSectionDSDXDTheta_WW( double XEv, double Theta, double E0 )
+{
   // Checking correct the low limit of fraction of energy
   if( XEv*E0 <= MA ){ return 0.0; }
   // Setting momentums of photon flux.
@@ -141,10 +141,11 @@ double DarkMassSpin2::CrossSectionDSDXDTheta_WW( double XEv, double Theta
 }
 
 
-// Calculation single differential cross-section as function fraction of energy 
-// of radiation particle in WW approximation. Using GSL method QAGS intagrate 
-// double differential cross-section
-double DarkMassSpin2::CrossSectionDSDX_WW( double XEv, double E0 ){
+// Single differential cross-section as a function of fraction of energy 
+// of emitted particle in WW approximation. Uses GSL integration method QAGS
+// and double differential cross-section
+double DarkMassSpin2::CrossSectionDSDX_WW( double XEv, double E0 )
+{
   // Checking correct the low limit of fraction of energy
   if( E0 < 2.0 * MA ) { return 0.0; }
   // Setting upper limit of number of subintervals and relative error
@@ -175,10 +176,10 @@ double DarkMassSpin2::CrossSectionDSDX_WW( double XEv, double E0 ){
   return res;
 }
 
-// Calculation  total cross-section as function of energy of radiation particle 
-// in WW approximation. Using GSL method QAGS intagrate single differential 
-// cross-section in pBarn
-double DarkMassSpin2::TotalCrossSectionCalc_WW( double E0 ){
+// Total cross-section in WW approximation. Uses GSL integration method QAGS and
+// single differential cross-section in pBarn
+double DarkMassSpin2::TotalCrossSectionCalc_WW( double E0 )
+{
   // Checking correct the low limit of fraction of energy
   if( E0 < 2.0 * MA ) { return 0.0; }
   // Setting upper limit of number of subintervals and relative error
@@ -210,20 +211,22 @@ double DarkMassSpin2::TotalCrossSectionCalc_WW( double E0 ){
 }
 
 
-double DarkMassSpin2::GetSigmaTot( double E0 ){
+double DarkMassSpin2::GetSigmaTot( double E0 )
+{
   return GetSigmaTot0( E0 );
 }
 
 
-double DarkMassSpin2::CrossSectionDSDXDU( double XEv, double UThetaEv
-                                        , double E0 ){
+double DarkMassSpin2::CrossSectionDSDXDU( double XEv, double UThetaEv, double E0 )
+{
   (void) XEv; (void) UThetaEv; (void) E0;
   return 0;
 }
 
 
-// Calculation decay width of particle into pair of initial fermoin
-double DarkMassSpin2::Width(){
+// Decay width into a pair of initial fermions
+double DarkMassSpin2::Width()
+{
   double ratMass =  mInit / MA;
   return  ( 1.0/(160.0*M_PI) ) * MA*MA*MA * epsil*epsil
         * pow( 1.0 - 4.0 * ratMass*ratMass, 3.0/2.0 )

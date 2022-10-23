@@ -1,4 +1,4 @@
- This G4 application used default configuration in DMG4/DarkMatterPhysicsConfigure.cc. If you want to change it, copy the file here.
+ This G4 application uses default configuration in DMG4/DarkMatterPhysicsConfigure.cc. If you want to change it, copy the file here.
  Usage: type the following commands:
    runconfigure
    make

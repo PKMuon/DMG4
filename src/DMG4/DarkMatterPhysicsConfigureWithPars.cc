@@ -1,18 +1,4 @@
 #include "DarkMatterPhysics.hh"
-
-#include "DarkMatter.hh"
-#include "DarkPhotons.hh"
-#include "DarkScalars.hh"
-#include "DarkPseudoScalars.hh"
-#include "DarkAxials.hh"
-#include "ALP.hh"
-#include "DarkZ.hh"
-#include "DarkPhotonsAnnihilation.hh"
-#include "DarkScalarsAnnihilation.hh"
-#include "DarkPseudoScalarsAnnihilation.hh"
-#include "DarkAxialsAnnihilation.hh"
-
-
 #include "DarkMatterParametersFactory.hh"
 
 #include "G4SystemOfUnits.hh"
@@ -58,7 +44,7 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure(void *ptr)
      //G4double EThresh = 2000.; // to turn off A emissions
 
      //select particle type and details
-     DMpar->RegisterNewParam("DMProcessType", 1.); // 1 - 4: Brem. process for Vector, Scalar, Axial, Pseudoscalar, 21 - ALP
+     DMpar->RegisterNewParam("DMProcessType", 1.); // 1 - 4: Brem. process for Vector, Scalar, Axial, Pseudoscalar, 5 - spin 2, 21 - ALP
                                                    // 31 - ZPrime (muon beams), 11 - 14: Annihilation
      DMpar->RegisterNewParam("DMMass", 0.0167*GeV);
      DMpar->RegisterNewParam("Epsilon", 0.0001);
