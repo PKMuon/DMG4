@@ -1,3 +1,9 @@
+24.10.2022   Version 2.2      Add possibility of more complicated semivisible DM models, with asymmetric decays
+                              In addition to Z', a possibility to emit muophilic scalar and pseudoscalar DM particle is added, for the moment only fully invisible
+                              Extend some K-factor tables to 3 GeV
+                              Add spin 2 DM model, coupling to electrons and positrons, brem. and annihilation production channels, for the moment only
+                              fully invisible.
+
 06.07.2022   Version 2.1      Consistent usage of Geant4 system of units in the DMG4 part, in particular in DarkMatterPhysicsConfigure
                               Fix bug in the calculation of MeanFreePath, which increases the yield of DM by 10%
                               Fix units in subpackage DarkMatter, remove its dependency on Geant4 (but it still depends on CLHEP taken through Geant4)
