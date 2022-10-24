@@ -14,6 +14,7 @@
 #include "DarkScalars.hh"
 #include "DarkPseudoScalars.hh"
 #include "DarkMassSpin2.hh"
+#include "DarkMassSpin2Annihilation.hh"
 #include "DarkAxials.hh"
 
 #include "DMProcessDMBrem.hh"
@@ -161,23 +162,27 @@ void DarkMatterPhysics::Init(){
       break;
     case 11:
       G4cout << "Initialize DarkPhotonsAnnihilation\n";
-      myDarkMatter = new DarkPhotonsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,RDM,
-                                                 DMpar->GetRegisteredParam("AlphaD", 0.5),BranchingType,fFactor );
+      myDarkMatter = new DarkPhotonsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
+                                                 DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor );
       break;
     case 12:
       G4cout << "Initialize DarkScalarsAnnihilation\n";
-      myDarkMatter = new DarkScalarsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,RDM,
-              DMpar->GetRegisteredParam("AlphaD", 0.5),BranchingType,fFactor );
+      myDarkMatter = new DarkScalarsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
+              DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor );
       break;
     case 13:
       G4cout << "Initialize DarkAxialsAnnihilation\n";
-      myDarkMatter = new DarkAxialsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,RDM,
-              DMpar->GetRegisteredParam("AlphaD", 0.5),BranchingType,fFactor );
+      myDarkMatter = new DarkAxialsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
+              DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor );
       break;
     case 14:
       G4cout << "Initialize DarkPseudoScalarsAnnihilation\n";
-      myDarkMatter = new DarkPseudoScalarsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType,RDM,
-              DMpar->GetRegisteredParam("AlphaD", 0.5),BranchingType,fFactor );
+      myDarkMatter = new DarkPseudoScalarsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
+              DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor );
+       break;
+    case 15:
+      G4cout << "Initialize DarkMassSpin2Annihilation\n";
+      myDarkMatter = new DarkMassSpin2Annihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM);
        break;
      default:
        G4cout << G4endl << "Wrong DM process type specified: " << DMProcessType << " , exiting" << G4endl << G4endl;
