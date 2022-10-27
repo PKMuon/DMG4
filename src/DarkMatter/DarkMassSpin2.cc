@@ -134,8 +134,8 @@ double DarkMassSpin2::CrossSectionDSDXDTheta_WW( double XEv, double Theta, doubl
          ChiWWAnalytical *= ZNucl*ZNucl * td*td / pow( (ta - td), 3 );
     // Calc result 
   double
-  Prefactor = 4.0 * E0*E0 * alphaEW*alphaEW * sin(Theta) / (1.0 - XEv)
-            * sqrt( XEv*XEv - ( MA*MA ) / ( E0*E0 ) )
+  Prefactor = 4.0 * E0*E0 *alphaEW*alphaEW  * epsilBench*epsilBench 
+            * sin(Theta) / (1.0 - XEv) * sqrt( XEv*XEv - ( MA*MA ) / ( E0*E0 ) )
             / ( 8.0 * M_PI * (sMnd -  mInit*mInit)*(sMnd -  mInit*mInit) );
   return Prefactor * ChiWWAnalytical * MatElwhoutMass;
 }
