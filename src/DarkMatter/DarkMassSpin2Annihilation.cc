@@ -64,7 +64,7 @@ double DarkMassSpin2Annihilation::TotalCrossSectionCalc( double E0 )
   sigma = sigma / ( (ss - MA*MA)*(ss - MA*MA) + MA*MA * gg*gg );
   
   // here sigma is in  1 /Energy^2. Move to pBarn
-  sigma = sigma * GeVtoPb;
+  sigma = sigma * GeVtoPb * 4*M_PI * alphaD * epsilBench*epsilBench;
 
   // A.C. correct here for atomic effects
   sigma = sigma * ZNucl;
