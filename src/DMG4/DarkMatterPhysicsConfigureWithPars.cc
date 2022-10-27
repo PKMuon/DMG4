@@ -6,7 +6,7 @@
 
 // BiasSigmaFactor Invisible mode Vector EThresh=35
 // 900.  9.e12
-// 16.7  8.e8
+// 16.7  1.e9
 //  5.   1.75e8
 //  2.   3.5e7
 // 0.5   1.2e7
@@ -37,7 +37,7 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure(void *ptr)
     //call an instance of the class
      DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
 
-     DMpar->RegisterNewParam("BiasSigmaFactor0", 8.e8);
+     DMpar->RegisterNewParam("BiasSigmaFactor0", 1.e9);
      DMpar->RegisterNewParam("EThresh", 35.*GeV); // for sensitivity calculations invisible mode
      //G4double EThresh = 18.; // for sensitivity calculations visible mode
      //G4double EThresh = 1.; // for shape studies
@@ -68,7 +68,7 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure(void *ptr)
       Setting this to "1" means that the code will produce the "ff" final state, according to Branching type.
      */
 
-     DMpar->RegisterNewParam("DecayType", 1.);
+     DMpar->RegisterNewParam("DecayType", 0.);
 
      /* Comments to "BranchingType"
       * Optional to make different decay table; 0 : invisible decays or SM lepton decays, depending on DecayType; 1 : B - L model; 2 : Semivisible: Inelastic DM; 3 : Semivisible: Dirac Inelastic DM    
