@@ -24,12 +24,12 @@ DMParticleAPrime* DMParticleAPrime::Definition()
     // Reduce the formula to the case where the two masses are equal
     if (mass1 == mass2)
       return MassIn/3.*
-        sqrt(1.-4*mass1*mass1/(MassIn*MassIn))*
-        (1.+2*mass1*mass1/(MassIn*MassIn));
+        sqrt(1.-4.*mass1*mass1/(MassIn*MassIn))*
+        (1.+2.*mass1*mass1/(MassIn*MassIn));
     // Full expression for the general case
     return MassIn/3.*
       sqrt((1.-pow((mass1+mass2),2.)/(MassIn*MassIn))*(1.-pow((mass1-mass2),2.)/(MassIn*MassIn)))*
-      (1-(pow((mass1-mass2),2.)-4.*mass1*mass2)/(2*MassIn*MassIn)-(pow(mass1*mass1-mass2*mass2,2.)/(2*pow(MassIn,4.))));
+      (1.-(pow((mass1-mass2),2.)-4.*mass1*mass2)/(2.*MassIn*MassIn)-(pow(mass1*mass1-mass2*mass2,2.)/(2.*pow(MassIn,4.))));
   };
 
   //get parameters from factory (NOTE: mass is parsed in GeV)
@@ -123,9 +123,9 @@ DMParticleAPrime* DMParticleAPrime::Definition()
       const G4double IDMTheta = DMpar->GetRegisteredParam("IDMTheta");
       //Partial widths
       if(MassIn > 2.*electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(electron_mass_c2, electron_mass_c2, MassIn);
-      if (MassIn > MChi1+MChi2) Chi12Width = pow(sin(2*IDMTheta),2.) * AlphaD * APrimeWidth(MChi1, MChi2, MassIn);
-      if (MassIn > 2.*MChi1) Chi11Width = pow(sin(IDMTheta),4) * AlphaD * APrimeWidth(MChi1, MChi1, MassIn);
-      if (MassIn > 2.*MChi2) Chi22Width = pow(cos(IDMTheta),4) * AlphaD * APrimeWidth(MChi2, MChi2, MassIn);
+      if (MassIn > MChi1+MChi2) Chi12Width = pow(sin(2.*IDMTheta),2.) * AlphaD * APrimeWidth(MChi1, MChi2, MassIn);
+      if (MassIn > 2.*MChi1) Chi11Width = pow(sin(IDMTheta),4.) * AlphaD * APrimeWidth(MChi1, MChi1, MassIn);
+      if (MassIn > 2.*MChi2) Chi22Width = pow(cos(IDMTheta),4.) * AlphaD * APrimeWidth(MChi2, MChi2, MassIn);
       //Total width
       WidthIn = eWidth + Chi12Width + Chi11Width + Chi22Width;
       if(WidthIn == 0.) isStable = true;
