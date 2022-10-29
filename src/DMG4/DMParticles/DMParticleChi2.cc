@@ -6,6 +6,7 @@
 #include "G4PhysicalConstants.hh"
 #include "G4PhaseSpaceDecayChannel.hh"
 #include "G4DecayTable.hh"
+#include "G4iDM3bodyDecayChannel.hh"
 
 DMParticleChi2 * DMParticleChi2::theInstance = nullptr;
 
@@ -43,7 +44,7 @@ DMParticleChi2* DMParticleChi2::Definition()
   //Dirac inelastic DM (i2DM)
   if(BranchingType == 3) {
     G4double y = Epsilon*Epsilon*AlphaD*pow((MassChi1/DMMass),4.);
-    WidthIn =4.*fine_structure_const*pow(tan(IDMTheta),2.)*pow(cos(IDMTheta),4.)*y*MassChi1*pow(Splitting/MassChi1,5.)/(15*CLHEP::pi);
+    WidthIn =4.*fine_structure_const*pow(tan(IDMTheta),2.)*pow(cos(IDMTheta),4.)*y*MassChi1*pow(Splitting/MassChi1,5.)/(15.*CLHEP::pi);
   }
   std::cout << "===> Width Chi2->chi1ee " << WidthIn/MeV <<" MeV "<< std::endl;
 
@@ -80,7 +81,7 @@ DMParticleChi2* DMParticleChi2::Definition()
     // create decay table and add mode
     G4DecayTable* table = new G4DecayTable();
     // create decay channel to chi1 + e+ + e-
-    G4VDecayChannel* mode = new G4PhaseSpaceDecayChannel(name, 1., 3, "DMParticleChi1", "e+", "e-");
+    G4VDecayChannel* mode = new G4iDM3bodyDecayChannel(name, 1.,"DMParticleChi1", "e+", "e-");
     table->Insert(mode);
 
     anInstance->SetDecayTable(table);
