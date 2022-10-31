@@ -269,6 +269,9 @@ void DarkMatterPhysics::ConstructProcess()
     if(myDarkMatter->GetDMType() == 4) {
       theDMParticlePtr = DMParticlePseudoScalar::Definition();
     }
+    if(myDarkMatter->GetDMType() == 5) {
+      theDMParticlePtr = DMParticleAPrime::Definition(); // A' for the moment, the spin 2 particle not yet implemented
+    }
   }
   if(myDarkMatter->GetParentPDGID() == -11) { // Annihilation
     if(myDarkMatter->GetDMType() == 1) {
@@ -282,6 +285,9 @@ void DarkMatterPhysics::ConstructProcess()
     }
     if(myDarkMatter->GetDMType() == 4) {
       theDMParticlePtr = DMParticlePseudoScalar::Definition();
+    }
+    if(myDarkMatter->GetDMType() == 5) {                    // Annihilation through spin 2 DM, A' for the moment
+      theDMParticlePtr = DMParticleAPrime::Definition();
     }
   }
   if(myDarkMatter->GetParentPDGID() == 13) {
