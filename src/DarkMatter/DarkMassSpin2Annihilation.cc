@@ -49,17 +49,14 @@ DarkMassSpin2Annihilation::~DarkMassSpin2Annihilation(  ){ ; }
 double DarkMassSpin2Annihilation::TotalCrossSectionCalc( double E0 )
 {
   // Invariant mass 
-  double ss = 2.0 * Mel * E0
-       , rsChi = mChi*mChi / ss, rsEl = Mel*Mel / ss;
+  double ss = 2.0 * Mel * E0, rsChi = mChi*mChi / ss, rsEl = Mel*Mel / ss;
   // A.C. e+e- -> G -> chi chi can happen also for an G and chi with large 
   // mass, i.e. through the off-shell tail of the resonance, but this still 
   // needs to be kinematically allowed.
-  if ( sqrt(ss) < 2.0 * mChi ){ return 0.0; }
-  if ( sqrt(ss) < 2.0 * Mel ){ return 0.0; }
-  double sigma =   ( 1.0/(256.0*M_PI) ) * ss*ss*ss * sqrt( 1.0 - 4.0 * rsEl )
-                 * ( 1.0 + ( 8.0 / 3.0 ) * rsEl )
-                 * pow( 1.0 - 4.0 * rsChi, 3.0/2.0 )
-                 * ( 1.0 + ( 8.0 / 3.0 ) * rsChi );
+  if ( sqrt(ss) < 2.0 * mChi && sqrt(ss) < 2.0 * Mel ){ return 0.0; }
+  double sigma =   ( 1.0/(256.0*M_PI) ) * ss*ss*ss 
+  //               * sqrt( 1.0 - 4.0 * rsEl ) * (1.0 + (8.0/3.0) * rsEl )
+                 * pow( 1.0 - 4.0*rsChi, 3.0/2.0 ) * (1.0 + (8.0/3.0) * rsChi);
   double gg = this->Width();
   sigma = sigma / ( (ss - MA*MA)*(ss - MA*MA) + MA*MA * gg*gg );
   
@@ -84,7 +81,7 @@ bool DarkMassSpin2Annihilation::EmissionAllowed( double E0, double DensityMat )
   if ( sqrt(2. * Mel * E0) < 2.0 * mChi ){ return false; }
   if ( E0 < EThresh ){ return false; }
   if ( NEmissions ){ return false; }   // For G4 DM classes
-  if ( fabs(DensityMat - Density) > 0.1 ){ return false; } 
+  if ( fabs(DensityMat - Density) > 0.1 ){ return false; }
   return true;
 }
 
@@ -110,7 +107,7 @@ double DarkMassSpin2Annihilation::CrossSectionDSDXDU( double XEv
 // decay width of decay into a pair of dark fermions
 double DarkMassSpin2Annihilation::Width()
 {
-  return  ( 1.0/(160.0*M_PI) ) * MA*MA*MA * epsil*epsil
-        * pow( 1.0 - 4.0 * r*r, 3.0/2.0 )
-        * ( 1.0 + ( 8.0 / 3.0 ) * r*r );
+  double rMAChi = mChi*mChi / (MA*MA);
+  return  ( 1.0/(160.0*M_PI) ) * MA*MA*MA * 4.0*M_PI * alphaD 
+        * pow( 1.0 - 4.0 * rMAChi, 3.0/2.0 ) * ( 1.0 + ( 8.0 / 3.0 ) * rMAChi );
 }
