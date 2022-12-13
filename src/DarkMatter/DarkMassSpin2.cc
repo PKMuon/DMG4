@@ -10,7 +10,7 @@
 
 #define LIM_ITER_QAGS 25000
 #define REL_ERR_QAGS 1.0e-8
-#define REL_ERR_QAGS_MIN 1.0e-4
+#define REL_ERR_QAGS_MIN 1.0e-2
 #define ABS_ERR_QAGS 0.0
 #define REL_ERR_QAGS_STEP 1.2
 
@@ -69,7 +69,6 @@ DarkMassSpin2::DarkMassSpin2( double MAIn, double EThreshIn
   mInit = Mel;          // mass of initial particle
   tMax =         100.;  // tmax initial; tmax = E0*E0 will be taken
   ThetaMax =      0.1;  // Max. angle of radiation
-  //PsiMax =        1.0;  // Max. angle of recoil lepton
 }
 
 
@@ -105,11 +104,9 @@ double DarkMassSpin2::CrossSectionDSDXDTheta_WW( double XEv, double Theta, doubl
   if( XEv*E0 <= MA ){ return 0.0; }
   // Setting momentums of photon flux.
   // Typical square of inverse of screening and nuclear radius
-  double aa = 111.0*pow(ZNucl,-1.0/3.0)/Mel
-       , d = 0.164*pow(ANucl,-2.0/3.0);
+  double aa = 111.0*pow(ZNucl,-1.0/3.0)/Mel, d = 0.164*pow(ANucl,-2.0/3.0);
   // Transmitted momentum, GeV^2
-  double ta = pow(1.0/aa, 2.0)                  
-       , td = d;                              
+  double ta = pow(1.0/aa, 2.0), td = d;                              
   // Expression for lepton Mandelstam variable u in WW approx. shifting on mass
   double Uxth = E0*E0 * Theta*Theta * XEv 
               + MA*MA * (1.0 - XEv)/XEv + mInit*mInit * XEv;
@@ -132,7 +129,7 @@ double DarkMassSpin2::CrossSectionDSDXDTheta_WW( double XEv, double Theta, doubl
          ChiWWAnalytical -= ( ta + td + 2.0*tmin ) 
                             * std::log( (td + tmin ) / ( ta + tmin ) );
          ChiWWAnalytical *= ZNucl*ZNucl * td*td / pow( (ta - td), 3 );
-    // Calc result 
+  // Calc result 
   double
   Prefactor = 4.0 * E0*E0 *alphaEW*alphaEW  * epsilBench*epsilBench 
             * sin(Theta) / (1.0 - XEv) * sqrt( XEv*XEv - ( MA*MA ) / ( E0*E0 ) )
@@ -149,12 +146,10 @@ double DarkMassSpin2::CrossSectionDSDX_WW( double XEv, double E0 )
   // Checking correct the low limit of fraction of energy
   if( E0 < 2.0 * MA ) { return 0.0; }
   // Setting upper limit of number of subintervals and relative error
-  double limInterv = LIM_ITER_QAGS
-       , relerr = REL_ERR_QAGS, abserr = ABS_ERR_QAGS;
+  double limInterv = LIM_ITER_QAGS, relerr = REL_ERR_QAGS, abserr = ABS_ERR_QAGS;
   // Allocation of space for the work of the integrator
   gsl_integration_workspace* w = gsl_integration_workspace_alloc( limInterv );
-  double res, err
-       , thMin = 0.0, thMax = ThetaMax;
+  double res, err, thMin = 0.0, thMax = ThetaMax;
   // Setting function of integrand with parameters
   gsl_function F;
   BoundParmsDsDx parms = { this, E0, XEv };
@@ -169,9 +164,6 @@ double DarkMassSpin2::CrossSectionDSDX_WW( double XEv, double E0 )
     relerr *= REL_ERR_QAGS_STEP;
   }
   gsl_set_error_handler(old_handler);
-  //if(relerr > REL_ERR_QAGS_MIN ){ 
-  //  std::cout << "DsDx, DarkMassSpin2, relerr "<< relerr << std::endl; 
-  //}
   gsl_integration_workspace_free( w ); 
   return res;
 }
@@ -187,8 +179,7 @@ double DarkMassSpin2::TotalCrossSectionCalc_WW( double E0 )
        , relerr = REL_ERR_QAGS, abserr = ABS_ERR_QAGS;
   // Allocation of space for the work of the integrator
   gsl_integration_workspace* w = gsl_integration_workspace_alloc( limInterv );
-  double res, err
-       , xMin = MA/E0, xMax = 1.0 - mInit/E0;
+  double res, err, xMin = MA/E0, xMax = 1.0 - mInit/E0;
   // Setting function of integrand with parameters
   gsl_function F;
   BoundParmsDs parms = { this, E0 };
@@ -203,9 +194,6 @@ double DarkMassSpin2::TotalCrossSectionCalc_WW( double E0 )
     relerr *= REL_ERR_QAGS_STEP;
   }
   gsl_set_error_handler(old_handler);
-  //  if(relerr > REL_ERR_QAGS_MIN ){ 
-  //  std::cout << "Ds, DarkMassSpin2, relerr "<< relerr << std::endl; 
-  //}
   gsl_integration_workspace_free( w ); 
   return GeVtoPb * res;
 }
@@ -224,11 +212,10 @@ double DarkMassSpin2::CrossSectionDSDXDU( double XEv, double UThetaEv, double E0
 }
 
 
-// Decay width into a pair of initial fermions
+// Decay width into a pair of fermions
 double DarkMassSpin2::Width()
 {
-  double ratMass =  mInit / MA;
+  double rIn =  mInit / MA;
   return  ( 1.0/(160.0*M_PI) ) * MA*MA*MA * epsil*epsil
-        * pow( 1.0 - 4.0 * ratMass*ratMass, 3.0/2.0 )
-        * ( 1.0 + ( 8.0 / 3.0 ) * ratMass*ratMass );
+        * pow( 1.0 - 4.0 * rIn*rIn, 3.0/2.0 ) * ( 1.0 + (8.0/3.0) * rIn*rIn );
 }
