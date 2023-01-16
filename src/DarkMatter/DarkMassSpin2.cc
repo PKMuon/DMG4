@@ -8,6 +8,8 @@
 #include <gsl/gsl_multimin.h>
 #include <gsl/gsl_integration.h>
 
+#include <cmath>
+
 #define LIM_ITER_QAGS 25000
 #define REL_ERR_QAGS 1.0e-8
 #define REL_ERR_QAGS_MIN 1.0e-2
