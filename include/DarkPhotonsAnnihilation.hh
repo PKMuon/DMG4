@@ -26,6 +26,7 @@ public:
     virtual void SetMA(double MAIn);
 
     virtual double AngularDistributionResonant(double eta,double E0);
+    virtual double GetTotalCrossSectionMax();
 
 private:
 
@@ -35,6 +36,8 @@ private:
     double alphaD;
     double mChi;
     double mChi1,mChi2,deltaMchi;
+
+    double TotalCrossSectionCalcFactor(double E0);
 };
 
 #endif /* INCLUDE_DARKPHOTONSANNIHILATION_HH_ */

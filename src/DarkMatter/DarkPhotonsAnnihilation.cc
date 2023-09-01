@@ -55,8 +55,6 @@ iBranchingType(IBranchingIn), r(rIn), f(fIn), alphaD(alphaDIn)
     std::cout<<"mChi: "<<mChi<<std::endl;
   }
   std::cout<<"Width: "<<this->Width()<<std::endl;
-
-
   std::cout << std::endl;
 }
 
@@ -65,11 +63,10 @@ DarkPhotonsAnnihilation::~DarkPhotonsAnnihilation()
 {;}
 
 
-//Input: E0, positron energy in GeV
-//output: total annihilation cross-section in pbarn.
-//Since the framework assumes this method is returning the total cross section per nucleous, for the moment I scale this by Z.
-double DarkPhotonsAnnihilation::TotalCrossSectionCalc(double E0)
-{
+//Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
+//This is the total cross section without the BW denominator
+double DarkPhotonsAnnihilation::TotalCrossSectionCalcFactor(double E0){
+
   double ss = 2. * Mel * E0;
   double qq=0.,E1=0.,E2=0.;
   switch (iBranchingType) {
@@ -88,11 +85,9 @@ double DarkPhotonsAnnihilation::TotalCrossSectionCalc(double E0)
       break;
   }
 
-  double gg = this->Width();
 
   double sigma = 4 * M_PI * alphaEW * epsilBench * epsilBench * alphaD;
   sigma = sigma * qq / sqrt(ss);
-  sigma = sigma / ((ss - MA * MA) * (ss - MA * MA) + MA * MA * gg * gg);
 
 
 
@@ -116,6 +111,18 @@ double DarkPhotonsAnnihilation::TotalCrossSectionCalc(double E0)
 
   //A.C. correct here for atomic effects
   sigma = sigma * ZNucl;
+  return sigma;
+}
+
+//Input: E0, positron energy in GeV
+//output: total annihilation cross-section in pbarn.
+//Since the framework assumes this method is returning the total cross section per nucleous, for the moment I scale this by Z.
+double DarkPhotonsAnnihilation::TotalCrossSectionCalc(double E0)
+{
+  double ss = 2. * Mel * E0;
+  double sigma=this->TotalCrossSectionCalcFactor(E0);
+  double gg = this->Width();
+  sigma=sigma/((ss - MA * MA) * (ss - MA * MA) + MA * MA * gg * gg);
   return sigma;
 }
 
@@ -196,6 +203,15 @@ void DarkPhotonsAnnihilation::SetMA(double MAIn) {
    }
 
 
+}
+//A.C. useful function to directly return the maximum cross section value (for numerical precision)
+double DarkPhotonsAnnihilation::GetTotalCrossSectionMax(){
+
+  double Eres = (MA*MA/(2.*Mel));
+  double sigma=this->TotalCrossSectionCalcFactor(Eres);
+  double gg = this->Width();
+  sigma=sigma/(MA * MA * gg * gg);
+  return sigma;
 }
 
 

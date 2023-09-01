@@ -31,4 +31,10 @@ class DMProcessAnnihilation : public G4VDiscreteProcess
     DarkMatterParametersFactory* DMpar;
     G4int iBranchingType;
     G4double mChi,mChi1,mChi2;
+
+    //This part is used to take into account the energy dependence of the cross section along the step
+    G4double CrossSectionStepVal; //the cross section used by the GetMeanFreePath method. Should be larger than the cross section along the step
+    G4double CrossSectionStepE;   //the energy used to compute the above
+    G4double xi;
+
 };

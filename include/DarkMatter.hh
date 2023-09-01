@@ -93,6 +93,7 @@ class DarkMatter
     double SimulateEmissionResonant(double E0); //E0 in GeV
     virtual double AngularDistributionResonant(double eta,double E0); //E0 in GeV
 
+    virtual double GetTotalCrossSectionMax(); //Returns the maximum value of the total cross section. For the moment, used only in annihilation classes
 
     double GetAccumulatedProbability() {return AccumulatedProbability;}
 

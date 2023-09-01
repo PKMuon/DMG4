@@ -766,4 +766,12 @@ double DarkMatter::AngularDistributionResonant(double eta,double E0){
 }
 
 
+/*
+ * GetMaxCrossSection() returns the maximum value of the total cross section
+ */
+
+double DarkMatter::GetTotalCrossSectionMax(){
+  printf("DarkMatter::GetTotalCrossSectionMax()() default method is called. This is meaningless.\n");
+  return 0.;
+}
 
