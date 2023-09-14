@@ -75,6 +75,8 @@ class DarkMatter
     virtual double CrossSectionDSDXDPSI_IWW(double XEv, double auxpsi, double E0) {(void)XEv; (void)auxpsi; (void)E0; abort();}
     virtual double CrossSectionDSDXDPSI_WW(double XEv, double auxpsi, double E0) {(void)XEv; (void)auxpsi; (void)E0; abort();}
     virtual double CrossSectionDSDXDTheta(double XEv, double auxpsi, double E0) {(void)XEv; (void)auxpsi; (void)E0; abort();}
+    virtual double CrossSectionDSDTheta(double UThetaEv, double E0) {(void)E0; (void)UThetaEv; abort();}
+    virtual double CrossSectionDSDThetaMAX(double E0) {(void)E0; abort();}
     virtual double CrossSectionDSDX_WW(double XEv, double E0) {(void)XEv; (void)E0; abort();}
     virtual double CrossSectionDSDX_IWW(double XEv, double E0) {(void)XEv; (void)E0; abort();}
     virtual double Width() = 0;
@@ -85,6 +87,7 @@ class DarkMatter
     double SimulateEmission(double E0, double* angles);
     double SimulateEmissionWithAngle(double E0, double* angles);
     double SimulateEmissionWithAngle2(double E0, double* angles);
+    double SimulateEmissionWithAngle3(double E0, double* angles);
     double SimulateEmissionByMuon2(double E0, double* angles);
     double SimulateEmissionByMuon(double E0, double* angles);
     double SimulateEmissionVector(double E0, double* angles);

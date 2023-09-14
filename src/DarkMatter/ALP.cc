@@ -72,54 +72,60 @@ double ALP::Width()
   return 1./(64.*3.1415926)*MA*MA*MA*epsil*epsil;
 }
 
-//This is just a very rough prototype of a NEW METHOD for ALP angle sampling \theta
-////it returns just (d\sigma/d\theta) up to arbitrary prefactor (that
-////does not depend on \theta). The method CrossSectionDSDTheta  should be added to DM general
-//class.
-// For details see e.g. formulas from  https://arxiv.org/pdf/2004.04469.pdf
-double ALP::CrossSectionDSDTheta( double E0)
+/**
+ * Differential cross-section of Ngamma->Na w.r.t ALP emission angle
+ * WARNING: Missing prefactor since this method is only relevant for sampling
+ *
+ * For details see e.g. formulas from  https://arxiv.org/pdf/2004.04469.pdf
+ *
+ * MA is a mass of ALP (GeV)
+ * @params E0 energy of incoming photon (GeV)
+ * @params ThetaEv is the ALP emission angle
+ * @return differential cross-section at given energy and angle values (a.u.)
+ *
+ */
+double ALP::CrossSectionDSDTheta(double ThetaEv, double E0)
 {
   double tmin = MA*MA*MA*MA/(4.*E0*E0); //
-  // E0 is a energy of incoming photon (GeV)
-  // MA is a mass of ALP (GeV)
-  // theta is an ALP emission angle
   double atomFFcoeff=111.0*pow(ZNucl,-1.0/3.0)/Mel;//a-parameter for atomic coefficient of form-factor
   double tAtom=1.0/(atomFFcoeff*atomFFcoeff); // atomic coefficient of form-factor
   double tNucl=0.164*pow(ANucl,-2.0/3.0); // nuclear form-factor coefficient in GeV**2
-  double tAsFuncOfThetaALP= E0*E0*theta*theta +tmin; // see Eq.(11) from 2004.04469, momentum trasnfer squared as a function of theta
+  double tAsFuncOfThetaALP= E0*E0*ThetaEv*ThetaEv +tmin; // see Eq.(11) from 2004.04469, momentum trasnfer squared as a function of ThetaEv
   double FFpref1=tAsFuncOfThetaALP/(1.0+tAsFuncOfThetaALP/tAtom); // atomic Formfactor term without ~ Z a^2 (see Eq.(5) from 2004.04469)
-  double FFpref2= 1.0/(1.0+tAsFuncOfThetaALP/tNucl); // nuclear Formfactor term, it seems to be that it does not play important role as soon as theta < 1.0e-2
+  double FFpref2= 1.0/(1.0+tAsFuncOfThetaALP/tNucl); // nuclear Formfactor term, it seems to be that it does not play important role as soon as ThetaEv < 1.0e-2
   double FFtotal=FFpref1*FFpref2; // total formfactor
-  double FFtotalSquared= FFtotal*FFtotal;// Note that it depends on theta via transfer momentum squared tAsFuncOfThetaALP!!!!
+  double FFtotalSquared= FFtotal*FFtotal;// Note that it depends on ThetaEv via transfer momentum squared tAsFuncOfThetaALP!!!!
   double deltaALP=MA*MA/(2.0*E0*E0); // see Eq.(16) from 2004.04469
   double deltaALP2=deltaALP*deltaALP;
-  double theta2=theta*theta;
-  double MA2=MA*MA;
-  double ThetaDependence= theta2*theta/((theta2+deltaALP2)*(theta2+deltaALP2));
-  double DsigmaDthetaWithoutPrefactor=FFtotalSquared*ThetaDependence; // general form of Eq. (16) in 2004.04469 without prefactor (only theta dependence!!!)
-
-  // Misha this is just a link between X and theta: Xaccepted = Ea/Egamma from Eq. (10) in 2004.04469
-  double Xaccepted =1.-E0*theta2/(2.0*ANucl)-MA2*MA2/(8.0*ANucl*E0*E0*E0); // we assume here that Mnucleus = ANucl
+  double theta2=ThetaEv*ThetaEv;
+  double ThetaDependence= theta2*ThetaEv/((theta2+deltaALP2)*(theta2+deltaALP2));
+  double DsigmaDthetaWithoutPrefactor=FFtotalSquared*ThetaDependence; // general form of Eq. (16) in 2004.04469 without prefactor (only ThetaEv dependence!!!)
 
   return DsigmaDthetaWithoutPrefactor;
 }
 
 
 
-
-// we perform below the maximum value of the DsigmaDthetaWithoutPrefactor function
-// that implies substituted thetaMAX (see Eq.(17) from 2004.04469)
-double ALP::CrossSectionDSDThetaMAX( double E0)
+/**
+ * Differential cross-section of Ngamma->Na w.r.t ALP emission angle
+ * WARNING: Missing prefactor since this method is only relevant for sampling
+ *
+ * For details see e.g. formulas from  https://arxiv.org/pdf/2004.04469.pdf
+ * For thetaMAX see Eq.(17) from 2004.04469
+ *
+ * @params E0 energy of incoming photon (GeV)
+ * @params thetaMAX is the ALP emission angle for which the differential cross-section is maximal
+ * @return differential cross-section at given energy and angle values (a.u.)
+ *
+ */
+double ALP::CrossSectionDSDThetaMAX(double E0)
 {
 
   double tmin = MA*MA*MA*MA/(4.*E0*E0); //
-  // E0 is a energy of incoming photon (GeV)
-  // MA is a mass of ALP (GeV)
-  // thetaMAX is a ALP emission angle that provides maximum value of the differential cross section
   double atomFFcoeff=111.0*pow(ZNucl,-1.0/3.0)/Mel;//a-parameter for atomic coefficient of form-factor
   double tAtom=1.0/(atomFFcoeff*atomFFcoeff); // atomic coefficient of form-factor
   double tNucl=0.164*pow(ANucl,-2.0/3.0); // nuclear form-factor coefficient in GeV**2
-  double thetaMAX= 1.0/(E0*atomFFcoeff)*sqrt(3.0*(1.0+tmin/tAtom)); // (see Eq.(17) from 2004.04469)
+  double thetaMAX= 1.0/(E0*atomFFcoeff)*sqrt(3.0*(1.0+tmin/tAtom));
   double tAsFuncOfThetaMAXALP= E0*E0*thetaMAX*thetaMAX +tmin; // see Eq.(11) from 2004.04469, momentum trasnfer squared as a function of theta
   double FFpref1=tAsFuncOfThetaMAXALP/(1.0+tAsFuncOfThetaMAXALP/tAtom); // atomic Formfactor term without ~ Z a^2 (see Eq.(5) from 2004.04469)
   double FFpref2= 1.0/(1.0+tAsFuncOfThetaMAXALP/tNucl); // nuclear Formfactor term, it seems to be that it does not play important role as soon as t>
@@ -128,9 +134,8 @@ double ALP::CrossSectionDSDThetaMAX( double E0)
   double deltaALP=MA*MA/(2.0*E0*E0); // see Eq.(16) from 2004.04469
   double deltaALP2=deltaALP*deltaALP;
   double thetaMAX2=thetaMAX*thetaMAX;
-  double MA2=MA*MA;
   double ThetaMAXDependence= thetaMAX2*thetaMAX/((thetaMAX2+deltaALP2)*(thetaMAX2+deltaALP2));
-  double DsigmaDthetaMAXWithoutPrefactor=FFtotalSquared*ThetaMAXDependence; // general form of Eq.  (16) in 2004.04469 without prefactor (only theta dep>
+  double DsigmaDthetaMAXWithoutPrefactor=FFtotalSquared*ThetaMAXDependence; // general form of Eq.  (16) in 2004.04469 without prefactor (only theta dependence!!!)
 
   return DsigmaDthetaMAXWithoutPrefactor;
 }
