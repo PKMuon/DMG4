@@ -2,8 +2,8 @@
 # https://cern.service-now.com/service-portal/article.do?n=KB0003690
 # https://gitlab.cern.ch/help/ci/yaml/README.md
 
-# use the default image for build (currently slc7)
-# image: slc6
+# use same OS as lxplus (CC7)
+image: gitlab-registry.cern.ch/ci-tools/ci-worker:cc7
 
 build:
   stage: test
