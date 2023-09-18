@@ -540,76 +540,54 @@ double DarkMatter::SimulateEmissionWithAngle3(double E0, double* angles)
   angles[0] = 0.;
   angles[1] = 0.;
 
-  if(!ISampler || MA < 0.001) { // Don't use external sampler DarkMatterSampler
+  double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl); // we assume here that Mnucleus = ANucl
+  if(Xmin > Xmax) return 0.;
 
-    double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl);
-    if(Xmin > Xmax) return 0.;
+  // Maximum value of diff CS
+  double sigmaMax = CrossSectionDSDThetaMAX(E0);
 
-    double sigmaMax = CrossSectionDSDThetaMAX(E0);
+  double XAcc, ThetaAcc, PhiAcc, sigma, ThetaEv, Log10ThetaEv;
+  XAcc = ThetaAcc = PhiAcc = sigma = ThetaEv = Log10ThetaEv = 0.;
 
-    double XAcc, ThetaAcc, PhiAcc, sigma, ThetaEv, Log10ThetaEv;
-    XAcc = ThetaAcc = PhiAcc = sigma = ThetaEv = Log10ThetaEv = 0.;
+  // Set range of log-uniform sampling between ~10^-10 and 1
+  double ThetaMaxA = 1.;
+  double Log10ThetaMax = log10(ThetaMaxA);
+  double Log10ThetaMin = -23;
 
-    //double ThetaMaxA = 0.0002*pow((MA/0.001), 0.7)*(100./E0); //TODO: check this
-    double ThetaMaxA = 1.;
-    double Log10ThetaMax = log10(ThetaMaxA);
-    double Log10ThetaMin = -23;
+  int maxiterA = 2000000;
+  for(int iii = 1; iii < maxiterA; iii++) { // Angle simulation loop
 
-    int maxiterA = 2000000;
-    for(int iii = 1; iii < maxiterA; iii++) { // Angle simulation loop
+    // log-uniform sampling
+    Log10ThetaEv = G4UniformRand() * (Log10ThetaMax - Log10ThetaMin) + Log10ThetaMin; // sample value between ~10^-10 and 1
+    ThetaEv = pow(10., Log10ThetaEv);
+    sigma = CrossSectionDSDTheta(ThetaEv, E0);
 
-      //ThetaEv = ThetaMaxA * G4UniformRand();
-      // log-uniform sampling
-      Log10ThetaEv = G4UniformRand() * (Log10ThetaMax - Log10ThetaMin) + Log10ThetaMin;
-      ThetaEv = pow(10., Log10ThetaEv);
-      sigma = CrossSectionDSDTheta(ThetaEv, E0);
-
-      if(sigma > sigmaMax) {
-        printf ("Maximum violated: ratio = % .18f\n", sigma/sigmaMax);
-        sigmaMax = 1.05*sigma;
-      }
-
-      double UU = G4UniformRand() * sigmaMax;
-
-      if(sigma >= UU) {
-        ThetaAcc = ThetaEv; // this is just a theta accepted!!!
-        PhiAcc = G4UniformRand() * 2. * 3.1415926;
-        XAcc = 1. - E0*ThetaAcc*ThetaAcc/(2.*ANucl) - MA*MA*MA*MA/(8.*ANucl*E0*E0*E0); // we assume here that Mnucleus = ANucl
-
-        std::cout << "Accepted after " << iii << " iterations for Angle" << std::endl;
-        printf( "EParent = %e XAcc = %e ThetaAcc = %e\n ", E0, XAcc, ThetaAcc);
-
-        angles[0] = ThetaAcc;
-        angles[1] = PhiAcc;
-        return XAcc;
-      }
+    if(sigma > sigmaMax) {
+      printf ("Maximum violated: ratio = % .18f\n", sigma/sigmaMax);
+      sigmaMax = 1.05*sigma;
     }
-    std::cout << "Simulation of Angle failed after N iterations = " << maxiterA << " ,X = " << XAcc << std::endl;
-    return 0.;
 
-  } else { // Use external sampler
-/*
-    // NOTE: the engine later must be supplied by the G4-physics instance
-    dphmc_URandomState state = {CLHEP::HepRandom::getTheEngine()};
+    double UU = G4UniformRand() * sigmaMax;
 
-    double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl);
+    if(sigma >= UU) {
+      ThetaAcc = ThetaEv; // this is the accepted theta
+      PhiAcc = G4UniformRand() * 2. * 3.1415926;
 
-    Sampler s(E0, MA);
-    double x, theta;
-    double accProb = s.sample_x_theta(&state, x, theta, Xmin, Xmax);
-    (void)accProb; // to avoid warning
-    if(x < Xmin || x > Xmax) {
-      std::cout << "SimulateEmissionWithAngle: error, X from sampler beyond limits, exiting" << std::endl;
-      exit(1);
-    } else {
-      angles[0] = theta;
-      angles[1] = G4UniformRand() * 2. * 3.1415926;
-      return x;
+      // Fractional energy directly calculated from theta 
+      XAcc = 1. - E0*ThetaAcc*ThetaAcc/(2.*ANucl) - MA*MA*MA*MA/(8.*ANucl*E0*E0*E0);
+
+      std::cout << "Accepted after " << iii << " iterations for Angle" << std::endl;
+      printf( "EParent = %e XAcc = %e ThetaAcc = %e\n ", E0, XAcc, ThetaAcc);
+
+      angles[0] = ThetaAcc;
+      angles[1] = PhiAcc;
+      return XAcc;
     }
-*/
-    std::cout << "SimulateEmissionWithAngle: simulation of emission with a sampler failed" << std::endl;
-    return 0.;
   }
+
+  std::cout << "Simulation of Angle failed after N iterations = " << maxiterA << " ,X = " << XAcc << std::endl;
+  return 0.;
+
 }
 
 // Z' sampling in 2 steps using DSDX and DSDXDPSI
