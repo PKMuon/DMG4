@@ -549,17 +549,14 @@ double DarkMatter::SimulateEmissionWithAngle3(double E0, double* angles)
   double XAcc, ThetaAcc, PhiAcc, sigma, ThetaEv, Log10ThetaEv;
   XAcc = ThetaAcc = PhiAcc = sigma = ThetaEv = Log10ThetaEv = 0.;
 
-  // Set range of log-uniform sampling between ~10^-10 and 1
+  // Set range of uniform sampling between 0 and 1
   double ThetaMaxA = 1.;
-  double Log10ThetaMax = log10(ThetaMaxA);
-  double Log10ThetaMin = -23;
 
   int maxiterA = 2000000;
   for(int iii = 1; iii < maxiterA; iii++) { // Angle simulation loop
 
-    // log-uniform sampling
-    Log10ThetaEv = G4UniformRand() * (Log10ThetaMax - Log10ThetaMin) + Log10ThetaMin; // sample value between ~10^-10 and 1
-    ThetaEv = pow(10., Log10ThetaEv);
+    // uniform sampling
+    ThetaEv = G4UniformRand() * ThetaMaxA;
     sigma = CrossSectionDSDTheta(ThetaEv, E0);
 
     if(sigma > sigmaMax) {
