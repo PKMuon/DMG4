@@ -72,6 +72,7 @@ double ALP::Width()
   return 1./(64.*3.1415926)*MA*MA*MA*epsil*epsil;
 }
 
+
 /**
  * Differential cross-section of Ngamma->Na w.r.t ALP emission angle
  * WARNING: Missing prefactor since this method is only relevant for sampling
@@ -103,7 +104,6 @@ double ALP::CrossSectionDSDTheta(double ThetaEv, double E0)
 
   return DsigmaDthetaWithoutPrefactor;
 }
-
 
 
 /**

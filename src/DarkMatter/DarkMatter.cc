@@ -522,8 +522,6 @@ double DarkMatter::SimulateEmissionWithAngle3(double E0, double* angles)
 {
   double Xmin = MA/E0;
 
-  if(MA < 0.001 && EThresh/E0 > Xmin) Xmin = EThresh/E0; // may be should not do it for ALP; small effect in any case
-
   if(ParentPDGID == 11) {
     std::cout << "DarkPhoton: Error: differential cross section DSDTheta is not implemented, exiting" << std::endl;
     exit(1);
