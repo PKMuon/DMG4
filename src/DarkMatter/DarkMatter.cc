@@ -518,6 +518,73 @@ double DarkMatter::SimulateEmissionWithAngle2(double E0, double* angles)
 }
 
 
+double DarkMatter::SimulateEmissionWithAngle3(double E0, double* angles)
+{
+  double Xmin = MA/E0;
+
+  if(ParentPDGID == 11) {
+    std::cout << "DarkPhoton: Error: differential cross section DSDTheta is not implemented, exiting" << std::endl;
+    exit(1);
+  }
+  if(ParentPDGID == 13) {
+    std::cout << "DarkZ: Error: procedure of simulation Z with angle not implemented, exiting" << std::endl;
+    exit(1);
+  }
+  if(ParentPDGID == -11) {
+    std::cout << "DarkPhotonsAnnihilation: Error: annihilation simulation with angle not implemented, exiting" << std::endl;
+    exit(1);
+  }
+
+  angles[0] = 0.;
+  angles[1] = 0.;
+
+  double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl); // we assume here that Mnucleus = ANucl
+  if(Xmin > Xmax) return 0.;
+
+  // Maximum value of diff CS
+  double sigmaMax = CrossSectionDSDThetaMAX(E0);
+
+  double XAcc, ThetaAcc, PhiAcc, sigma, ThetaEv, Log10ThetaEv;
+  XAcc = ThetaAcc = PhiAcc = sigma = ThetaEv = Log10ThetaEv = 0.;
+
+  // Set range of uniform sampling between 0 and 1
+  double ThetaMaxA = 1.;
+
+  int maxiterA = 2000000;
+  for(int iii = 1; iii < maxiterA; iii++) { // Angle simulation loop
+
+    // uniform sampling
+    ThetaEv = G4UniformRand() * ThetaMaxA;
+    sigma = CrossSectionDSDTheta(ThetaEv, E0);
+
+    if(sigma > sigmaMax) {
+      printf ("Maximum violated: ratio = % .18f\n", sigma/sigmaMax);
+      sigmaMax = 1.05*sigma;
+    }
+
+    double UU = G4UniformRand() * sigmaMax;
+
+    if(sigma >= UU) {
+      ThetaAcc = ThetaEv; // this is the accepted theta
+      PhiAcc = G4UniformRand() * 2. * 3.1415926;
+
+      // Fractional energy directly calculated from theta 
+      XAcc = 1. - E0*ThetaAcc*ThetaAcc/(2.*ANucl) - MA*MA*MA*MA/(8.*ANucl*E0*E0*E0);
+
+      std::cout << "Accepted after " << iii << " iterations for Angle" << std::endl;
+      printf( "EParent = %e XAcc = %e ThetaAcc = %e\n ", E0, XAcc, ThetaAcc);
+
+      angles[0] = ThetaAcc;
+      angles[1] = PhiAcc;
+      return XAcc;
+    }
+  }
+
+  std::cout << "Simulation of Angle failed after N iterations = " << maxiterA << " ,X = " << XAcc << std::endl;
+  return 0.;
+
+}
+
 // Z' sampling in 2 steps using DSDX and DSDXDPSI
 double DarkMatter::SimulateEmissionByMuon2(double E0, double* angles)
 {

@@ -12,6 +12,8 @@ class ALP : public DarkMatter
     virtual double GetSigmaTot(double E0);
     virtual double CrossSectionDSDX(double Xev, double E0);
     virtual double CrossSectionDSDXDU(double Xev, double UThetaEv, double E0);
+    virtual double CrossSectionDSDTheta(double ThetaEv, double E0);
+    virtual double CrossSectionDSDThetaMAX(double E0);
     virtual double Width();
 
   private:

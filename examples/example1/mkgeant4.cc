@@ -22,6 +22,7 @@ int main() {
   //G4double EThresh = 2000.; // to turn off A emissions
 
   DarkMatter* myDarkMatter = new DarkPhotons(MA, EThresh, SigmaNorm); // Initialize by default for Pb with eps=0.0001
+  //DarkMatter* myDarkMatter = new ALP(MA, EThresh, SigmaNorm); // Initialize by default for Pb with eps=0.0001
   myDarkMatter->PrepareTable();
 
   double ekin = 100.;
@@ -31,6 +32,8 @@ int main() {
   G4cout << "Test of the DarkMatter package: DM emission simulation, energy = " << ekin << " GeV, mass = " << MA << " GeV" << G4endl;
   G4cout << G4endl;
 
+  std::ofstream fout("result.d");
+
   int NTry=100;
   int ITry;
   for(int i=0; i<NTry; i++) {
@@ -39,11 +42,13 @@ int main() {
     //double XAcc = myDarkMatter->SimulateEmission(ekin, angles);            // used in invisible mode for electrons
     //double XAcc = myDarkMatter->SimulateEmissionWithAngle(ekin, angles);   // one-step sampling, for electrons, not used by default
     double XAcc = myDarkMatter->SimulateEmissionWithAngle2(ekin, angles);    // two-step sampling, used by default for electrons if decays are enabled
+    //double XAcc = myDarkMatter->SimulateEmissionWithAngle3(ekin, angles);  // one-step sampling of Theta, for ALP
     //double XAcc = myDarkMatter->SimulateEmissionByMuon(ekin, angles);      // one-step sampling (2-dim), for muons
     //double XAcc = myDarkMatter->SimulateEmissionByMuon2(ekin, angles);     // two-step sampling, used by default for muons
 
     if(XAcc > 0.0000001) {
       G4cout << "Emission simulated, X = " << XAcc << " Theta = " << angles[0] << G4endl;
+      fout << XAcc << " " << angles[0] << std::endl;
     }
 
   }
