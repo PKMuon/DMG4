@@ -95,6 +95,9 @@ void DarkMatterPhysics::Init(){
   //G4double IDMTheta = DMpar->GetRegisteredParam("IDMTheta",1.e-3); // is it to be used somewhere as argument?
   G4int BranchingType = DMpar->GetRegisteredParam("BranchingType",0);
 
+
+  G4double minWidth =  DMpar->GetRegisteredParam("AnnihilationMinWidth",0);
+
 /*
  * A.C. all quantities obtained from DMPar have intrinsic G4 units
  * In the following, we pass them to DarkMatter classes, that use following convention:
@@ -108,6 +111,7 @@ void DarkMatterPhysics::Init(){
   EThresh/=GeV;
   DMMass/=GeV;
   Density/=(g/cm3);
+  minWidth/=GeV;
 
 
   switch(DMProcessType)
@@ -163,7 +167,7 @@ void DarkMatterPhysics::Init(){
     case 11:
       G4cout << "Initialize DarkPhotonsAnnihilation\n";
       myDarkMatter = new DarkPhotonsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
-                                                 DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor );
+                                                 DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor,minWidth);
       break;
     case 12:
       G4cout << "Initialize DarkScalarsAnnihilation\n";

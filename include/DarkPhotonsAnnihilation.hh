@@ -14,7 +14,7 @@ class DarkPhotonsAnnihilation: public DarkMatter {
 
 public:
 
-    DarkPhotonsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn = 1., double ANuclIn = 207., double ZNuclIn = 82., double DensityIn = 11.35, double epsilIn = 0.0001, int IDecayIn = 0,double rIn=1./3,double alphaD=0.5,int IBranchingIn=0, double fIn=0.1);
+    DarkPhotonsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn = 1., double ANuclIn = 207., double ZNuclIn = 82., double DensityIn = 11.35, double epsilIn = 0.0001, int IDecayIn = 0,double rIn=1./3,double alphaD=0.5,int IBranchingIn=0, double fIn=0.1,double minWidth=0);
     virtual ~DarkPhotonsAnnihilation();
 
     virtual double TotalCrossSectionCalc(double E0);
@@ -28,6 +28,7 @@ public:
     virtual double AngularDistributionResonant(double eta,double E0);
     virtual double GetTotalCrossSectionMax();
 
+
 private:
 
     int iBranchingType;
@@ -36,6 +37,8 @@ private:
     double alphaD;
     double mChi;
     double mChi1,mChi2,deltaMchi;
+
+    double widthEnhancementFactor;
 
     double TotalCrossSectionCalcFactor(double E0);
 };

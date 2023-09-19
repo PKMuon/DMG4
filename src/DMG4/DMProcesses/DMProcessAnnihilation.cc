@@ -40,12 +40,15 @@ DMProcessAnnihilation::DMProcessAnnihilation(DarkMatter *DarkMatterPointerIn, G4
 
   //Init Xi
   //see documentation: https://gitlab.cern.ch/P348/DMG4/-/issues/14
+  G4double deltaE = 0.005*MeV; //according to B. Banto studies, documentation before
+
   G4double Emax=(myDarkMatter->GetMA()*myDarkMatter->GetMA())/(2*Mel); //this is resonant energy in GeV
-  G4double deltaE = 0.005; //according to B. Banto studies, documentation before
   if (DMpar->ExistsRegisteredParam("dEmaxPerStep")){
-    deltaE=DMpar->GetRegisteredParam("dEmaxPerStep"); //must be in GeV
+    deltaE=DMpar->GetRegisteredParam("dEmaxPerStep")/GeV;
   }
   xi=Emax/(Emax+deltaE);
+
+  G4cout<<"DMProcessAnnihilation, init xi: "<<xi<<G4endl;
 }
 
 G4bool DMProcessAnnihilation::IsApplicable(const G4ParticleDefinition &pDef) {
@@ -66,6 +69,7 @@ G4ForceCondition* /*condition*/) {
      * See: https://gitlab.cern.ch/P348/DMG4/-/issues/14
      */
     G4double Emax=(myDarkMatter->GetMA()*myDarkMatter->GetMA())/(2*Mel); //this is in GeV
+
 
     //First case, the energy at the beginning of the step is smaller than the resonant energy
     if (ekin < Emax){
@@ -88,6 +92,7 @@ G4ForceCondition* /*condition*/) {
       this->CrossSectionStepE=Emax;
       this->CrossSectionStepVal=myDarkMatter->GetTotalCrossSectionMax();
     }
+
     //avoid numerical manipulations of this->CrossSectionStepVal
     CrossSection = this->CrossSectionStepVal;
 #endif
@@ -112,16 +117,15 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
   const G4double incidentE = aTrack.GetKineticEnergy(); //this is the energy at the end of the step
   const G4double initialE =  aStep.GetPreStepPoint()->GetKineticEnergy(); //this is the energy at the beginning of the step
 
-
-
-#ifdef EDEP_ALONG_STEP
   const G4double finalCrossSection=myDarkMatter->GetSigmaTot(incidentE/GeV); //this is the cross section at the end of the step
   const G4double initialCrossSection=myDarkMatter->GetSigmaTot(initialE/GeV); //this is the cross section at the beginning of the step
   const G4double prob=finalCrossSection/this->CrossSectionStepVal;
 
-  //  G4cout<<"PostStepDoIt1 "<<aStep.GetPreStepPoint()->GetKineticEnergy()/GeV<<" "<<aStep.GetPostStepPoint()->GetKineticEnergy()/GeV<<G4endl;
-  //  G4cout<<"PostStepDoIt2 "<<initialCrossSection<<" "<<finalCrossSection<<G4endl;
-  //  G4cout<<"PostStepDoIt3 "<<this->CrossSectionStepE<<" "<<this->CrossSectionStepVal<<" "<<prob<<G4endl;
+#ifdef EDEP_ALONG_STEP
+ // G4cout<<"PostStepDoIt1 "<<aStep.GetPreStepPoint()->GetKineticEnergy()/GeV<<" "<<aStep.GetPostStepPoint()->GetKineticEnergy()/GeV<<G4endl;
+ // G4cout<<"PostStepDoIt1a "<<aTrack.GetTrackID()<<" "<<aTrack.GetParentID()<<G4endl;
+ // G4cout<<"PostStepDoIt2 "<<initialCrossSection<<" "<<finalCrossSection<<G4endl;
+ // G4cout<<"PostStepDoIt3 "<<this->CrossSectionStepE<<" "<<this->CrossSectionStepVal<<" "<<prob<<G4endl;
 
   G4double p=G4UniformRand();
   //Do nothing if p>prob
@@ -157,6 +161,7 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
 
     std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding() << " emitted by " << aTrack.GetDefinition()->GetParticleName() << " with energy = "
         << incidentE / GeV << " GeV, DM energy = " << incidentE / GeV << " GeV " << std::endl;
+    std::cout << "DM cross section=" <<initialCrossSection<<" [MAX VALUE: "<<myDarkMatter->GetTotalCrossSectionMax()<<"]"<<std::endl;
 
     return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
   } else { //simulate the decay e+e- -->A' -->ff

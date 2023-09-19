@@ -16,7 +16,7 @@
 
 
 DarkPhotonsAnnihilation::DarkPhotonsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
-                                                 double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
+                                                 double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn,double minWidth) :
 DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn),
 iBranchingType(IBranchingIn), r(rIn), f(fIn), alphaD(alphaDIn)
 {
@@ -28,6 +28,8 @@ iBranchingType(IBranchingIn), r(rIn), f(fIn), alphaD(alphaDIn)
   mChi = MAIn/3;
   mChi1=mChi;
   mChi2=mChi;
+  widthEnhancementFactor=1;
+
 
 
   if (iBranchingType==2){
@@ -44,17 +46,22 @@ iBranchingType(IBranchingIn), r(rIn), f(fIn), alphaD(alphaDIn)
   deltaMchi=mChi2-mChi1;
 
 
-
   std::cout << "Initialized DarkPhotonsAnnihilation (e+ e- -> A' -> DM DM) for material density = " << DensityIn << std::endl;
-  std::cout << "mA: "<<MA<<std::endl;
+  std::cout << "mA: "<<MA*1000<<" MeV "<<std::endl;
   std::cout << "IbranchingType: "<<iBranchingType<<std::endl;
   if (iBranchingType==2){
-    std::cout<<"mChi1: "<<mChi1<<std::endl;
-    std::cout<<"mChi2: "<<mChi2<<std::endl;
+    std::cout<<"mChi1: "<<mChi1*1000<<" MeV "<<std::endl;
+    std::cout<<"mChi2: "<<mChi2*1000<<" MeV "<<std::endl;
   }else{
-    std::cout<<"mChi: "<<mChi<<std::endl;
+    std::cout<<"mChi: "<<mChi*1000<<" MeV "<<std::endl;
   }
-  std::cout<<"Width: "<<this->Width()<<std::endl;
+  std::cout<<"Width: "<<this->Width()*1E3<<" MeV "<<std::endl;
+
+  if ((minWidth >0)&&(this->Width()<minWidth)){
+    widthEnhancementFactor=minWidth/this->Width();
+    std::cout<<"Width after artificial enhancement: "<<this->Width()<<std::endl;
+  }
+
   std::cout << std::endl;
 }
 
@@ -111,6 +118,10 @@ double DarkPhotonsAnnihilation::TotalCrossSectionCalcFactor(double E0){
 
   //A.C. correct here for atomic effects
   sigma = sigma * ZNucl;
+
+  //A.C. width enhancement factor to avoid sharp variations of the cross section
+  //Documentation: https://gitlab.cern.ch/P348/DMG4/-/issues/14
+  sigma=sigma * widthEnhancementFactor;
   return sigma;
 }
 
@@ -179,8 +190,9 @@ double DarkPhotonsAnnihilation::Width() {
       }
       break;
   }
-
-
+  //A.C. add width-enhancement factor
+  //Documentation: https://gitlab.cern.ch/P348/DMG4/-/issues/14
+  ret=ret*widthEnhancementFactor;
 
   return ret;
 }
@@ -254,7 +266,7 @@ double DarkPhotonsAnnihilation::AngularDistributionResonant(double eta,double E0
     }
 
     return val;
-
-
 }
+
+
 
