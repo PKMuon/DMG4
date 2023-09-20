@@ -518,7 +518,7 @@ double DarkMatter::SimulateEmissionWithAngle2(double E0, double* angles)
 }
 
 
-double DarkMatter::SimulateEmissionWithAngle3(double E0, double* angles)
+double DarkMatter::SimulateEmissionWithAngle3(double E0, double* angles) // For ALP simulation (Primakoff process)
 {
   double Xmin = MA/E0;
 
@@ -548,7 +548,7 @@ double DarkMatter::SimulateEmissionWithAngle3(double E0, double* angles)
   XAcc = ThetaAcc = PhiAcc = sigma = ThetaEv = Log10ThetaEv = 0.;
 
   // Set range of uniform sampling between 0 and 1
-  double ThetaMaxA = 1.;
+  double ThetaMaxA = 0.3;
 
   int maxiterA = 2000000;
   for(int iii = 1; iii < maxiterA; iii++) { // Angle simulation loop
