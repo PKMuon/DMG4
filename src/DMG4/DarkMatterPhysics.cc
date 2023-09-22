@@ -16,6 +16,7 @@
 #include "DarkMassSpin2.hh"
 #include "DarkMassSpin2Annihilation.hh"
 #include "DarkAxials.hh"
+#include "DarkLLPhi.hh"
 
 #include "DMProcessDMBrem.hh"
 #include "DMProcessPrimakoffALP.hh"
@@ -27,6 +28,7 @@
 #include "DMParticleScalar.hh"
 #include "DMParticlePseudoScalar.hh"
 #include "DMParticleAxial.hh"
+#include "DMParticleLFCScalar.hh"
 #include "DMParticleChi1.hh"
 #include "DMParticleChi2.hh"
 
@@ -159,6 +161,13 @@ void DarkMatterPhysics::Init(){
         exit(1);
       }
       myDarkMatter = new DarkMuPhilicPseudoScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+    case 35:
+      G4cout << "Initialize DarkLLPhi\n";
+      if(DecayType) { // Temporary plug
+        G4cout << G4endl << "DarkLLPhi with decays is not yet implemented, exiting" << G4endl << G4endl;
+        exit(1);
+      }
+      myDarkMatter = new DarkLLPhi(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
       break;
     case 11:
       G4cout << "Initialize DarkPhotonsAnnihilation\n";
@@ -201,6 +210,7 @@ void DarkMatterPhysics::ConstructParticle()
   DMParticleZPrime::Definition();
   DMParticleALP::Definition();
   DMParticleScalar::Definition();
+  DMParticleLFCScalar::Definition();
   DMParticlePseudoScalar::Definition();
   DMParticleAxial::Definition();
 
@@ -291,7 +301,11 @@ void DarkMatterPhysics::ConstructProcess()
     }
   }
   if(myDarkMatter->GetParentPDGID() == 13) {
-    theDMParticlePtr = DMParticleZPrime::Definition(); // Always Z' for the moment, scalar etc. particles from muons not yet implemented
+    if(myDarkMatter->GetDMType() == 2) { // scalar
+      theDMParticlePtr = DMParticleLFCScalar::Definition();
+    }
+    else
+      theDMParticlePtr = DMParticleZPrime::Definition(); // Always Z' for the moment, scalar etc. particles from muons not yet implemented
   }
   if(myDarkMatter->GetParentPDGID() == 22) {
     theDMParticlePtr = DMParticleALP::Definition();
