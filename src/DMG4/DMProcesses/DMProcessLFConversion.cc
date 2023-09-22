@@ -63,7 +63,7 @@ G4VParticleChange* DMProcessLFConversion::PostStepDoIt(const G4Track& aTrack,
 
   if(myDarkMatter->GetParentPDGID() == 15 || myDarkMatter->GetParentPDGID() == 13) {
     // TODO: apply correct sampling
-    XAcc = myDarkMatter->SimulateEmissionByMuonLFClog10(incidentE/GeV, angles); // 2-dim log-uniform sampling, angles are for the recoil lepton
+    XAcc = myDarkMatter->SimulateEmissionVector(incidentE/GeV, angles); // 2-dim log-uniform sampling, angles are for the recoil lepton
 
   }
 

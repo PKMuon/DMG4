@@ -19,6 +19,7 @@ class DarkMatter
 {
   friend class DarkPhotons;
   friend class DarkScalars;
+  friend class DarkLFCScalars;
   friend class DarkPseudoScalars;
   friend class DarkAxials;
   friend class DarkZ;

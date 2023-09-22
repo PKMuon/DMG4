@@ -7,6 +7,7 @@
 #include "G4PhysicalConstants.hh"
 #include "G4DalitzDecayChannel.hh"
 #include "G4DecayTable.hh"
+#include "G4MuonMinus.hh"
 
 DMParticleLFCScalar * DMParticleLFCScalar::theInstance = nullptr;
 
@@ -26,9 +27,10 @@ DMParticleLFCScalar* DMParticleLFCScalar::Definition()
   // search in particle table
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition * anInstance = pTable->FindParticle(name);
-  G4double RatioEA2 = electron_mass_c2*electron_mass_c2/(MassIn*MassIn);
+  const G4double muMass = G4MuonMinus::MuonMinusDefinition()->GetPDGMass();
+  G4double RatioEA2 = muMass*muMass/(MassIn*MassIn);
   G4bool isStable = DecayType > 0 ? false : true;
-  if(MassIn < 2.001*Mmu*GeV) isStable = true;
+  if(MassIn < 2.001*muMass*GeV) isStable = true;
 
   G4int IDPDG = 5400023; // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
   G4double WidthIn = 0.;
