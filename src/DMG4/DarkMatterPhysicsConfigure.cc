@@ -45,8 +45,12 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
   DMpar->RegisterNewParam("DMProcessType", 1.); // 1 - 4: Brem. process for Vector, Scalar, Axial, Pseudoscalar, 5 - spin 2, 21 - ALP
                                                 // 11 - 14: Annihilation, 15 - annihilation through spin 2 DM
                                                 // 31 - ZPrime (muon beams)
+                                                // 45 - Lepton flavour conversion with scalar boson (muon and electron beams)
   DMpar->RegisterNewParam("DMMass", 0.0167*GeV);
   DMpar->RegisterNewParam("Epsilon", 0.0001);
+
+  // additional parameters for lepton flavour conversion indicating the parent PDGID
+  DMpar->RegisterNewParam("ParentPDGID", 11);
 
   // Initialize for Pb
   DMpar->RegisterNewParam("ANucl"      ,207.   );
@@ -91,6 +95,7 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
   //DMpar->RegisterNewParam("Ffactor", 0.4);
   // additional parameter for Dirac DM, describing the dark fermion mixing (if absent the default ones will be used)
   //DMpar->RegisterNewParam("IDMTheta", 1.e-3);
+  
 
   return true;
 }

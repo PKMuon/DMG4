@@ -60,3 +60,4 @@ DNAIonisingTransfer              2             64             -1             -1 
 DMProcessDMBrem                 9              1             -1             -1              3  0
 DMProcessAnnihilation           9              1             -1             -1              3  0
 DMProcessPrimakoffALP           9              1             -1             -1              3  0
+DMProcessLFConversion           9              2             -1             -1              3  0

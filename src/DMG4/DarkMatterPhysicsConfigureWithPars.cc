@@ -46,8 +46,13 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure(void *ptr)
      //select particle type and details
      DMpar->RegisterNewParam("DMProcessType", 1.); // 1 - 4: Brem. process for Vector, Scalar, Axial, Pseudoscalar, 5 - spin 2, 21 - ALP
                                                    // 31 - ZPrime (muon beams), 11 - 14: Annihilation
+                                                   // 45 - Lepton flavour conversion with scalar boson (muon and electron)
      DMpar->RegisterNewParam("DMMass", 0.0167*GeV);
      DMpar->RegisterNewParam("Epsilon", 0.0001);
+
+
+     // additional parameters for lepton flavour conversion indicating the parent PDGID
+     DMpar->RegisterNewParam("ParentPDGID", 11);
 
      // Initialize for Pb
      DMpar->RegisterNewParam("ANucl"      ,207.   );
@@ -71,7 +76,7 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure(void *ptr)
      DMpar->RegisterNewParam("DecayType", 0.);
 
      /* Comments to "BranchingType"
-      * Optional to make different decay table; 0 : invisible decays or SM lepton decays, depending on DecayType; 1 : B - L model; 2 : Semivisible: Inelastic DM; 3 : Semivisible: Dirac Inelastic DM    
+      * Optional to make different decay table; 0 : invisible decays or SM lepton decays, depending on DecayType; 1 : B - L model; 2 : Semivisible: Inelastic DM; 3 : Semivisible: Dirac Inelastic DM, 
       * For annihilation e+e- --> R --> ff the meaning is DIFFERENT!
 
         0: default: fermionic ff final state

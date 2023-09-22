@@ -32,6 +32,7 @@ class DarkMatter
   friend class DarkScalarsAnnihilation;
   friend class DarkPseudoScalarsAnnihilation;
   friend class DarkAxialsAnnihilation;
+  friend class DarkScalarLFC;
   public:
 
     DarkMatter(double MAIn, double EThreshIn, double SigmaNormIn=1., double ANuclIn=207., double ZNuclIn=82., double DensityIn=11.35,
@@ -91,10 +92,18 @@ class DarkMatter
     double SimulateEmissionByMuon2(double E0, double* angles);
     double SimulateEmissionByMuon(double E0, double* angles);
     double SimulateEmissionVector(double E0, double* angles);
+    double SimulateEmissionByMuonLFClog10(double E0, double* angles);
 
     //for resonant production e+ e- --> R --> f f, this function returns the cosine of the angle of the f in the CM frame.
     double SimulateEmissionResonant(double E0); //E0 in GeV
     virtual double AngularDistributionResonant(double eta,double E0); //E0 in GeV
+
+    // for emission with different final and inital state lepton 
+    void PrepareTableLFC(); 
+    double MaxCrossSectionCalcLFC(double E0); 
+    double MaxCrossSectionAngleCalcLFC(double E0);  
+    double MaxCrossSectionPsiCalcLFCLog10(double E0); // log-uniform random sampling 
+    double MaxCrossSectionThetaCalcLFC(double E0);
 
 
     double GetAccumulatedProbability() {return AccumulatedProbability;}
