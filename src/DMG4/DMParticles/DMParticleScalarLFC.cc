@@ -82,7 +82,7 @@ DMParticleScalarLFC* DMParticleScalarLFC::Definition()
       anInstance->SetDecayTable(table);
       anInstance->DumpTable();
     }
-    
+
   }
   theInstance = reinterpret_cast<DMParticleScalarLFC*>(anInstance);
   return theInstance;

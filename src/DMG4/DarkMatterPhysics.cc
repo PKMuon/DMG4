@@ -48,7 +48,7 @@
 
 
 DarkMatterPhysics::DarkMatterPhysics() 
-: G4VPhysicsConstructor("DarkMatterPhysics")
+  : G4VPhysicsConstructor("DarkMatterPhysics")
 {
   SetPhysicsType(bUnknown);
   //fMessenger = new DarkMatterPhysicsMessenger();
@@ -58,11 +58,11 @@ DarkMatterPhysics::DarkMatterPhysics()
     exit(1);
   }
   this->Init();
- }
+}
 
 
 DarkMatterPhysics::DarkMatterPhysics(void *ptr)
-: G4VPhysicsConstructor("DarkMatterPhysics")
+  : G4VPhysicsConstructor("DarkMatterPhysics")
 {
   SetPhysicsType(bUnknown);
   //fMessenger = new DarkMatterPhysicsMessenger();
@@ -99,15 +99,15 @@ void DarkMatterPhysics::Init(){
   G4int BranchingType = DMpar->GetRegisteredParam("BranchingType",0);
   G4int ParentPDGID = DMpar->GetRegisteredParam("ParentPDGID");
 
-/*
- * A.C. all quantities obtained from DMPar have intrinsic G4 units
- * In the following, we pass them to DarkMatter classes, that use following convention:
- *
- * Masses, energies => GeV
- * Density => g/cm3
- *
- * We convert them here
- */
+  /*
+   * A.C. all quantities obtained from DMPar have intrinsic G4 units
+   * In the following, we pass them to DarkMatter classes, that use following convention:
+   *
+   * Masses, energies => GeV
+   * Density => g/cm3
+   *
+   * We convert them here
+   */
 
   EThresh/=GeV;
   DMMass/=GeV;
@@ -115,7 +115,7 @@ void DarkMatterPhysics::Init(){
 
 
   switch(DMProcessType)
-    {
+  {
     case 1:
       G4cout << "Initialize DarkPhotons\n";
       myDarkMatter = new DarkPhotons(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType);
@@ -175,33 +175,33 @@ void DarkMatterPhysics::Init(){
     case 11:
       G4cout << "Initialize DarkPhotonsAnnihilation\n";
       myDarkMatter = new DarkPhotonsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
-                                                 DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor );
+          DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor );
       break;
     case 12:
       G4cout << "Initialize DarkScalarsAnnihilation\n";
       myDarkMatter = new DarkScalarsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
-              DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor );
+          DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor );
       break;
     case 13:
       G4cout << "Initialize DarkAxialsAnnihilation\n";
       myDarkMatter = new DarkAxialsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
-              DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor );
+          DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor );
       break;
     case 14:
       G4cout << "Initialize DarkPseudoScalarsAnnihilation\n";
       myDarkMatter = new DarkPseudoScalarsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
-              DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor );
-       break;
+          DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor );
+      break;
     case 15:
       G4cout << "Initialize DarkMassSpin2Annihilation\n";
       myDarkMatter = new DarkMassSpin2Annihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM);
-       break;
-     default:
-       G4cout << G4endl << "Wrong DM process type specified: " << DMProcessType << " , exiting" << G4endl << G4endl;
-       exit(1);
-     }
+      break;
+    default:
+      G4cout << G4endl << "Wrong DM process type specified: " << DMProcessType << " , exiting" << G4endl << G4endl;
+      exit(1);
+  }
 
-   BiasSigmaFactor = DMpar->GetRegisteredParam("BiasSigmaFactor0") * 0.0001 * 0.0001 / (myDarkMatter->Getepsil()*myDarkMatter->Getepsil());
+  BiasSigmaFactor = DMpar->GetRegisteredParam("BiasSigmaFactor0") * 0.0001 * 0.0001 / (myDarkMatter->Getepsil()*myDarkMatter->Getepsil());
 }
 
 
@@ -228,7 +228,7 @@ void DarkMatterPhysics::ConstructParticle()
   G4int BranchingType = (G4int)(DMpar->GetRegisteredParam("BranchingType", 0.));
 
   switch(DMProcessType)
-    {
+  {
     case 1:  //dark-photon bremmstrahlung
       if (DecayType == 0) { //Only invisible, do nothing
       }
@@ -262,7 +262,7 @@ void DarkMatterPhysics::ConstructParticle()
     case 45:
     default:
       break;
-    }
+  }
 }
 
 
@@ -327,7 +327,7 @@ void DarkMatterPhysics::ConstructProcess()
 
   // Sepcial for LFC sampling
   if(myDarkMatter->GetDMType() == 45) {
-     myDarkMatter->PrepareTableLFC();
+    myDarkMatter->PrepareTableLFC();
   }
   else
     myDarkMatter->PrepareTable();
@@ -347,37 +347,37 @@ void DarkMatterPhysics::ConstructProcess()
 
   // ... here the processes asociated with new physics should be registered
   //     as follows
-  
+
   if(myDarkMatter->GetParentPDGID() == 11) {
     if(myDarkMatter->GetDMType() == 45) {
       phLHelper->RegisterProcess( new DMProcessLFConversion(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
-                                  G4Electron::ElectronDefinition() );
+          G4Electron::ElectronDefinition() );
     }
     else {
       phLHelper->RegisterProcess( new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
-                                  G4Electron::ElectronDefinition() );
+          G4Electron::ElectronDefinition() );
       phLHelper->RegisterProcess( new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
-                                  G4Positron::PositronDefinition() );
+          G4Positron::PositronDefinition() );
     }
   }
   if(myDarkMatter->GetParentPDGID() == -11) {
     phLHelper->RegisterProcess( new DMProcessAnnihilation(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
-                                G4Positron::PositronDefinition() );
+        G4Positron::PositronDefinition() );
   }
   if(myDarkMatter->GetParentPDGID() == 13) {
     if(myDarkMatter->GetDMType() == 45) {
       phLHelper->RegisterProcess( new DMProcessLFConversion(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
-                                  G4MuonMinus::MuonMinusDefinition() );
+          G4MuonMinus::MuonMinusDefinition() );
     }
     else {
       phLHelper->RegisterProcess( new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
-                                  G4MuonMinus::MuonMinusDefinition() );
+          G4MuonMinus::MuonMinusDefinition() );
       phLHelper->RegisterProcess( new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
-                                  G4MuonPlus::MuonPlusDefinition() );
+          G4MuonPlus::MuonPlusDefinition() );
     }
   }
   if(myDarkMatter->GetParentPDGID() == 22) {
     phLHelper->RegisterProcess( new DMProcessPrimakoffALP(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
-                                G4Gamma::GammaDefinition() );
+        G4Gamma::GammaDefinition() );
   }
 }

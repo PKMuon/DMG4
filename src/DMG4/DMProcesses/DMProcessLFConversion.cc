@@ -62,7 +62,7 @@ G4VParticleChange* DMProcessLFConversion::PostStepDoIt(const G4Track& aTrack,
 
   if(myDarkMatter->GetParentPDGID() == 11 || myDarkMatter->GetParentPDGID() == 13) {
     XAcc = myDarkMatter->SimulateEmissionByMuonLFClog10(incidentE/GeV, angles); // 2-dim log-uniform sampling, angles are for the recoil lepton
-    
+
   }
 
   // Check if it failed? In this case XAcc = 0
@@ -137,10 +137,10 @@ G4VParticleChange* DMProcessLFConversion::PostStepDoIt(const G4Track& aTrack,
   aParticleChange.ProposeMomentumDirection(0., 0., 0.);
   aParticleChange.ProposeEnergy(0.);
   aParticleChange.ProposeTrackStatus(fStopAndKill);
-  
+
   std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding() 
-            << " emitted by " << aTrack.GetDefinition()->GetParticleName()
-            << " with energy = " << incidentE/GeV << " DM kinetic energy = " << DMKinE/GeV << std::endl;
+    << " emitted by " << aTrack.GetDefinition()->GetParticleName()
+    << " with energy = " << incidentE/GeV << " DM kinetic energy = " << DMKinE/GeV << std::endl;
 
   return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
 }

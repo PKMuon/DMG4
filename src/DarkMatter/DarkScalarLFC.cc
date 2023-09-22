@@ -34,8 +34,8 @@
 
 // Additional structures holding E0 value to be passed into GSL callbacks.
 struct BoundParms {
-    DarkScalarLFC * this_;
-    double E0;
+  DarkScalarLFC * this_;
+  double E0;
 };
 
 struct BoundParms2 {
@@ -45,9 +45,9 @@ struct BoundParms2 {
 };
 
 struct BoundParms3 {
-	DarkScalarLFC * this_;
-	double E0;
-	double psi;
+  DarkScalarLFC * this_;
+  double E0;
+  double psi;
 };
 
 
@@ -64,56 +64,56 @@ double DarkScalarLFC::chiIWW(double E0) {
   double ta = pow(1./aa,2.);
   double td = d;
   double fluxAnalytical = ZNucl*ZNucl*(-((td*td*(((ta - td)*(ta + td + 2.0*tmax)*(tmax - tmin))/((ta + tmax)*(td + tmax)) + (ta + td + 2.0*tmin)*(log(ta + tmax) - log(td + tmax) - log(ta + tmin) + log(td + tmin))))/((ta-td)*(ta-td)*(ta-td))));
- 
+
   return fluxAnalytical;
 
 }
 
 // A callback wrapping function for DarkScalarLFC::CrossSectionDSDX_IWW()
 static double _DarkScalarLFCDsDxMuon(double x1, void * parms_) {
-    //BoundParms * parms = (BoundParms*) parms_;  // or, equivalently, in C++ style
-    BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
-    // Forward invocation to target method
-    return parms->this_->CrossSectionDSDX_IWW( x1, parms->E0 );
+  //BoundParms * parms = (BoundParms*) parms_;  // or, equivalently, in C++ style
+  BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
+  // Forward invocation to target method
+  return parms->this_->CrossSectionDSDX_IWW( x1, parms->E0 );
 }
 
 
 // A callback wrapping function for DarkScalarLFC::CrossSectionDSDX_WW()
 static double _DarkScalarLFCDsDxMuon_WW(double x1, void * parms_) {
-    //BoundParms * parms = (BoundParms*) parms_;  // or, equivalently, in C++ style
-    BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
-    // Forward invocation to target method
-    return parms->this_->CrossSectionDSDX_WW( x1, parms->E0 );
+  //BoundParms * parms = (BoundParms*) parms_;  // or, equivalently, in C++ style
+  BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
+  // Forward invocation to target method
+  return parms->this_->CrossSectionDSDX_WW( x1, parms->E0 );
 }
 
 
 // A callback wrapping function for DarkScalarLFC::CrossSectionDSDXDTheta()
 static double _DarkScalarLFCDsDxDThetaMuon(double x[], size_t dim, void * parms_) {
-    BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
-    // Forward invocation to target method
-    // x[1] = theta is jacobian of dcos to dtheta
-    return parms->this_->CrossSectionDSDXDTheta( x[0], x[1], parms->E0 );
+  BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
+  // Forward invocation to target method
+  // x[1] = theta is jacobian of dcos to dtheta
+  return parms->this_->CrossSectionDSDXDTheta( x[0], x[1], parms->E0 );
 }
 
 // A callback wrapping function for DarkScalarLFC::CrossSectionDSDXDTheta() for use in DSDX_WW integration over theta
 static double _DarkScalarLFCDsDx_integrand(double theta1, void * parms_) {
-    BoundParms2 * parms = reinterpret_cast<BoundParms2*>(parms_);
-    // Forward invocation to target method
-    // theta1 is jacobian from cos theta -> theta
-    return parms->this_->CrossSectionDSDXDTheta( parms->X, theta1, parms->E0 );
+  BoundParms2 * parms = reinterpret_cast<BoundParms2*>(parms_);
+  // Forward invocation to target method
+  // theta1 is jacobian from cos theta -> theta
+  return parms->this_->CrossSectionDSDXDTheta( parms->X, theta1, parms->E0 );
 }
 static double _DarkScalarLFCDsDpsi_integrand(double y, void * parms_) {
-	BoundParms3 * parms = reinterpret_cast<BoundParms3*>(parms_);
-	double auxpsi = 0.5*parms->psi*parms->psi;
-	return parms->this_->CrossSectionDSDXDPSI_IWW( 1.0-y, auxpsi, parms->E0 );
+  BoundParms3 * parms = reinterpret_cast<BoundParms3*>(parms_);
+  double auxpsi = 0.5*parms->psi*parms->psi;
+  return parms->this_->CrossSectionDSDXDPSI_IWW( 1.0-y, auxpsi, parms->E0 );
 }
 
 // A callback wrapping function for DarkScalarLFC::CrossSectionDSDXDpsi()
 static double _DarkScalarLFCDsDxDPsiMuon(double x[], size_t dim, void * parms_) {
-    BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
-    // Forward invocation to target method
-    double auxpsi = 0.5*x[1]*x[1];
-return parms->this_->CrossSectionDSDXDPSI_WW( x[0], auxpsi, parms->E0 );
+  BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
+  // Forward invocation to target method
+  double auxpsi = 0.5*x[1]*x[1];
+  return parms->this_->CrossSectionDSDXDPSI_WW( x[0], auxpsi, parms->E0 );
 }
 
 
@@ -121,7 +121,7 @@ return parms->this_->CrossSectionDSDXDPSI_WW( x[0], auxpsi, parms->E0 );
 
 
 DarkScalarLFC::DarkScalarLFC(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
-                         double epsilIn, int IDecayIn, int ParentPDGIDIn)
+    double epsilIn, int IDecayIn, int ParentPDGIDIn)
 : DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn)
 {
   DMType = 45;
@@ -202,7 +202,7 @@ double DarkScalarLFC::TotalCrossSectionCalc_IWW(double E0)
 
   gsl_integration_workspace* w1 = gsl_integration_workspace_alloc (1000);
   double result1, error1;
- 
+
   double Xmin1=MA/E0;
   double Xmax1 = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MChild/E0;
 
@@ -261,7 +261,7 @@ double DarkScalarLFC::TotalCrossSectionCalc_WW(double E0)
 
   double IntDsDx = result1;
   gsl_integration_workspace_free (w1);
-  
+
   // include prefactor to get total cross section
   double prefactor = E0*epsil*epsil*alphaEW*alphaEW/(2.*M_PI);
   sigmaTot= GeVtoPb*prefactor*IntDsDx;
@@ -452,10 +452,10 @@ double DarkScalarLFC::CrossSectionDSDX_WW(double XEv, double E0)
 // wrapper for DSDXDU, used in electron mode sampling
 double DarkScalarLFC::CrossSectionDSDXDU(double XEv, double UThetaEv, double E0)
 {
-	if(IApprox == 1) return CrossSectionDSDXDU_IWW(XEv, UThetaEv, E0);
-	if(IApprox == 2) return CrossSectionDSDXDU_WW(XEv, UThetaEv, E0);
-	std::cout << "DarkScalarLFC: wrong value of IApprox, exiting" << std::endl;
-	exit(1);
+  if(IApprox == 1) return CrossSectionDSDXDU_IWW(XEv, UThetaEv, E0);
+  if(IApprox == 2) return CrossSectionDSDXDU_WW(XEv, UThetaEv, E0);
+  std::cout << "DarkScalarLFC: wrong value of IApprox, exiting" << std::endl;
+  exit(1);
 }
 
 // Below is the double-differential cross-section as for Theta expressed
@@ -495,7 +495,7 @@ double DarkScalarLFC::CrossSectionDSDXDU_WW(double XEv, double UThetaEv, double 
   double ta = pow(1./aa,2.);
   double td = d;
   double fluxAnalytical = ZNucl*ZNucl*(-((td*td*(((ta - td)*(ta + td + 2.0*tmax)*(tmax - tmin))/((ta + tmax)*(td + tmax)) + (ta + td + 2.0*tmin)*(log(ta + tmax) - log(td + tmax) - log(ta + tmin) + log(td + tmin))))/((ta-td)*(ta-td)*(ta-td))));
- 
+
   double res = fluxAnalytical*(1. - XEv)*amp/(u*u);
   return res;
 }
@@ -544,8 +544,8 @@ double DarkScalarLFC::CrossSectionDSDXDPSI_IWW(double XEv, double auxpsi, double
 //
 double DarkScalarLFC::CrossSectionDSDXDPSI_WW(double XEv, double auxpsi, double E0)
 {
-  
-//  if(E0*XEv < EThresh) return 0.0;
+
+  //  if(E0*XEv < EThresh) return 0.0;
 
   double y = 1. - XEv;
   double psi = sqrt(2.0*auxpsi);
@@ -580,7 +580,7 @@ double DarkScalarLFC::CrossSectionDSDXDPSI_WW(double XEv, double auxpsi, double 
 //
 double DarkScalarLFC::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double E0)
 {
-    if(E0*XEv < EThresh) return 0.0;
+  if(E0*XEv < EThresh) return 0.0;
 
   // prefactor and amplitude 
   // double prefactor = E0*epsil*epsil*alphaEW*alphaEW/(2.*M_PI);
@@ -599,7 +599,7 @@ double DarkScalarLFC::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double 
   double ta = pow(1./aa,2.);
   double td = d;
   double fluxAnalytical = ZNucl*ZNucl*(-((td*td*(((ta - td)*(ta + td + 2.0*tmax)*(tmax - tmin))/((ta + tmax)*(td + tmax)) + (ta + td + 2.0*tmin)*(log(ta + tmax) - log(td + tmax) - log(ta + tmin) + log(td + tmin))))/((ta-td)*(ta-td)*(ta-td))));
- 
+
   double res = sin(ThetaEv)*fluxAnalytical*momentumOfDP*(1. - XEv)*amp/(u*u);
   return res;
 }
@@ -610,8 +610,8 @@ double DarkScalarLFC::Width()
   double width = 0.;
 #if 0
   if (MA > MChild+MParent) {
-  double p = sqrt(MA*MA-pow(MChild+MParent,2.)*(MA*MA-pow(MChild-MParent,2.)))/MA*0.5;
-  width = epsil*epsil*p/(8*M_PI)*(1.0-(MChild*MChild+MParent*MParent)/(MA*MA));
+    double p = sqrt(MA*MA-pow(MChild+MParent,2.)*(MA*MA-pow(MChild-MParent,2.)))/MA*0.5;
+    width = epsil*epsil*p/(8*M_PI)*(1.0-(MChild*MChild+MParent*MParent)/(MA*MA));
   }
   else {
     G4cout << "DarkScalarLFC: width for the mass below Mel+Mmu is not valid, exiting" << G4endl;
@@ -623,15 +623,15 @@ double DarkScalarLFC::Width()
 
 // for plotting purposes
 double DarkScalarLFC::CrossSectionDSDX_WW_withprefactor(double XEv, double E0) {
-	// multiplies CrossSectionDSDX_WW with its prefactor
-	double prefactor = E0*epsil*epsil*alphaEW*alphaEW/(2.*M_PI);
-	return prefactor*CrossSectionDSDX_WW(XEv, E0);
+  // multiplies CrossSectionDSDX_WW with its prefactor
+  double prefactor = E0*epsil*epsil*alphaEW*alphaEW/(2.*M_PI);
+  return prefactor*CrossSectionDSDX_WW(XEv, E0);
 }
 
 double DarkScalarLFC::CrossSectionDSDX_IWW_withprefactor(double XEv, double E0) {
-	// multiplies CrossSectionDSDX_IWW with its prefactor
-	double prefactor = chiIWW(E0)*epsil*epsil*alphaEW*alphaEW/(4.0*M_PI);
-	return prefactor*CrossSectionDSDX_IWW(XEv, E0);
+  // multiplies CrossSectionDSDX_IWW with its prefactor
+  double prefactor = chiIWW(E0)*epsil*epsil*alphaEW*alphaEW/(4.0*M_PI);
+  return prefactor*CrossSectionDSDX_IWW(XEv, E0);
 }
 
 double DarkScalarLFC::CrossSectionDSDPSI_IWW_noprefactor(double Psi, double E0) {
