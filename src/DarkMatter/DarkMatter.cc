@@ -27,10 +27,10 @@
 
 
 DarkMatter::DarkMatter(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
-                       double epsilIn, int IDecayIn)
+    double epsilIn, int IDecayIn)
 :MA(MAIn), EThresh(EThreshIn), SigmaNorm(SigmaNormIn),
-ANucl(ANuclIn), ZNucl(ZNuclIn), Density(DensityIn), epsilBench(0.0001), epsil(epsilIn), IDecay(IDecayIn),ISampler(0),
-AccumulatedProbability(0.), NEmissions(0)
+  ANucl(ANuclIn), ZNucl(ZNuclIn), Density(DensityIn), epsilBench(0.0001), epsil(epsilIn), IDecay(IDecayIn),ISampler(0),
+  AccumulatedProbability(0.), NEmissions(0)
 {
   if(MA > 3.) {std::cout << "Maximal allowed mass is 3 GeV, exiting" << std::endl; exit(1);}
   nptable = NPTAB;
@@ -75,8 +75,8 @@ void DarkMatter::PrepareTableLFC()
     sigmax[ip] = MaxCrossSectionCalcLFC(ep[ip]);
     if(MA >= 0.001) sigmaxa[ip] = MaxCrossSectionAngleCalcLFC(ep[ip]);
     sigmaxpsi[ip] = MaxCrossSectionPsiCalcLFCLog10(ep[ip]);
-//sigmaxtheta[ip] = MaxCrossSectionThetaCalcLFC(ep[ip]);
-}
+    //sigmaxtheta[ip] = MaxCrossSectionThetaCalcLFC(ep[ip]);
+  }
 }
 
 
@@ -316,7 +316,7 @@ double DarkMatter::MaxCrossSectionPsiCalcLFCLog10(double E0)
   double PsiMax = M_PI;
   double Log10PsiMax = log10(PsiMax);
   double Log10PsiMin = -5;
- 
+
   if(E0 < 2.*MA) return 0.;
 
   double xi, auxpsi, csi, Log10PsiEv, PsiEv, yexponent;
@@ -329,9 +329,9 @@ double DarkMatter::MaxCrossSectionPsiCalcLFCLog10(double E0)
     auxpsi = 0.5 * PsiEv*PsiEv;
     csi = CrossSectionDSDXDPSI(xi, auxpsi, E0);
     if(csi > csmax) {
-	csmax = csi;
-	xMAX = xi;
-	psiMAX = PsiEv;
+      csmax = csi;
+      xMAX = xi;
+      psiMAX = PsiEv;
     }
   }
   std::cout << "ymax/psimax/csmax " << 1. - xMAX << " " << psiMAX << " " << csmax << std::endl;
@@ -869,7 +869,7 @@ double DarkMatter::SimulateEmissionByMuon(double E0, double* angles)
     } else { // straight sampling of X
       XEv  =  G4UniformRand() * (Xmax-Xmin) + Xmin;
     }
-//    std::cout << "X, FactorSigmaX = " << XEv << " " << FactorSigmaX << std::endl;
+    //    std::cout << "X, FactorSigmaX = " << XEv << " " << FactorSigmaX << std::endl;
     FactorSigmaA = 1.;
     if(MA <= 0.008) { // adaptive sampling of angle
       if(G4UniformRand() < Frac) {
@@ -959,16 +959,16 @@ double DarkMatter::SimulateEmissionVector(double E0, double* angles)
  */
 double DarkMatter::SimulateEmissionResonant(double E0){
 
-    int maxiter = 25000000;
-    double eta;
-    double fcomp,frand;
-    for( int iii = 1; iii < maxiter; iii++) {
-        eta = G4UniformRand()*2 -1; //between -1 and 1;
-        fcomp=this->AngularDistributionResonant(eta,E0);
-        frand=G4UniformRand();
-        if (frand<fcomp) return eta;
-     }
-    return 1;
+  int maxiter = 25000000;
+  double eta;
+  double fcomp,frand;
+  for( int iii = 1; iii < maxiter; iii++) {
+    eta = G4UniformRand()*2 -1; //between -1 and 1;
+    fcomp=this->AngularDistributionResonant(eta,E0);
+    frand=G4UniformRand();
+    if (frand<fcomp) return eta;
+  }
+  return 1;
 }
 
 /*This method returns the angular distribution for e+e- --> A' --> ff in the CM frame
@@ -978,7 +978,7 @@ double DarkMatter::SimulateEmissionResonant(double E0){
  * IMPORTANT: it has to be normalized so that the maximum is one.
  */
 double DarkMatter::AngularDistributionResonant(double eta,double E0){
-    return (1+eta*eta)/2.;
+  return (1+eta*eta)/2.;
 }
 
 // log-uniform sampling
