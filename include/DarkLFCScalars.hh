@@ -1,12 +1,12 @@
-class DarkLLPhi : public DarkMatter
+class DarkLFCScalars : public DarkMatter
 {
 
   public:
 
-    DarkLLPhi(double MAIn, double EThreshIn, double SigmaNormIn=1., double ANuclIn=207., double ZNuclIn=82., double DensityIn=11.35,
+    DarkLFCScalars(double MAIn, double EThreshIn, double SigmaNormIn=1., double ANuclIn=207., double ZNuclIn=82., double DensityIn=11.35,
                 double epsilIn=0.0001, int IDecayIn=0);
 
-    virtual ~DarkLLPhi();
+    virtual ~DarkLFCScalars();
 
     virtual double TotalCrossSectionCalc(double E0);
     double TotalCrossSectionCalc_IWW(double E0);

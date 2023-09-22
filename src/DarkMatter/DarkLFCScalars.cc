@@ -4,7 +4,7 @@
 //
 //
 #include "DarkMatter.hh"
-#include "DarkLLPhi.hh"
+#include "DarkLFCScalars.hh"
 #include "Utils.hh"
 
 #include <gsl/gsl_math.h>
@@ -25,13 +25,13 @@
 
 // Additional structure holding E0 value to be passed into GSL callbacks.
 struct BoundParms {
-    DarkLLPhi * this_;
+    DarkLFCScalars * this_;
     double E0;
 };
 
 
-// A callback wrapping function for DarkLLPhi::CrossSectionDSDX_IWW()
-static double _DarkLLPhiDsDxMuon(double x1, void * parms_) {
+// A callback wrapping function for DarkLFCScalars::CrossSectionDSDX_IWW()
+static double _DarkLFCScalarsDsDxMuon(double x1, void * parms_) {
     //BoundParms * parms = (BoundParms*) parms_;  // or, equivalently, in C++ style
     BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
     // Forward invocation to target method
@@ -39,8 +39,8 @@ static double _DarkLLPhiDsDxMuon(double x1, void * parms_) {
 }
 
 
-// A callback wrapping function for DarkLLPhi::CrossSectionDSDX_WW()
-static double _DarkLLPhiDsDxMuon_WW(double x1, void * parms_) {
+// A callback wrapping function for DarkLFCScalars::CrossSectionDSDX_WW()
+static double _DarkLFCScalarsDsDxMuon_WW(double x1, void * parms_) {
     //BoundParms * parms = (BoundParms*) parms_;  // or, equivalently, in C++ style
     BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
     // Forward invocation to target method
@@ -48,16 +48,16 @@ static double _DarkLLPhiDsDxMuon_WW(double x1, void * parms_) {
 }
 
 
-// A callback wrapping function for DarkLLPhi::CrossSectionDSDXDTheta()
-static double _DarkLLPhiDsDxDThetaMuon(double x[], size_t dim, void * parms_) {
+// A callback wrapping function for DarkLFCScalars::CrossSectionDSDXDTheta()
+static double _DarkLFCScalarsDsDxDThetaMuon(double x[], size_t dim, void * parms_) {
     (void)dim; // to avoid warning
     BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
     // Forward invocation to target method
     return parms->this_->CrossSectionDSDXDTheta( x[0], x[1], parms->E0 );
 }
 
-// A callback wrapping function for DarkLLPhi::CrossSectionDSDXDpsi()
-static double _DarkLLPhiDsDxDPsiMuon(double x[], size_t dim, void * parms_) {
+// A callback wrapping function for DarkLFCScalars::CrossSectionDSDXDpsi()
+static double _DarkLFCScalarsDsDxDPsiMuon(double x[], size_t dim, void * parms_) {
     (void)dim; // to avoid warning
     BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
     // Forward invocation to target method
@@ -68,7 +68,7 @@ static double _DarkLLPhiDsDxDPsiMuon(double x[], size_t dim, void * parms_) {
 // Class methods:  ---------------
 
 
-DarkLLPhi::DarkLLPhi(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
+DarkLFCScalars::DarkLFCScalars(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
                          double epsilIn, int IDecayIn)
 : DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn)
 {
@@ -93,21 +93,21 @@ DarkLLPhi::DarkLLPhi(double MAIn, double EThreshIn, double SigmaNormIn, double A
 }
 
 
-DarkLLPhi::~DarkLLPhi()
+DarkLFCScalars::~DarkLFCScalars()
 {;}
 
 
-double DarkLLPhi::TotalCrossSectionCalc(double E0)
+double DarkLFCScalars::TotalCrossSectionCalc(double E0)
 {
   if(IApprox == 1) return TotalCrossSectionCalc_IWW(E0); 
   if(IApprox == 2) {
     if(IMethodTotalCS == 1) return TotalCrossSectionCalc_WW2(E0); // Integral of ds/dxdTheta
     if(IMethodTotalCS == 2) return TotalCrossSectionCalc_WW3(E0); // Integral of ds/dxdPsi
     if(IMethodTotalCS == 3) return TotalCrossSectionCalc_WW(E0);  // Integral of ds/dx
-    std::cout << "DarkLLPhi: wrong value of IMethodTotalCS, exiting" << std::endl;
+    std::cout << "DarkLFCScalars: wrong value of IMethodTotalCS, exiting" << std::endl;
     exit(1);
   } else {
-    std::cout << "DarkLLPhi: wrong value of IApprox, exiting" << std::endl;
+    std::cout << "DarkLFCScalars: wrong value of IApprox, exiting" << std::endl;
   }
   exit(1);
 }
@@ -116,7 +116,7 @@ double DarkLLPhi::TotalCrossSectionCalc(double E0)
 // We integrate below the differential cross-section over x and t (see e.g. second line of Eq.(30) in 1705.01633,
 // where x=E_Z'/E_0, t is a transfer momentum squared
 //
-double DarkLLPhi::TotalCrossSectionCalc_IWW(double E0)
+double DarkLFCScalars::TotalCrossSectionCalc_IWW(double E0)
 {
   if(E0 < 2.*MA) return 0.;
 
@@ -131,7 +131,7 @@ double DarkLLPhi::TotalCrossSectionCalc_IWW(double E0)
 
   gsl_function F1;
   BoundParms parms = { this, E0 };
-  F1.function = _DarkLLPhiDsDxMuon;
+  F1.function = _DarkLFCScalarsDsDxMuon;
   F1.params = &parms;
 
   gsl_integration_qags (&F1, Xmin1, Xmax1, 0, 1e-7, 1000, w1, &result1, &error1);
@@ -155,7 +155,7 @@ double DarkLLPhi::TotalCrossSectionCalc_IWW(double E0)
 
 // Below is the integration of WW ds/dx
 //
-double DarkLLPhi::TotalCrossSectionCalc_WW(double E0)
+double DarkLFCScalars::TotalCrossSectionCalc_WW(double E0)
 {
   double sigmaTot;
 
@@ -174,7 +174,7 @@ double DarkLLPhi::TotalCrossSectionCalc_WW(double E0)
 
   gsl_function F1;
   BoundParms parms = {this, E0};
-  F1.function = _DarkLLPhiDsDxMuon_WW;
+  F1.function = _DarkLFCScalarsDsDxMuon_WW;
   F1.params = &parms;
 
   //gsl_integration_qags (&F1, Xmin1, Xmax1, 0, 1e-7, 1000, w1, &result1, &error1);
@@ -204,7 +204,7 @@ double DarkLLPhi::TotalCrossSectionCalc_WW(double E0)
 
 // Below is the 2 - dimensional integration of WW ds/dxdTheta
 //
-double DarkLLPhi::TotalCrossSectionCalc_WW2(double E0)
+double DarkLFCScalars::TotalCrossSectionCalc_WW2(double E0)
 {
   if(E0 < 2.*MA) return 0.;
 
@@ -224,7 +224,7 @@ double DarkLLPhi::TotalCrossSectionCalc_WW2(double E0)
 
   gsl_monte_function G;
   BoundParms parms = {this, E0};
-  G.f = _DarkLLPhiDsDxDThetaMuon;
+  G.f = _DarkLFCScalarsDsDxDThetaMuon;
   G.dim = 2;
   G.params = &parms;
 
@@ -264,7 +264,7 @@ double DarkLLPhi::TotalCrossSectionCalc_WW2(double E0)
 
 // Below is the 2 - dimensional integration of WW ds/dxdPsi
 //
-double DarkLLPhi::TotalCrossSectionCalc_WW3(double E0)
+double DarkLFCScalars::TotalCrossSectionCalc_WW3(double E0)
 {
   if(E0 < 2.*MA) return 0.;
 
@@ -283,7 +283,7 @@ double DarkLLPhi::TotalCrossSectionCalc_WW3(double E0)
 
   gsl_monte_function G;
   BoundParms parms = {this, E0};
-  G.f = _DarkLLPhiDsDxDPsiMuon;
+  G.f = _DarkLFCScalarsDsDxDPsiMuon;
   G.dim = 2;
   G.params = &parms;
 
@@ -322,24 +322,24 @@ double DarkLLPhi::TotalCrossSectionCalc_WW3(double E0)
 }
 
 
-double DarkLLPhi::GetSigmaTot(double E0)
+double DarkLFCScalars::GetSigmaTot(double E0)
 {
   return GetSigmaTot0(E0);
 }
 
 
-double DarkLLPhi::CrossSectionDSDX(double XEv, double E0)
+double DarkLFCScalars::CrossSectionDSDX(double XEv, double E0)
 {
   if(IApprox == 1) return CrossSectionDSDX_IWW(XEv, E0);
   if(IApprox == 2) return CrossSectionDSDX_WW(XEv, E0);
-  std::cout << "DarkLLPhi: wrong value of IApprox, exiting" << std::endl;
+  std::cout << "DarkLFCScalars: wrong value of IApprox, exiting" << std::endl;
   exit(1);
 }
 
 
 // See ArXiv:1705.01633, second line of Eq.(30)
 //
-double DarkLLPhi::CrossSectionDSDX_IWW(double XEv, double E0)
+double DarkLFCScalars::CrossSectionDSDX_IWW(double XEv, double E0)
 {
   if(XEv*E0 <= MA) return 0.;
   double momentumOfDP = sqrt(XEv*XEv*E0*E0-MA*MA);
@@ -361,7 +361,7 @@ double DarkLLPhi::CrossSectionDSDX_IWW(double XEv, double E0)
 // for references see e.g. https://www.overleaf.com/8686251169nmvbnqfszfxs.
 // It is unstable, works only for very small M/E
 //
-double DarkLLPhi::CrossSectionDSDX_WW(double XEv, double E0)
+double DarkLFCScalars::CrossSectionDSDX_WW(double XEv, double E0)
 {
   double TempThetaMax= 0.07; //is the typical maximum angle from NA64mu design (We should disciss that value)
   double TempThetaMax2=TempThetaMax*TempThetaMax;
@@ -409,7 +409,7 @@ double DarkLLPhi::CrossSectionDSDX_WW(double XEv, double E0)
 
 // Below is cross section obtained by integration of ds/dxdTheta
 //
-double DarkLLPhi::CrossSectionDSDX_WW(double XEv, double E0)
+double DarkLFCScalars::CrossSectionDSDX_WW(double XEv, double E0)
 {
   // return ds/sx = 0 if energy Z' less mass rest
   if( XEv*E0 <= MA ){ return 0.0; }
@@ -544,7 +544,7 @@ double DarkLLPhi::CrossSectionDSDX_WW(double XEv, double E0)
 // Below is the IWW formula for the double differential cross-section
 // from 1705.01633, see e.g. corresponding second line of Eq.(25)
 //
-double DarkLLPhi::CrossSectionDSDXDU(double XEv, double UThetaEv, double E0)
+double DarkLFCScalars::CrossSectionDSDXDU(double XEv, double UThetaEv, double E0)
 {
   if(XEv*E0 <= MA) return 0.;
   double Uxtheta = E0*E0*2.*UThetaEv*XEv + MA*MA*(1.0-XEv)/XEv + Mmu*Mmu*XEv;
@@ -556,16 +556,16 @@ double DarkLLPhi::CrossSectionDSDXDU(double XEv, double UThetaEv, double E0)
 }
 
 
-double DarkLLPhi::CrossSectionDSDXDPSI(double XEv, double auxpsi, double E0)
+double DarkLFCScalars::CrossSectionDSDXDPSI(double XEv, double auxpsi, double E0)
 {
   if(IApprox == 1) return CrossSectionDSDXDPSI_IWW(XEv, auxpsi, E0);
   if(IApprox == 2) return CrossSectionDSDXDPSI_WW(XEv, auxpsi, E0);
-  std::cout << "DarkLLPhi: wrong value of IApprox, exiting" << std::endl;
+  std::cout << "DarkLFCScalars: wrong value of IApprox, exiting" << std::endl;
   exit(1);
 }
 
 
-double DarkLLPhi::CrossSectionDSDXDPSI_IWW(double XEv, double auxpsi, double E0)
+double DarkLFCScalars::CrossSectionDSDXDPSI_IWW(double XEv, double auxpsi, double E0)
 {
   // In IWW approach we suppose that flux factor \chi doesn't depend on y and psi
   // in that method y=Emu'/Emu is muon energy fraction and auxpsi=psi^2/2 is an auxiliar variable
@@ -586,7 +586,7 @@ double DarkLLPhi::CrossSectionDSDXDPSI_IWW(double XEv, double auxpsi, double E0)
 }
 
 
-double DarkLLPhi::CrossSectionDSDXDPSI_WW(double XEv, double auxpsi, double E0)
+double DarkLFCScalars::CrossSectionDSDXDPSI_WW(double XEv, double auxpsi, double E0)
 {
   if(E0*XEv < EThresh) return 0.;
   double Xmin = MA/E0;
@@ -634,7 +634,7 @@ double DarkLLPhi::CrossSectionDSDXDPSI_WW(double XEv, double auxpsi, double E0)
 
 // WW cross section for the total cross section
 //
-double DarkLLPhi::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double E0)
+double DarkLFCScalars::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double E0)
 {
 
   if(E0*XEv < EThresh) return 0.;
@@ -692,7 +692,7 @@ double DarkLLPhi::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double E0)
 }
 
 
-double DarkLLPhi::Width()
+double DarkLFCScalars::Width()
 {
   const double muMass = Mmu;
   const double tauMass = Mtau;
@@ -708,7 +708,7 @@ double DarkLLPhi::Width()
     }
     width = nuWidth+muWidth; // in GeV
   } else {
-    std::cout << "DarkLLPhi: width for the mass above 2 Mtau is not implemented, exiting" << std::endl;
+    std::cout << "DarkLFCScalars: width for the mass above 2 Mtau is not implemented, exiting" << std::endl;
     exit(1);
   }
   return width;

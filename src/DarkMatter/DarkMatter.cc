@@ -766,8 +766,11 @@ double DarkMatter::SimulateEmissionVector(double E0, double* angles)
 {
   double Xmin = MA/E0;
   double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MParent/E0;
+  //double Xmax = 1. - Mtau/E0;
   double ThetaMax = 0.1;
 
+  //TLorentzVector pMu(E0, 0, 0, E0); // incoming muon 4-mom
+  
   double sigmaMax = GetSigmaThetaMax(E0);
 
   int maxiter = 20000000;
@@ -795,8 +798,18 @@ double DarkMatter::SimulateEmissionVector(double E0, double* angles)
       std::cout << "Accepted after " << iii << " iterations" << std::endl;
       printf( "EParent = %e XAcc = %e ThetaAcc = %e\n ", E0, XAcc, ThetaAcc);
 
+      //// Calculate Tau 4-mom from p_tau = p_mu - p_phi (approximation)
+      //double pPhiMom = TMath::Sqrt(XEv*E0*XEv*E0 - MA*MA);
+      //TLorentzVector pPhi(XEv*E0, pPhiMom*TMath::Sin(ThetaAcc)*TMath::Cos(PhiAcc), pPhiMom*TMath::Sin(ThetaAcc)*TMath::Sin(PhiAcc), pPhiMom*TMath::Cos(ThetaAcc) );
+      //TLorentzVector pTau = pMu - pPhi;
+
+      //pMu.Print();
+      //pPhi.Print();
+      //pTau.Print();
+      //
       angles[0] = ThetaAcc;
       angles[1] = PhiAcc;
+      //angles[2] = pTau.E();
       return XAcc;
     }
   }

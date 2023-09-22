@@ -16,7 +16,7 @@
 #include "DarkMassSpin2.hh"
 #include "DarkMassSpin2Annihilation.hh"
 #include "DarkAxials.hh"
-#include "DarkLLPhi.hh"
+#include "DarkLFCScalars.hh"
 
 #include "DMProcessDMBrem.hh"
 #include "DMProcessPrimakoffALP.hh"
@@ -162,12 +162,12 @@ void DarkMatterPhysics::Init(){
       }
       myDarkMatter = new DarkMuPhilicPseudoScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
     case 35:
-      G4cout << "Initialize DarkLLPhi\n";
+      G4cout << "Initialize DarkLFCScalars\n";
       if(DecayType) { // Temporary plug
-        G4cout << G4endl << "DarkLLPhi with decays is not yet implemented, exiting" << G4endl << G4endl;
+        G4cout << G4endl << "DarkLFCScalars with decays is not yet implemented, exiting" << G4endl << G4endl;
         exit(1);
       }
-      myDarkMatter = new DarkLLPhi(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+      myDarkMatter = new DarkLFCScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
       break;
     case 11:
       G4cout << "Initialize DarkPhotonsAnnihilation\n";
