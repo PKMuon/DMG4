@@ -117,8 +117,12 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
   const G4double incidentE = aTrack.GetKineticEnergy(); //this is the energy at the end of the step
   const G4double initialE =  aStep.GetPreStepPoint()->GetKineticEnergy(); //this is the energy at the beginning of the step
 
-  const G4double finalCrossSection=myDarkMatter->GetSigmaTot(incidentE/GeV); //this is the cross section at the end of the step
+  G4double DMMass = myDarkMatter->GetMA()*GeV; // in MeV
   const G4double initialCrossSection=myDarkMatter->GetSigmaTot(initialE/GeV); //this is the cross section at the beginning of the step
+  // Take either the cross section at the end of the step or the maximum if this was crossed
+  const G4double finalCrossSection= (incidentE < DMMass*DMMass/2./CLHEP::electron_mass_c2)?
+    this->CrossSectionStepVal
+    : myDarkMatter->GetSigmaTot(incidentE/GeV);
   const G4double prob=finalCrossSection/this->CrossSectionStepVal;
 
 #ifdef EDEP_ALONG_STEP
