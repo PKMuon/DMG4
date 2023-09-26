@@ -122,7 +122,30 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
   // Take either the cross section at the end of the step or the maximum if this was crossed
   const G4double finalCrossSection= (incidentE < DMMass*DMMass/2./CLHEP::electron_mass_c2)?
     this->CrossSectionStepVal
-    : myDarkMatter->GetSigmaTot(incidentE/GeV);
+    : myDarkMatter->GetSigmaTot(incidentE/GeV); //this is the cross section at the end of the step
+  G4double diffE = (initialE - incidentE)/GeV; // in GeV
+  /*
+   * Here are the calculations needed for the average cross-section
+   *
+  G4double ssin = 2 * initialE * CLHEP::electron_mass_c2; // in MeV^2
+  G4double ssout = 2 * incidentE * CLHEP::electron_mass_c2; // in MeV^2
+  G4double avgE = (incidentE + initialE)/2.; // in MeV
+  G4double ssavg = 2 * (avgE) * CLHEP::electron_mass_c2; // in MeV^2
+  G4double width = myDarkMatter->Width()*GeV; // in GeV
+  G4double sigma = myDarkMatter->GetSigmaTot(avgE/GeV);
+  G4double prefactor = sigma*((ssavg - DMMass * DMMass) * (ssavg - DMMass * DMMass) + DMMass * DMMass * width * width)/GeV/GeV/GeV/GeV;
+  //G4cout << "PostStepDoIt: diffE = " << diffE << std::endl;
+  //G4cout << "PostStepDoIt: finalE = " << incidentE/GeV << std::endl;
+  //if (incidentE < 250.*250./2./CLHEP::electron_mass_c2) G4cout << "PASSED sigma_max! "  << std::endl;
+  G4double arctanin = atan((ssin-DMMass*DMMass)/(DMMass*width));
+  G4double arctanout = atan((ssout-DMMass*DMMass)/(DMMass*width));
+  G4double avgCrossSection = prefactor/(diffE)/(2*CLHEP::electron_mass_c2*width*DMMass/GeV/GeV/GeV)*(arctanin-arctanout);
+  if (incidentE < 250.*250./2./CLHEP::electron_mass_c2) G4cout << "PASSED sigma_max without doing shit! "  << std::endl;
+  const G4double prob=avgCrossSection/this->CrossSectionStepVal;
+  G4cout << "PostStepDoIt: AvgCS = " << avgCrossSection << std::endl;
+  G4cout << "PostStepDoIt: CS = " << this->CrossSectionStepVal << std::endl;
+  G4cout << "PostStepDoIt: Final CS = " << finalCrossSection << std::endl;
+  */
   const G4double prob=finalCrossSection/this->CrossSectionStepVal;
 
 #ifdef EDEP_ALONG_STEP
@@ -133,7 +156,7 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
 
   G4double p=G4UniformRand();
   //Do nothing if p>prob
-  if (p>prob){
+  if (p>prob || diffE == 0){
     aStep.GetPostStepPoint()->SetProcessDefinedStep(0); //important for the G4SteppingAction
     aParticleChange.Initialize(aTrack);
     return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
