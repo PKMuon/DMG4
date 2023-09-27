@@ -6,6 +6,7 @@
  */
 
 #include "DarkMatter.hh"
+#include "DarkMatterAnnihilation.hh"
 #include "DarkScalarsAnnihilation.hh"
 #include "Utils.hh"
 
@@ -16,37 +17,10 @@
 
 DarkScalarsAnnihilation::DarkScalarsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
                                                  double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
-DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn),
-iBranchingType(IBranchingIn), r(rIn), f(fIn), alphaD(alphaDIn)
+DarkMatterAnnihilation(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn,IBranchingIn, rIn, fIn, alphaDIn)
 {
     DMType = 2; //A.C.
-    ParentPDGID = -11;
-    DaughterPDGID = 11;
 
-    //default values
-    mChi = MA / 3;
-    mChi1 = mChi;
-    mChi2 = mChi;
-
-
-
-    if (iBranchingType == 2) {
-        std::cerr
-                << " DarkScalarAnnihilation iBranchingType==2 not yet supported"
-                << std::endl;
-        exit(1);
-    }
-
-    if (iBranchingType == 2) {
-        mChi1 = MA * r;
-        mChi2 = (1. + f) * mChi1;
-    } else {
-        mChi = MA * r;
-        mChi2 = mChi;
-        mChi1 = mChi;
-    }
-
-    deltaMchi = mChi2 - mChi1;
     std::cout
             << "Initialized DarkScalarsAnnihilation (e+ e- -> A' -> DM DM) for material density = "
             << DensityIn << std::endl;
@@ -58,24 +32,19 @@ DarkScalarsAnnihilation::~DarkScalarsAnnihilation() {
     ;
 }
 
-//Input: E0, positron energy in GeV
-//output: total annihilation cross-section in pbarn.
-//Since the framework assumes this method is returning the total cross section per nucleous, for the moment I scale this by Z.
-double DarkScalarsAnnihilation::TotalCrossSectionCalc(double E0) {
 
-
+//Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
+//This is the total cross section without the BW denominator
+double DarkScalarsAnnihilation::PreFactor(double E0){
 
     double ss = 2. * Mel * E0;
     if (sqrt(ss) < 2. * mChi)
         return 0.; // A.C. e+e- -> S -> chi chi can happen also for an S and chi with large mass,
                    // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
     double qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
-    double gg = this->Width();
 
     double sigma = 4 * M_PI * alphaEW * epsilBench * epsilBench * alphaD;
     sigma = sigma * qq / sqrt(ss);
-
-    sigma = sigma / ((ss - MA * MA) * (ss - MA * MA) + MA * MA * gg * gg);
 
     switch (iBranchingType) {
     case 0:

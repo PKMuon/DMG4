@@ -7,6 +7,7 @@
  */
 
 #include "DarkMatter.hh"
+#include "DarkMatterAnnihilation.hh"
 #include "DarkPhotonsAnnihilation.hh"
 #include "Utils.hh"
 
@@ -17,44 +18,20 @@
 
 DarkPhotonsAnnihilation::DarkPhotonsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
                                                  double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
-DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn),
-iBranchingType(IBranchingIn), r(rIn), f(fIn), alphaD(alphaDIn)
+DarkMatterAnnihilation(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn,IBranchingIn, rIn, fIn, alphaDIn)
 {
   DMType = 1; //A.C.
-  ParentPDGID = -11;
-  DaughterPDGID = 11;
-
-  //default values
-  mChi = MAIn/3;
-  mChi1=mChi;
-  mChi2=mChi;
-
-
-  if (iBranchingType==2){
-      mChi1 = MA * r;
-      mChi2 = (1. + f) * mChi1;
-  }else{
-      mChi = MA * r;
-      mChi1=mChi;
-      mChi2=mChi;
-
-  }
-
-
-  deltaMchi=mChi2-mChi1;
-
-
 
   std::cout << "Initialized DarkPhotonsAnnihilation (e+ e- -> A' -> DM DM) for material density = " << DensityIn << std::endl;
-  std::cout << "mA: "<<MA<<std::endl;
+  std::cout << "mA: "<<MA*1000<<" MeV "<<std::endl;
   std::cout << "IbranchingType: "<<iBranchingType<<std::endl;
   if (iBranchingType==2){
-    std::cout<<"mChi1: "<<mChi1<<std::endl;
-    std::cout<<"mChi2: "<<mChi2<<std::endl;
+    std::cout<<"mChi1: "<<mChi1*1000<<" MeV "<<std::endl;
+    std::cout<<"mChi2: "<<mChi2*1000<<" MeV "<<std::endl;
   }else{
-    std::cout<<"mChi: "<<mChi<<std::endl;
+    std::cout<<"mChi: "<<mChi*1000<<" MeV "<<std::endl;
   }
-  std::cout<<"Width: "<<this->Width()<<std::endl;
+  std::cout<<"Width: "<<this->Width()*1E3<<" MeV "<<std::endl;
 
 
   std::cout << std::endl;
@@ -65,11 +42,10 @@ DarkPhotonsAnnihilation::~DarkPhotonsAnnihilation()
 {;}
 
 
-//Input: E0, positron energy in GeV
-//output: total annihilation cross-section in pbarn.
-//Since the framework assumes this method is returning the total cross section per nucleous, for the moment I scale this by Z.
-double DarkPhotonsAnnihilation::TotalCrossSectionCalc(double E0)
-{
+//Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
+//This is the total cross section without the BW denominator
+double DarkPhotonsAnnihilation::PreFactor(double E0){
+
   double ss = 2. * Mel * E0;
   double qq=0.,E1=0.,E2=0.;
   switch (iBranchingType) {
@@ -88,11 +64,9 @@ double DarkPhotonsAnnihilation::TotalCrossSectionCalc(double E0)
       break;
   }
 
-  double gg = this->Width();
 
   double sigma = 4 * M_PI * alphaEW * epsilBench * epsilBench * alphaD;
   sigma = sigma * qq / sqrt(ss);
-  sigma = sigma / ((ss - MA * MA) * (ss - MA * MA) + MA * MA * gg * gg);
 
 
 
@@ -118,7 +92,6 @@ double DarkPhotonsAnnihilation::TotalCrossSectionCalc(double E0)
   sigma = sigma * ZNucl;
   return sigma;
 }
-
 
 double DarkPhotonsAnnihilation::GetSigmaTot(double E0) {
   return TotalCrossSectionCalc(E0);
@@ -238,7 +211,5 @@ double DarkPhotonsAnnihilation::AngularDistributionResonant(double eta,double E0
     }
 
     return val;
-
-
 }
 

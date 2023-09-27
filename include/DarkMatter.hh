@@ -24,6 +24,7 @@ class DarkMatter
   friend class DarkZ;
   friend class DarkMuPhilicScalars;
   friend class DarkMuPhilicPseudoScalars;
+  friend class DarkMatterAnnihilation;
   friend class DarkMassSpin2;
   friend class DarkMassSpin2Annihilation;
   friend class DarkVector;
@@ -88,11 +89,6 @@ class DarkMatter
     double SimulateEmissionByMuon2(double E0, double* angles);
     double SimulateEmissionByMuon(double E0, double* angles);
     double SimulateEmissionVector(double E0, double* angles);
-
-    //for resonant production e+ e- --> R --> f f, this function returns the cosine of the angle of the f in the CM frame.
-    double SimulateEmissionResonant(double E0); //E0 in GeV
-    virtual double AngularDistributionResonant(double eta,double E0); //E0 in GeV
-
 
     double GetAccumulatedProbability() {return AccumulatedProbability;}
 
