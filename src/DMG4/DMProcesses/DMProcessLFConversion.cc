@@ -20,7 +20,7 @@ DMProcessLFConversion::DMProcessLFConversion(DarkMatter* DarkMatterPointerIn, G4
   theDMParticlePtr(theDMParticlePtrIn),
   BiasSigmaFactor(BiasSigmaFactorIn)
 {
-  SetProcessSubType(2);
+  SetProcessSubType(1);
 }
 
 G4bool DMProcessLFConversion::IsApplicable(const G4ParticleDefinition& pDef)
