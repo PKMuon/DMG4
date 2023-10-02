@@ -803,34 +803,3 @@ double DarkMatter::SimulateEmissionVector(double E0, double* angles)
   printf ("Simulation of emission failed after N iterations = %d\n", maxiter);
   return 0.;
 }
-
-
-/*This method returns a random cosine for e+e- --> A' --> ff in the CM frame
- * E0: positron energy in LAB frame (GeV units)
- */
-double DarkMatter::SimulateEmissionResonant(double E0){
-
-    int maxiter = 25000000;
-    double eta;
-    double fcomp,frand;
-    for( int iii = 1; iii < maxiter; iii++) {
-        eta = G4UniformRand()*2 -1; //between -1 and 1;
-        fcomp=this->AngularDistributionResonant(eta,E0);
-        frand=G4UniformRand();
-        if (frand<fcomp) return eta;
-     }
-    return 1;
-}
-
-/*This method returns the angular distribution for e+e- --> A' --> ff in the CM frame
- * It has to be implemented in the derived classes (the default method is a dummy implementation)
- * eta: cosine of the f in the CM frame
- * E0: positron beam energy in LAB frame (GeV units)
- * IMPORTANT: it has to be normalized so that the maximum is one.
- */
-double DarkMatter::AngularDistributionResonant(double eta,double E0){
-    return (1+eta*eta)/2.;
-}
-
-
-

@@ -1,4 +1,5 @@
 #include "DarkMatter.hh"
+#include "DarkMatterAnnihilation.hh"
 #include "DarkMassSpin2Annihilation.hh"
 #include "Utils.hh"
 
@@ -18,19 +19,9 @@ DarkMassSpin2Annihilation::DarkMassSpin2Annihilation( double MAIn
                                                     , double alphaDIn
                                                     , int IBranchingIn
                                                     , double fIn ) 
-                                                    : DarkMatter( MAIn, EThreshIn
-                                                                , SigmaNormIn
-                                                                , ANuclIn
-                                                                , ZNuclIn
-                                                                , DensityIn
-                                                                , epsilIn
-                                                                , IDecayIn ),
-                                                      iBranchingType(IBranchingIn)
-                                                      , r( rIn ), f( fIn )
-                                                      , alphaD( alphaDIn ){
+                                                    :DarkMatterAnnihilation(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn, rIn,alphaDIn, IBranchingIn,fIn)
+{
   DMType = 5;
-  ParentPDGID = -11;
-  DaughterPDGID = 11;
 
   mChi = MA * r;
   mChi2 = mChi;
@@ -46,7 +37,7 @@ DarkMassSpin2Annihilation::~DarkMassSpin2Annihilation(  ){ ; }
 
 
 // Total cross-section in pBarn
-double DarkMassSpin2Annihilation::TotalCrossSectionCalc( double E0 )
+double DarkMassSpin2Annihilation::PreFactor( double E0 )
 {
   // Invariant mass 
   double ss = 2.0 * Mel * E0, rsChi = mChi*mChi / ss, rsEl = Mel*Mel / ss;
@@ -57,8 +48,6 @@ double DarkMassSpin2Annihilation::TotalCrossSectionCalc( double E0 )
   double sigma =   ( 1.0/(256.0*M_PI) ) * ss*ss*ss 
   //               * sqrt( 1.0 - 4.0 * rsEl ) * (1.0 + (8.0/3.0) * rsEl )
                  * pow( 1.0 - 4.0*rsChi, 3.0/2.0 ) * (1.0 + (8.0/3.0) * rsChi);
-  double gg = this->Width();
-  sigma = sigma / ( (ss - MA*MA)*(ss - MA*MA) + MA*MA * gg*gg );
   
   // here sigma is in  1 /Energy^2. Move to pBarn
   sigma = sigma * GeVtoPb * 4*M_PI * alphaD * epsilBench*epsilBench;
@@ -110,4 +99,11 @@ double DarkMassSpin2Annihilation::Width()
   double rMAChi = mChi*mChi / (MA*MA);
   return  ( 1.0/(160.0*M_PI) ) * MA*MA*MA * 4.0*M_PI * alphaD 
         * pow( 1.0 - 4.0 * rMAChi, 3.0/2.0 ) * ( 1.0 + ( 8.0 / 3.0 ) * rMAChi );
+}
+
+void DarkMassSpin2Annihilation::SetMA(double MAIn) {
+    std::cout << "DarkMassSpin2Annihilation::SetMA was called with MAIn = " << MAIn << std::endl;
+    mChi = MA * r;
+    mChi1 = mChi;
+    mChi2 = mChi;
 }

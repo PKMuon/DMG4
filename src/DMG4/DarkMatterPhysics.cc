@@ -2,6 +2,7 @@
 #include "DarkMatterParametersFactory.hh"
 
 #include "DarkMatter.hh"
+#include "DarkMatterAnnihilation.hh"
 #include "DarkPhotons.hh"
 #include "DarkZ.hh"
 #include "DarkMuPhilicScalars.hh"
@@ -326,7 +327,7 @@ void DarkMatterPhysics::ConstructProcess()
                                 G4Positron::PositronDefinition() );
   }
   if(myDarkMatter->GetParentPDGID() == -11) {
-    phLHelper->RegisterProcess( new DMProcessAnnihilation(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
+    phLHelper->RegisterProcess( new DMProcessAnnihilation(dynamic_cast<DarkMatterAnnihilation*>(myDarkMatter), theDMParticlePtr, BiasSigmaFactor),
                                 G4Positron::PositronDefinition() );
   }
   if(myDarkMatter->GetParentPDGID() == 13) {

@@ -1,6 +1,7 @@
 #include "DMProcessAnnihilation.hh"
 
 #include "DarkMatter.hh"
+#include "DarkMatterAnnihilation.hh"
 #include "DarkPhotons.hh"
 
 #include "DMParticleAPrime.hh"
@@ -15,7 +16,7 @@
 
 #include "DarkMatterParametersFactory.hh"
 
-DMProcessAnnihilation::DMProcessAnnihilation(DarkMatter *DarkMatterPointerIn, G4ParticleDefinition *theDMParticlePtrIn, G4double BiasSigmaFactorIn) :
+DMProcessAnnihilation::DMProcessAnnihilation(DarkMatterAnnihilation *DarkMatterPointerIn, G4ParticleDefinition *theDMParticlePtrIn, G4double BiasSigmaFactorIn) :
     G4VDiscreteProcess("DMProcessAnnihilation", fUserDefined),  // fElectromagnetic
     myDarkMatter(DarkMatterPointerIn), theDMParticlePtr(theDMParticlePtrIn), BiasSigmaFactor(BiasSigmaFactorIn), DMpar(0), iBranchingType(0), mChi(0), mChi1(0), mChi2(
         0) {
@@ -54,7 +55,7 @@ G4ForceCondition* /*condition*/) {
 
 
 
-    //The DarkMatter classes compute the cross section for eps = epsilBench. Here, we revert back to epsilon
+    //The DarkMatterAnnihilation classes compute the cross section for eps = epsilBench. Here, we revert back to epsilon
     CrossSection *= (myDarkMatter->Getepsil() * myDarkMatter->Getepsil()) / (myDarkMatter->GetepsilBench() * myDarkMatter->GetepsilBench());
     CrossSection /= myDarkMatter->GetSigmaNorm();
 

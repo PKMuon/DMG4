@@ -3,6 +3,7 @@
 #include <G4VDiscreteProcess.hh>
 
 class DarkMatter;
+class DarkMatterAnnihilation;
 class G4ParticleDefinition;
 class DarkMatterParametersFactory;
 
@@ -11,7 +12,7 @@ class DMProcessAnnihilation : public G4VDiscreteProcess
 {
   public:
 
-    DMProcessAnnihilation(DarkMatter* DarkMatterPointer, G4ParticleDefinition* theDMParticlePtrIn, G4double BiasSigmaFactor);
+    DMProcessAnnihilation(DarkMatterAnnihilation* DarkMatterPointer, G4ParticleDefinition* theDMParticlePtrIn, G4double BiasSigmaFactor);
 
     // Implements final state parameters when the process won.
     virtual G4VParticleChange* PostStepDoIt( const G4Track &, const G4Step & ) override;
@@ -24,7 +25,7 @@ class DMProcessAnnihilation : public G4VDiscreteProcess
 
   private:
 
-    DarkMatter* myDarkMatter;
+    DarkMatterAnnihilation* myDarkMatter;
     G4ParticleDefinition* theDMParticlePtr;
     G4double BiasSigmaFactor;
 
