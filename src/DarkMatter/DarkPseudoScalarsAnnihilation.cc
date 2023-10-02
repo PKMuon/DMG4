@@ -15,7 +15,7 @@
 
 DarkPseudoScalarsAnnihilation::DarkPseudoScalarsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
                                                              double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
-DarkMatterAnnihilation(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn,IBranchingIn, rIn, fIn, alphaDIn)
+                                                             DarkMatterAnnihilation(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn, rIn,alphaDIn, IBranchingIn,fIn)
 {
     DMType = 4; //A.C.
 

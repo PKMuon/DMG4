@@ -19,11 +19,7 @@ DarkMassSpin2Annihilation::DarkMassSpin2Annihilation( double MAIn
                                                     , double alphaDIn
                                                     , int IBranchingIn
                                                     , double fIn ) 
-                                                    : DarkMatterAnnihilation(
-                                                    MAIn, EThreshIn, SigmaNormIn, 
-                                                    ANuclIn, ZNuclIn, DensityIn, 
-                                                    epsilIn, IDecayIn,IBranchingIn, 
-                                                    rIn, fIn, alphaDIn)
+                                                    :DarkMatterAnnihilation(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn, rIn,alphaDIn, IBranchingIn,fIn)
 {
   DMType = 5;
 
