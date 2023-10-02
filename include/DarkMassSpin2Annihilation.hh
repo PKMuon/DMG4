@@ -1,4 +1,9 @@
-class DarkMatterAnnihilation;
+
+
+#ifndef INCLUDE_DarkMassSpin2ANNIHILATION_HH_
+#define INCLUDE_DarkMassSpin2ANNIHILATION_HH_
+
+#include "DarkMatterAnnihilation.hh"
 
 class DarkMassSpin2Annihilation : public DarkMatterAnnihilation
 {
@@ -21,3 +26,5 @@ class DarkMassSpin2Annihilation : public DarkMatterAnnihilation
     virtual double Width();
     virtual void SetMA(double MAIn);
 };
+
+#endif

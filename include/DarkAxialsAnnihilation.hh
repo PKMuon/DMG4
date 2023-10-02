@@ -14,7 +14,7 @@
 #ifndef INCLUDE_DARKAXIALSANNIHILATION_HH_
 #define INCLUDE_DARKAXIALSANNIHILATION_HH_
 
-class DarkMatterAnnihilation;
+#include "DarkMatterAnnihilation.hh"
 
 
 class DarkAxialsAnnihilation : public DarkMatterAnnihilation
