@@ -61,7 +61,14 @@ G4VParticleChange* DMProcessPrimakoffALP::PostStepDoIt( const G4Track& aTrack,
   G4ThreeVector incidentDir = aTrack.GetMomentumDirection();
 
   G4double XAcc, angles[2];
-  XAcc = myDarkMatter->SimulateEmission(incidentE/GeV, angles);
+
+  if(myDarkMatter->GetParentPDGID() == 22) {
+    if(myDarkMatter->Decay()) {
+      XAcc = myDarkMatter->SimulateEmissionWithAngle3(incidentE/GeV, angles);
+    } else {
+      XAcc = myDarkMatter->SimulateEmission(incidentE/GeV, angles);
+    }
+  }
 
   // Check if it failed? In this case XAcc = 0
 

@@ -518,6 +518,73 @@ double DarkMatter::SimulateEmissionWithAngle2(double E0, double* angles)
 }
 
 
+double DarkMatter::SimulateEmissionWithAngle3(double E0, double* angles) // For ALP simulation (Primakoff process)
+{
+  double Xmin = MA/E0;
+
+  if(ParentPDGID == 11) {
+    std::cout << "DarkPhoton: Error: differential cross section DSDTheta is not implemented, exiting" << std::endl;
+    exit(1);
+  }
+  if(ParentPDGID == 13) {
+    std::cout << "DarkZ: Error: procedure of simulation Z with angle not implemented, exiting" << std::endl;
+    exit(1);
+  }
+  if(ParentPDGID == -11) {
+    std::cout << "DarkPhotonsAnnihilation: Error: annihilation simulation with angle not implemented, exiting" << std::endl;
+    exit(1);
+  }
+
+  angles[0] = 0.;
+  angles[1] = 0.;
+
+  double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl); // we assume here that Mnucleus = ANucl
+  if(Xmin > Xmax) return 0.;
+
+  // Maximum value of diff CS
+  double sigmaMax = CrossSectionDSDThetaMAX(E0);
+
+  double XAcc, ThetaAcc, PhiAcc, sigma, ThetaEv, Log10ThetaEv;
+  XAcc = ThetaAcc = PhiAcc = sigma = ThetaEv = Log10ThetaEv = 0.;
+
+  // Set range of uniform sampling between 0 and 1
+  double ThetaMaxA = 0.3;
+
+  int maxiterA = 2000000;
+  for(int iii = 1; iii < maxiterA; iii++) { // Angle simulation loop
+
+    // uniform sampling
+    ThetaEv = G4UniformRand() * ThetaMaxA;
+    sigma = CrossSectionDSDTheta(ThetaEv, E0);
+
+    if(sigma > sigmaMax) {
+      printf ("Maximum violated: ratio = % .18f\n", sigma/sigmaMax);
+      sigmaMax = 1.05*sigma;
+    }
+
+    double UU = G4UniformRand() * sigmaMax;
+
+    if(sigma >= UU) {
+      ThetaAcc = ThetaEv; // this is the accepted theta
+      PhiAcc = G4UniformRand() * 2. * 3.1415926;
+
+      // Fractional energy directly calculated from theta 
+      XAcc = 1. - E0*ThetaAcc*ThetaAcc/(2.*ANucl) - MA*MA*MA*MA/(8.*ANucl*E0*E0*E0);
+
+      std::cout << "Accepted after " << iii << " iterations for Angle" << std::endl;
+      printf( "EParent = %e XAcc = %e ThetaAcc = %e\n ", E0, XAcc, ThetaAcc);
+
+      angles[0] = ThetaAcc;
+      angles[1] = PhiAcc;
+      return XAcc;
+    }
+  }
+
+  std::cout << "Simulation of Angle failed after N iterations = " << maxiterA << " ,X = " << XAcc << std::endl;
+  return 0.;
+
+}
+
 // Z' sampling in 2 steps using DSDX and DSDXDPSI
 double DarkMatter::SimulateEmissionByMuon2(double E0, double* angles)
 {
@@ -736,42 +803,3 @@ double DarkMatter::SimulateEmissionVector(double E0, double* angles)
   printf ("Simulation of emission failed after N iterations = %d\n", maxiter);
   return 0.;
 }
-
-
-/*This method returns a random cosine for e+e- --> A' --> ff in the CM frame
- * E0: positron energy in LAB frame (GeV units)
- */
-double DarkMatter::SimulateEmissionResonant(double E0){
-
-    int maxiter = 25000000;
-    double eta;
-    double fcomp,frand;
-    for( int iii = 1; iii < maxiter; iii++) {
-        eta = G4UniformRand()*2 -1; //between -1 and 1;
-        fcomp=this->AngularDistributionResonant(eta,E0);
-        frand=G4UniformRand();
-        if (frand<fcomp) return eta;
-     }
-    return 1;
-}
-
-/*This method returns the angular distribution for e+e- --> A' --> ff in the CM frame
- * It has to be implemented in the derived classes (the default method is a dummy implementation)
- * eta: cosine of the f in the CM frame
- * E0: positron beam energy in LAB frame (GeV units)
- * IMPORTANT: it has to be normalized so that the maximum is one.
- */
-double DarkMatter::AngularDistributionResonant(double eta,double E0){
-    return (1+eta*eta)/2.;
-}
-
-
-/*
- * GetMaxCrossSection() returns the maximum value of the total cross section
- */
-
-double DarkMatter::GetTotalCrossSectionMax(){
-  printf("DarkMatter::GetTotalCrossSectionMax()() default method is called. This is meaningless.\n");
-  return 0.;
-}
-
