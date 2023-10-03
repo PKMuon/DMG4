@@ -34,7 +34,6 @@ public:
     virtual void SetMA(double MAIn);
 
     virtual double AngularDistributionResonant(double eta,double E0);
-    virtual double GetTotalCrossSectionMax();
 
 private:
     double widthEnhancementFactor;

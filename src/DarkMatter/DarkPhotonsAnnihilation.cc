@@ -179,15 +179,6 @@ void DarkPhotonsAnnihilation::SetMA(double MAIn) {
 
 
 }
-//A.C. useful function to directly return the maximum cross section value (for numerical precision)
-double DarkPhotonsAnnihilation::GetTotalCrossSectionMax(){
-
-  double Eres = (MA*MA/(2.*Mel));
-  double sigma=this->PreFactor(Eres);
-  double gg = this->Width();
-  sigma=sigma/(MA * MA * gg * gg);
-  return sigma;
-}
 
 
 double DarkPhotonsAnnihilation::AngularDistributionResonant(double eta,double E0){

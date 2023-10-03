@@ -25,7 +25,7 @@ class DMProcessAnnihilation : public G4VDiscreteProcess
 
   private:
 
-    DarkMatterAnnihilation* myDarkMatter;
+    DarkMatterAnnihilation* myDarkMatterAnnihilation;
     G4ParticleDefinition* theDMParticlePtr;
     G4double BiasSigmaFactor;
 
