@@ -652,10 +652,8 @@ double DarkLFCScalars::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double
   double td = d;
   double u = utilde + Mmu2;
   double s = Mmu2 - (u-Mtau*Mtau)/(1-XEv);
-  double gV_re = 3e-03;
-  double gV_im = 1e-03;
-  double gA_re = 3e-03;
-  double gA_im = 2e-03;
+  double gV = epsil;
+  double gA = 0.;
   double tmax = MA2;
   const double pi = 3.141592654;
   //  if(fabs(tMax - 10000.) < 0.001) tmax = E0*E0;
@@ -663,14 +661,10 @@ double DarkLFCScalars::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double
   // I've calculated ChiWWAnalytical by using mathematica's "Integrate[...]" function
   // and converted the resulted expression to C-like form
 
-
-
   double ChiWWAnalytical = ZNucl*ZNucl*( (d*tmin/tmax + d*(d+tmin)/(d+tmax) + (d+2*tmin)*log(tmax) - (d+2*tmin)*log(d+tmax)) - (d*tmin/tmin + d*(d+tmin)/(d+tmin) + (d+2*tmin)*log(tmin) - (d+2*tmin)*log(d+tmin)) )/d;
  
-  //double ChiWWAnalytical= ZZZ*ZZZ*(log((td+tmin)/(tmin+ta))-2.0); // <--- this approximate expression is valid for MA < 500 MeV and E0=150 GeV
-
   // Trace of the amplitude from Eq. A.36 in https://arxiv.org/abs/2211.00664
-  double Factor1= 4*Mmu*Mtau*(gA_re*gA_re + gA_im*gA_im - gV_re*gV_re - gV_im*gV_im)/(pow((Mmu2 - s),2.)*pow(Mtau2 - u,2));
+  double Factor1= 4*Mmu*Mtau*(gA*gA - gV*gV)/(pow((Mmu2 - s),2.)*pow(Mtau2 - u,2));
   double Factor2= Mmu2*Mmu2*(MA2 + u) + 2*Mmu2*Mmu*(Mtau2*Mtau - Mtau*u) + Mmu2*(Mtau2*Mtau2 - 2*MA2*s - 2*Mtau2*u + u*(u-2*s)) + 2*Mmu*Mtau*s*(u - Mtau2) + s*(MA2*s + Mtau2*Mtau2 - 2*Mtau2*u + u*(s+u));
   double AmplZpr2WWVEGAS = Factor1*Factor2/(8*pi*s*s);
   // one should multiply the prefactor written below by factor
