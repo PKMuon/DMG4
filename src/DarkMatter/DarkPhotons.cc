@@ -116,11 +116,7 @@ double DarkPhotons::TotalCrossSectionCalc(double E0)
 
 double DarkPhotons::GetSigmaTot(double E0)
 {
-  if(MA > 0.001) {
-    return GetSigmaTot0(E0);
-  } else {
-    return TotCSVectorParticle(MA);
-  }
+  return GetSigmaTot0(E0);
 }
 
 

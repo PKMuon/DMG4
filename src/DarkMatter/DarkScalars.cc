@@ -116,11 +116,7 @@ double DarkScalars::TotalCrossSectionCalc(double E0)
 
 double DarkScalars::GetSigmaTot(double E0)
 {
-  if(MA > 0.001) {
-    return GetSigmaTot0(E0);
-  } else {
-    return TotCSScalarParticle(MA);
-  }
+  return GetSigmaTot0(E0);
 }
 
 
