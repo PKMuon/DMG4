@@ -72,9 +72,10 @@ DarkLFCScalars::DarkLFCScalars(double MAIn, double EThreshIn, double SigmaNormIn
                          double epsilIn, int IDecayIn)
 : DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn)
 {
-  DMType = 2; // scalar
+  DMType = 32; // scalar
   ParentPDGID = 13;
   DaughterPDGID = 0;
+  epsilBench = 0.003; // From https://doi.org/10.1140/epjc/s10052-023-11891-3
 
   IApprox =        2;   // Approximation: 1 - IWW; 2 - WW (default is 2)
   IMethodTotalCS = 1;   // Method for total CS: 1 - ds/dxdTheta; 2 - ds/dxdPsi; 3 - ds/dx (default is 1)
@@ -210,7 +211,6 @@ double DarkLFCScalars::TotalCrossSectionCalc_WW2(double E0)
 
   double Xmin1 = MA/E0;
   if(EThresh/E0 > Xmin1) Xmin1 = EThresh/E0;
-  //  double Xmax1 = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MParent/E0;
   double Xmax1 = 1. - Mtau/E0;
   if(Xmax1 < Xmin1) return 0.;
 
@@ -647,21 +647,19 @@ double DarkLFCScalars::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double
   double Mtau2 = Mtau*Mtau;
   double E02= E0*E0;
   double utilde = -XEv*E02*theta2-MA2*(1.0-XEv)/XEv-Mmu2*XEv;
-  double utilde2=utilde*utilde;
-  double ta = 1.0/(aa*aa);
-  double td = d;
   double u = utilde + Mmu2;
   double s = Mmu2 - (u-Mtau*Mtau)/(1-XEv);
   double gV = epsil;
   double gA = 0.;
   double tmax = MA2;
   const double pi = 3.141592654;
-  //  if(fabs(tMax - 10000.) < 0.001) tmax = E0*E0;
   double tmin= pow((u*u-Mtau2), 2.0)/(4.0*E02*(1.0-XEv)*(1.0-XEv));
   // I've calculated ChiWWAnalytical by using mathematica's "Integrate[...]" function
   // and converted the resulted expression to C-like form
-
-  double ChiWWAnalytical = ZNucl*ZNucl*( (d*tmin/tmax + d*(d+tmin)/(d+tmax) + (d+2*tmin)*log(tmax) - (d+2*tmin)*log(d+tmax)) - (d*tmin/tmin + d*(d+tmin)/(d+tmin) + (d+2*tmin)*log(tmin) - (d+2*tmin)*log(d+tmin)) )/d;
+  //double ChiWWAnalytical = ZNucl*ZNucl*((d*tmin/tmax + d*(d+tmin)/(d+tmax) + (d+2*tmin)*log(tmax) - (d+2*tmin)*log(d+tmax))
+  //                                    - (d*tmin/tmin + d*(d+tmin)/(d+tmin) + (d+2*tmin)*log(tmin) - (d+2*tmin)*log(d+tmin)) )/d;
+  double ChiWWAnalytical = ZNucl*ZNucl*( (d*tmin/tmax + d*(d+tmin)/(d+tmax) + (d+2*tmin)*log(tmax) - (d+2*tmin)*log(d+tmax))
+                                       - (2*d + (d+2*tmin)*log(tmin) - (d+2*tmin)*log(d+tmin)) )/d;
  
   // Trace of the amplitude from Eq. A.36 in https://arxiv.org/abs/2211.00664
   double Factor1= 4*Mmu*Mtau*(gA*gA - gV*gV)/(pow((Mmu2 - s),2.)*pow(Mtau2 - u,2));
@@ -679,9 +677,6 @@ double DarkLFCScalars::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double
   } else {
     ResTemporary = DsDxDthetaWithoutE0EpsilonAlphaEW;
   }
-  // Return flat cross section for debugging
-  //  ResTemporary=0.1;
-
   return ResTemporary;
 }
 

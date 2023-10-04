@@ -4,7 +4,7 @@ class DarkLFCScalars : public DarkMatter
   public:
 
     DarkLFCScalars(double MAIn, double EThreshIn, double SigmaNormIn=1., double ANuclIn=207., double ZNuclIn=82., double DensityIn=11.35,
-                double epsilIn=0.0001, int IDecayIn=0);
+                double epsilIn=0.003, int IDecayIn=0);
 
     virtual ~DarkLFCScalars();
 

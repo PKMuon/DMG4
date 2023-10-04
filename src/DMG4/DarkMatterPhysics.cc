@@ -302,7 +302,7 @@ void DarkMatterPhysics::ConstructProcess()
     }
   }
   if(myDarkMatter->GetParentPDGID() == 13) {
-    if(myDarkMatter->GetDMType() == 2) { // scalar
+    if(myDarkMatter->GetDMType() == 32) { // LFC scalar
       theDMParticlePtr = DMParticleLFCScalar::Definition();
     }
     else
@@ -345,7 +345,7 @@ void DarkMatterPhysics::ConstructProcess()
                                 G4Positron::PositronDefinition() );
   }
   if(myDarkMatter->GetParentPDGID() == 13) {
-    if(myDarkMatter->GetDMType() == 2) { // scalar
+    if(myDarkMatter->GetDMType() == 32) { // LFC scalar
       phLHelper->RegisterProcess( new DMProcessLFConversion(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
                                   G4MuonMinus::MuonMinusDefinition() );
       phLHelper->RegisterProcess( new DMProcessLFConversion(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),

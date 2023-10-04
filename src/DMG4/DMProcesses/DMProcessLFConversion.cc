@@ -70,7 +70,7 @@ G4VParticleChange* DMProcessLFConversion::PostStepDoIt(const G4Track& aTrack,
 
   G4double recoilE;
   // correct for MinitialLepton != MfinalLepton in LFC
-  if(myDarkMatter->GetDMType() == 99) {
+  if(myDarkMatter->GetDMType() == 32) {
     G4double MRecoilLepton = 0.;
     // mass of recoil lepton
     if(myDarkMatter->GetParentPDGID() == 13) MRecoilLepton = Mtau; // muon mode
