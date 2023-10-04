@@ -214,7 +214,7 @@ double DarkLFCScalars::TotalCrossSectionCalc_WW2(double E0)
   double Xmax1 = 1. - Mtau/E0;
   if(Xmax1 < Xmin1) return 0.;
 
-  double PrefactorEpsilonAlphaEWE0 = 2.0*epsilBench*epsilBench*alphaEW*alphaEW*alphaEW*E0*E0;
+  double PrefactorEpsilonAlphaEWE0 = alphaEW*alphaEW*E0*E0;
 
   double xl[2] = { Xmin1, 0.};
   double xu[2] = { Xmax1, ThetaMax};
@@ -670,7 +670,7 @@ double DarkLFCScalars::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double
   // one should multiply the prefactor written below by factor
   // 2.0*epsilon^2*alphaEW^3*E0^2 to get diff_CS_WW_Z' in GeV^(-2)
   // (see e.g. calling VEGAS MC  function)
-  double PrefactorWithoutE0EpsilonAlphaEW=E0*XEv*sqrt(1-MA2/E02)/(1.0-XEv);
+  double PrefactorWithoutE0EpsilonAlphaEW=sqrt(x2-MA2/E02)/(1.0-XEv);
   double DsDxDthetaWithoutE0EpsilonAlphaEW=sin(ThetaEv)*PrefactorWithoutE0EpsilonAlphaEW*AmplZpr2WWVEGAS*ChiWWAnalytical;
 
   double ResTemporary;
