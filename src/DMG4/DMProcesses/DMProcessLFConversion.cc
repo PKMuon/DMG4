@@ -34,12 +34,20 @@ G4double DMProcessLFConversion::GetMeanFreePath( const G4Track& aTrack,
 {
   G4double DensityMat = aTrack.GetMaterial()->GetDensity()/(g/cm3);
   G4double ekin = aTrack.GetKineticEnergy()/GeV;
+
   if( myDarkMatter->EmissionAllowed(ekin, DensityMat) ) {
 
-    G4double XMeanFreePath = myDarkMatter->GetMeanFreePathFactor()/myDarkMatter->GetSigmaTot(ekin);
+    G4double CrossSection = myDarkMatter->GetSigmaTot(ekin); //A.C. by DarkMatter definition, this is in picobarn
+    CrossSection *= picobarn;
+
+    CrossSection /= myDarkMatter->GetSigmaNorm();
+
+
+    G4double n = aTrack.GetMaterial()->GetTotNbOfAtomsPerVolume();
+    G4double XMeanFreePath = 1./(n*CrossSection);
+
     XMeanFreePath /= BiasSigmaFactor;
 
-    //std::cout << "DMMeanFreePath = " << XMeanFreePath << std::endl;
 
     return XMeanFreePath;
 
