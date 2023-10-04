@@ -33,6 +33,7 @@ DarkPhotonsAnnihilation::DarkPhotonsAnnihilation(double MAIn, double EThreshIn, 
   }
   std::cout<<"Width: "<<this->Width()*1E3<<" MeV "<<std::endl;
 
+  widthEnhancementFactor = 1;
   if ((minWidth >0)&&(this->Width()<minWidth)){
     widthEnhancementFactor=minWidth/this->Width();
     std::cout<<"Width after artificial enhancement: "<<this->Width()<<std::endl;
