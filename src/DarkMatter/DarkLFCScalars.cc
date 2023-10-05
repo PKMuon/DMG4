@@ -645,9 +645,8 @@ double DarkLFCScalars::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double
   double Mmu2= Mmu*Mmu;
   double Mtau2 = Mtau*Mtau;
   double E02= E0*E0;
-  double utilde = -XEv*E02*theta2-MA2*(1.0-XEv)/XEv-Mmu2*XEv;
-  double u = utilde + Mmu2;
-  double s = Mmu2 - (u-Mtau*Mtau)/(1-XEv);
+  double u = -XEv*E02*theta2 - MA2*(1.0-XEv)/XEv + Mmu2*(1.0-XEv);
+  double s = Mmu2 - (u-Mtau2)/(1.0-XEv);
   double gV = epsil;
   double gA = 0.;
   double tmax = MA2;
