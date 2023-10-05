@@ -214,7 +214,7 @@ double DarkLFCScalars::TotalCrossSectionCalc_WW2(double E0)
   double Xmax1 = 1. - Mtau/E0;
   if(Xmax1 < Xmin1) return 0.;
 
-  double PrefactorEpsilonAlphaEWE0 = alphaEW*alphaEW*E0*E0;
+  double PrefactorAlphaEW = alphaEW*alphaEW;
 
   double xl[2] = { Xmin1, 0.};
   double xu[2] = { Xmax1, ThetaMax};
@@ -241,7 +241,7 @@ double DarkLFCScalars::TotalCrossSectionCalc_WW2(double E0)
   gsl_monte_miser_state* stat = gsl_monte_miser_alloc(2);
   gsl_monte_miser_integrate(&G, xl, xu, 2, calls, r, stat, &res, &err);
   gsl_monte_miser_free(stat);
-  sigmaTot = GeVtoPb*res*PrefactorEpsilonAlphaEWE0;
+  sigmaTot = GeVtoPb*res*PrefactorAlphaEW;
 
   // Other vegas integration methods:
   // gsl_monte_plain : plain MC
@@ -253,7 +253,7 @@ double DarkLFCScalars::TotalCrossSectionCalc_WW2(double E0)
   do {
     gsl_monte_vegas_integrate (&G, xl, xu, 2, calls/5, r, s, &res, &err);
   } while (fabs (gsl_monte_vegas_chisq(stat) - 1.0) > 0.5);
-  double sigmaTot = GeVtoPb*res*PrefactorEpsilonAlphaEWE0;
+  double sigmaTot = GeVtoPb*res*PrefactorAlphaEW;
   gsl_monte_vegas_free(stat);
 #endif
 
@@ -640,7 +640,6 @@ double DarkLFCScalars::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double
   if(E0*XEv < EThresh) return 0.;
   double x2=XEv*XEv;
   double theta2=ThetaEv*ThetaEv;
-  double aa = 111.*pow(ZNucl,-1./3)/Mel;
   double d = 0.164*pow(ANucl,-2./3);
   double MA2= MA*MA;
   double Mmu2= Mmu*Mmu;
@@ -656,8 +655,6 @@ double DarkLFCScalars::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double
   double tmin= pow((u*u-Mtau2), 2.0)/(4.0*E02*(1.0-XEv)*(1.0-XEv));
   // I've calculated ChiWWAnalytical by using mathematica's "Integrate[...]" function
   // and converted the resulted expression to C-like form
-  //double ChiWWAnalytical = ZNucl*ZNucl*((d*tmin/tmax + d*(d+tmin)/(d+tmax) + (d+2*tmin)*log(tmax) - (d+2*tmin)*log(d+tmax))
-  //                                    - (d*tmin/tmin + d*(d+tmin)/(d+tmin) + (d+2*tmin)*log(tmin) - (d+2*tmin)*log(d+tmin)) )/d;
   double ChiWWAnalytical = ZNucl*ZNucl*( (d*tmin/tmax + d*(d+tmin)/(d+tmax) + (d+2*tmin)*log(tmax) - (d+2*tmin)*log(d+tmax))
                                        - (2*d + (d+2*tmin)*log(tmin) - (d+2*tmin)*log(d+tmin)) )/d;
  
@@ -666,16 +663,16 @@ double DarkLFCScalars::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double
   double Factor2= Mmu2*Mmu2*(MA2 + u) + 2*Mmu2*Mmu*(Mtau2*Mtau - Mtau*u) + Mmu2*(Mtau2*Mtau2 - 2*MA2*s - 2*Mtau2*u + u*(u-2*s)) + 2*Mmu*Mtau*s*(u - Mtau2) + s*(MA2*s + Mtau2*Mtau2 - 2*Mtau2*u + u*(s+u));
   double AmplZpr2WWVEGAS = Factor1*Factor2/(8*pi*s*s);
   // one should multiply the prefactor written below by factor
-  // 2.0*epsilon^2*alphaEW^3*E0^2 to get diff_CS_WW_Z' in GeV^(-2)
+  // alphaEW^2 to get diff_CS_WW_phi in GeV^(-2)
   // (see e.g. calling VEGAS MC  function)
-  double PrefactorWithoutE0EpsilonAlphaEW=sqrt(x2-MA2/E02)/(1.0-XEv);
-  double DsDxDthetaWithoutE0EpsilonAlphaEW=sin(ThetaEv)*PrefactorWithoutE0EpsilonAlphaEW*AmplZpr2WWVEGAS*ChiWWAnalytical;
+  double PrefactorWithoutAlphaEW=sqrt(x2-MA2/E02)/(1.0-XEv);
+  double DsDxDthetaWithoutAlphaEW=sin(ThetaEv)*PrefactorWithoutAlphaEW*AmplZpr2WWVEGAS*ChiWWAnalytical;
 
   double ResTemporary;
-  if (DsDxDthetaWithoutE0EpsilonAlphaEW < 0.0 ) {
+  if (DsDxDthetaWithoutAlphaEW < 0.0 ) {
     ResTemporary = 0.0;
   } else {
-    ResTemporary = DsDxDthetaWithoutE0EpsilonAlphaEW;
+    ResTemporary = DsDxDthetaWithoutAlphaEW;
   }
   return ResTemporary;
 }
