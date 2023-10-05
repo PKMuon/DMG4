@@ -59,7 +59,6 @@ G4VParticleChange* DMProcessLFConversion::PostStepDoIt(const G4Track& aTrack,
     const G4Step & aStep)
 {
   aParticleChange.Initialize(aTrack);
-  G4Material* aMaterial = aTrack.GetMaterial();
 
   // information about the incident particle
   const G4double incidentE = aTrack.GetTotalEnergy();
@@ -127,10 +126,14 @@ G4VParticleChange* DMProcessLFConversion::PostStepDoIt(const G4Track& aTrack,
         recoilE);
   } 
   // tau mode
-  if(myDarkMatter->GetParentPDGID() == 15) {
+  else if(myDarkMatter->GetParentPDGID() == 15) {
     aParticle1 = new G4DynamicParticle(G4MuonMinus::MuonMinus(), 
         projDirection,
         recoilE);
+  }
+  else {
+    throw std::runtime_error("DMProcessLFConversion: ERROR: Parent particle in LFConversion process is neither a muon nor a tau particle, exiting");
+    exit(1);
   }
   aParticleChange.AddSecondary(aParticle1);
   // create G4DynamicParticle object for the particle2
