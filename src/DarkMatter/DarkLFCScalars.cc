@@ -651,7 +651,7 @@ double DarkLFCScalars::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double
   double gA = 0.;
   double tmax = MA2;
   const double pi = 3.141592654;
-  double tmin= pow((u*u-Mtau2), 2.0)/(4.0*E02*(1.0-XEv)*(1.0-XEv));
+  double tmin= pow((u-Mtau2), 2.0)/(4.0*E02*(1.0-XEv)*(1.0-XEv));
   // I've calculated ChiWWAnalytical by using mathematica's "Integrate[...]" function
   // and converted the resulted expression to C-like form
   double ChiWWAnalytical = ZNucl*ZNucl*( (d*tmin/tmax + d*(d+tmin)/(d+tmax) + (d+2*tmin)*log(tmax) - (d+2*tmin)*log(d+tmax))
