@@ -198,6 +198,7 @@ double DarkMatter::MaxCrossSectionThetaCalc(double E0)
 {
   double Xmin = MA/E0;
   double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MParent/E0;
+  if (DMType == 32) Xmax = 1. - Mtau/E0;
   double thetamax = 0.1;
 
   double csmax = 0.;
