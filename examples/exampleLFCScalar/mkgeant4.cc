@@ -73,7 +73,7 @@ int main() {
   output->Close();
   
   G4cout << G4endl;
-  G4cout << "Cross section in pb for eps=0.0001 cs = " << myDarkMatter->GetAccumulatedProbability()/((double)NTry) << G4endl;
+  G4cout << "Cross section in pb for eps=" << myDarkMatter->Getepsil() << " cs = " << myDarkMatter->GetAccumulatedProbability()/((double)NTry) << G4endl;
 
   return 0;
 }
