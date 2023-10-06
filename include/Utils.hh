@@ -4,6 +4,8 @@ double parinv(double x, double a[], double f[], int n);
 
 
 #include <iostream>
+#include <complex>
+#include <cmath>
 
 template <int NY>
 double BilinearInterpolation(double X, double Y, double ArgX[], double ArgY[], double Func[][NY], int NX, int iprint)
@@ -33,4 +35,15 @@ double BilinearInterpolation(double X, double Y, double ArgX[], double ArgY[], d
   //if(iprint) printf("ResultBilinear=%.4f \n", Result);
   if(iprint) std::cout << "ResultBilinear=" << Result << std::endl;
   return Result;
+}
+
+std::complex acoth(std::complex<double> z){
+  std::complex<double> zero=(0.,0.);
+  std::complex<double> imag=(0.,1.);
+  if (z==zero){
+    return -imag*M_PI/2;
+  }
+  else{
+    return std::atanh(1./z);
+  }
 }
