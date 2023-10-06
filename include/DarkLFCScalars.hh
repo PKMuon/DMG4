@@ -13,11 +13,15 @@ class DarkLFCScalars : public DarkMatter
     virtual double GetSigmaTot(double E0);
     virtual double CrossSectionDSDX(double XEv, double E0);
     virtual double CrossSectionDSDXDU(double XEv, double UThetaEv, double E0);
+    virtual double CrossSectionDSDXDPSI(double XEv, double auxpsi, double E0);
+    virtual double CrossSectionDSDXDPSI_WW(double XEv, double auxpsi, double E0);
     virtual double CrossSectionDSDXDTheta(double XEv, double Theta, double E0);
+    virtual double CrossSectionDSDX_WW(double XEv, double E0);
     virtual double Width();
 
   private:
 
     double tMax;
     double ThetaMax;
+    double PsiMax;
 };
