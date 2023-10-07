@@ -108,6 +108,6 @@ void DarkMassSpin2Annihilation::SetMA(double MAIn) {
     mChi2 = mChi;
 }
 
-double DarkMassSpin2Annihilation::AngularDistributionResonant(doube E0,double eta){
+double DarkMassSpin2Annihilation::AngularDistributionResonant(double E0,double eta){
   return 1.;
 }
