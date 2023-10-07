@@ -104,3 +104,29 @@ void DarkPseudoScalarsAnnihilation::SetMA(double MAIn) {
         mChi2 = mChi;
     }
 }
+
+
+double DarkPseudoScalarsAnnihilation::AngularDistributionResonant(double eta,double E0){
+   double val=1;
+   double ss = 2. * Mel * E0;
+
+   switch (iBranchingType){
+       case 0:
+           //Fermionic LDM. Angular distribution f(eta) ~ 1
+           if (sqrt(ss) < 2.*mChi){
+               printf("DarkScalarsAnnihilation::AngularDistribution error with threshold, E0=%f, m=%f\n",E0,mChi);
+               exit(1);
+           }
+           val=1; //Must be maximum == 1
+           break;
+       case 1:
+           //Scalar LDM TODO
+           val=1;
+           break;
+       default:
+           break;
+   }
+   return val;
+}
+
+
