@@ -118,3 +118,9 @@ void DarkScalarsAnnihilation::SetMA(double MAIn) {
     mChi2 = mChi;
   }
 }
+
+//e+e- --> S --> LDM LDM is uniform in cos(theta) CM, for both scalar and fermionic LDM
+double DarkScalarsAnnihilation::AngularDistributionResonant(double eta,double E0){
+  double ret=1;
+  return ret;
+}
