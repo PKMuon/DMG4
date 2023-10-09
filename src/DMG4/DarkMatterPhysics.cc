@@ -162,6 +162,7 @@ void DarkMatterPhysics::Init(){
         exit(1);
       }
       myDarkMatter = new DarkMuPhilicPseudoScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+      break;
     case 35:
       G4cout << "Initialize DarkLFCScalars\n";
       if(DecayType) { // Temporary plug
