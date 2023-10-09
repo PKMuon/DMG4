@@ -41,8 +41,14 @@ double DarkPseudoScalarsAnnihilation::PreFactor(double E0){
     double sigma = 4 * M_PI * alphaEW * epsilBench * epsilBench * alphaD;
     sigma = sigma * qq / sqrt(ss);
 
-    sigma = sigma * (ss / 2);   // A.C. this is for final state fermions (default)
-
+    switch (iBranchingType) {
+      case 0:
+        sigma = sigma * (ss / 2);   // A.C. this is for final state fermions (default)
+        break;
+      case 1:
+        sigma = sigma * (MA * MA) / 4;   // A.C. this is for final state scalars
+        break;
+    }
     //here sigma is in G4 internal units, 1 /Energy^2. Move to pBarn;
     sigma *= GeVtoPb;
 
@@ -88,7 +94,12 @@ double DarkPseudoScalarsAnnihilation::Width() {
     double ret;
     ret = MA * epsil * epsil * alphaEW * 1. / 2;
     if (MA / 2. > mChi) {
+      if (iBranchingType==0){
         ret += MA * alphaD * sqrt(1 - 4 * mChi * mChi / (MA * MA)) / 2.;
+      }
+      if (iBranchingType==1){
+             ret += MA * alphaD * sqrt(1 - 4 * mChi * mChi / (MA * MA)) / 4.;
+      }
     }
     return ret;
 }
@@ -109,19 +120,15 @@ void DarkPseudoScalarsAnnihilation::SetMA(double MAIn) {
 double DarkPseudoScalarsAnnihilation::AngularDistributionResonant(double eta,double E0){
    double val=1;
    double ss = 2. * Mel * E0;
-
+   if (sqrt(ss) < 2.*mChi){
+     printf("DarkScalarsAnnihilation::AngularDistribution error with threshold, E0=%f, m=%f\n",E0,mChi);
+     exit(1);
+   }
    switch (iBranchingType){
        case 0:
-           //Fermionic LDM. Angular distribution f(eta) ~ 1
-           if (sqrt(ss) < 2.*mChi){
-               printf("DarkScalarsAnnihilation::AngularDistribution error with threshold, E0=%f, m=%f\n",E0,mChi);
-               exit(1);
-           }
-           val=1; //Must be maximum == 1
-           break;
        case 1:
-           //Scalar LDM TODO
-           val=1;
+           //Fermionic and scalar LDM. Angular distribution f(eta) ~ 1
+           val=1; //Must be maximum == 1
            break;
        default:
            break;
