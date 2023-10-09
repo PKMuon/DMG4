@@ -33,6 +33,7 @@ class DarkMatter
   friend class DarkScalarsAnnihilation;
   friend class DarkPseudoScalarsAnnihilation;
   friend class DarkAxialsAnnihilation;
+  friend class DarkZAnnihilation;
   public:
 
     DarkMatter(double MAIn, double EThreshIn, double SigmaNormIn=1., double ANuclIn=207., double ZNuclIn=82., double DensityIn=11.35,

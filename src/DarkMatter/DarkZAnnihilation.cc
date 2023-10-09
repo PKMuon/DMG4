@@ -1,9 +1,11 @@
 /*
  * DarkZAnnihilation.cc
  *
- *  Created on: Oct 6, 2020
+ *  Created on: Oct 6, 2023
  *      Author: celentan
- *  Fixed: Nov 2, 2020
+ *
+ *  In this class, the parameter "epsilon" is actually the coupling "g" between Z' and mu-tau current (see 2206.03101)
+ *
  */
 
 #include "DarkMatter.hh"
@@ -14,10 +16,12 @@
 #include <iostream>
 #include <cmath>
 
-DarkZAnnihilation::DarkZAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn, double epsilIn,
-    int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
-    DarkMatterAnnihilation(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn, rIn, alphaDIn, IBranchingIn, fIn) {
-  DMType = 12; //A.C.
+
+
+DarkZAnnihilation::DarkZAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
+                                                 double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
+                                                 DarkMatterAnnihilation(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn, rIn,alphaDIn, IBranchingIn,fIn){
+  DMType = 11; //A.C.
 
   std::cout << "Initialized DarkZAnnihilation (e+ e- -> Z' -> DM DM) for material density = " << DensityIn << std::endl;
   std::cout << "mA: " << MA * 1000 << " MeV " << std::endl;

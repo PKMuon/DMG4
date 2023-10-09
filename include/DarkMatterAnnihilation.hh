@@ -16,6 +16,7 @@ class DarkMatterAnnihilation : public DarkMatter {
   friend class DarkScalarsAnnihilation;
   friend class DarkPseudoScalarsAnnihilation;
   friend class DarkAxialsAnnihilation;
+  friend class DarkZAnnihilation;
 
   public:
 

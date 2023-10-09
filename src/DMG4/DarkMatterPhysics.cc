@@ -5,6 +5,7 @@
 #include "DarkMatterAnnihilation.hh"
 #include "DarkPhotons.hh"
 #include "DarkZ.hh"
+#include "DarkZAnnihilation.hh"
 #include "DarkMuPhilicScalars.hh"
 #include "DarkMuPhilicPseudoScalars.hh"
 #include "ALP.hh"
@@ -185,6 +186,10 @@ void DarkMatterPhysics::Init(){
       G4cout << "Initialize DarkMassSpin2Annihilation\n";
       myDarkMatter = new DarkMassSpin2Annihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM);
        break;
+    case 16:
+      G4cout << "Initialize DarkMassSpin2Annihilation\n";
+      myDarkMatter = new DarkZAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM);
+      break;
      default:
        G4cout << G4endl << "Wrong DM process type specified: " << DMProcessType << " , exiting" << G4endl << G4endl;
        exit(1);
@@ -289,6 +294,9 @@ void DarkMatterPhysics::ConstructProcess()
     }
     if(myDarkMatter->GetDMType() == 5) {                    // Annihilation through spin 2 DM, A' for the moment
       theDMParticlePtr = DMParticleAPrime::Definition();
+    }
+    if(myDarkMatter->GetDMType() == 11) {                    // Annihilation through Z' (Lmu-Ltau or B-L models)
+          theDMParticlePtr = DMParticleZPrime::Definition();
     }
   }
   if(myDarkMatter->GetParentPDGID() == 13) {
