@@ -56,7 +56,10 @@ G4ForceCondition* /*condition*/) {
 
 
     //The DarkMatterAnnihilation classes compute the cross section for eps = epsilBench. Here, we revert back to epsilon
-    CrossSection *= (myDarkMatter->Getepsil() * myDarkMatter->Getepsil()) / (myDarkMatter->GetepsilBench() * myDarkMatter->GetepsilBench());
+    //For the Z' model in e+ e- annihilation, instead, the cross section is computed using eps, and not epsilBench, hence no correction.
+    if (myDarkMatter->GetDMType()!=11){
+      CrossSection *= (myDarkMatter->Getepsil() * myDarkMatter->Getepsil()) / (myDarkMatter->GetepsilBench() * myDarkMatter->GetepsilBench());
+    }
     CrossSection /= myDarkMatter->GetSigmaNorm();
 
     G4double n = aTrack.GetMaterial()->GetTotNbOfAtomsPerVolume(); //The annihilation cross section already contains a multiplicative factor "Z".

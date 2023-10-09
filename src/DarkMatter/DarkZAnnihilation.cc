@@ -62,8 +62,8 @@ double DarkZAnnihilation::PreFactor(double E0) {
   switch (iBranchingType) {
   case 0: //Lmu-Ltau, vanilla, neutrinos (nMu+nTau contribution). See 2206.03101 Eq. A.4.
     sigma = (4 * M_PI * alphaEW) / 3.;
-    sigma = sigma * epsilBench * epsilBench / (4 * M_PI); //alphaZ' for Z' -> nunu
-    sigma = sigma * epsilBench * epsilBench * piF2(ss); //|Pi(S)|^2 for e+e- --> Z'
+    sigma = sigma * epsil * epsil / (4 * M_PI); //alphaZ' for Z' -> nunu
+    sigma = sigma * epsil * epsil * piF2(ss); //|Pi(S)|^2 for e+e- --> Z'
     sigma = sigma * ss;
     break;
   case 1: //B-L, vanilla, neutrinos
@@ -71,7 +71,7 @@ double DarkZAnnihilation::PreFactor(double E0) {
   case 2: //Lmu-Ltau, scalar DM.  See 2206.03101 Eq. A.4.
     sigma = (M_PI * alphaEW) / 3.;
     sigma = sigma * alphaD; //alphaD for Z' -> DM-DM
-    sigma = sigma * epsilBench * epsilBench * piF2(ss); //|Pi(S)|^2 for e+e- --> Z'
+    sigma = sigma * epsil * epsil * piF2(ss); //|Pi(S)|^2 for e+e- --> Z'
     sigma = sigma * ss;
     sigma = sigma * pow(1-sMin/ss,3./2);
     break;
@@ -130,16 +130,16 @@ double DarkZAnnihilation::Width() {
   double ret=0;
   switch (iBranchingType) {
   case 0: //Lmu-Ltau, vanilla
-      ret=MA/3*epsilBench*epsilBench/(4*M_PI); //Z->nu nu (mu+tau)
+      ret=MA/3*epsil*epsil/(4*M_PI); //Z->nu nu (mu+tau)
       if (MA > 2*Mmu)
-        ret += MA/3 * epsilBench*epsilBench/(4*M_PI)*(1+2*Mmu*Mmu/(MA*MA))*sqrt(1-4*Mmu*Mmu/(MA*MA)); //Z->mu mu
+        ret += MA/3 * epsil*epsil/(4*M_PI)*(1+2*Mmu*Mmu/(MA*MA))*sqrt(1-4*Mmu*Mmu/(MA*MA)); //Z->mu mu
     break;
   case 1: //B-L, vanilla
     break;
   case 2: //Lmu-Ltau, DM
-    ret=MA/3*epsilBench*epsilBench/(4*M_PI);//Z->nu nu
+    ret=MA/3*epsil*epsil/(4*M_PI);//Z->nu nu
     if (MA > 2*Mmu)
-      ret += MA/3 * epsilBench*epsilBench/(4*M_PI)*(1+2*Mmu*Mmu/(MA*MA))*sqrt(1-4*Mmu*Mmu/(MA*MA)); //Z->mu mu
+      ret += MA/3 * epsil*epsil/(4*M_PI)*(1+2*Mmu*Mmu/(MA*MA))*sqrt(1-4*Mmu*Mmu/(MA*MA)); //Z->mu mu
     ret+= MA/12*alphaD*pow((1-4*mChi*mChi/(MA*MA)),3./2); //Z->DM DM
     break;
   case 3: //B-L, DM
