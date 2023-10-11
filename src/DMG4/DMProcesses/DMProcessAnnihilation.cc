@@ -120,10 +120,7 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
 
   G4double DMMass = myDarkMatterAnnihilation->GetMA()*GeV; // in MeV
   const G4double initialCrossSection=myDarkMatterAnnihilation->GetSigmaTot(initialE/GeV); //this is the cross section at the beginning of the step
-  // Take either the cross section at the end of the step or the maximum if this was crossed
-  const G4double finalCrossSection= (incidentE < DMMass*DMMass/2./CLHEP::electron_mass_c2)?
-    this->CrossSectionStepVal
-    : myDarkMatterAnnihilation->GetSigmaTot(incidentE/GeV); //this is the cross section at the end of the step
+  const G4double finalCrossSection=myDarkMatterAnnihilation->GetSigmaTot(incidentE/GeV); //this is the cross section at the end of the step
   G4double diffE = (initialE - incidentE)/GeV; // in GeV
   /*
    * Here are the calculations needed for the average cross-section
