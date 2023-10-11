@@ -77,16 +77,11 @@ G4ForceCondition* /*condition*/) {
       this->CrossSectionStepE=ekin;
       this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTot(this->CrossSectionStepE);
     }
-    //Second case, the energy at the beginning of the step is larger than the resonant energy
-    else if (ekin > (Emax/xi)){//take the largest value between the resonant energy and the value xi*E
-      if (Emax > xi * ekin){
-        this->CrossSectionStepE=Emax;
-        this->CrossSectionStepVal=myDarkMatterAnnihilation->GetTotalCrossSectionMax();
-      }
-      else{
-        this->CrossSectionStepE=xi*ekin;
-        this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTot(this->CrossSectionStepE);
-     }
+    //Second case, the energy at the beginning of the step is larger than the resonant energy and also than Emax/xi
+    //take the value xi*E (0<xi<1)
+    else if (ekin > (Emax/xi)){
+      this->CrossSectionStepE=xi*ekin;
+      this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTot(this->CrossSectionStepE);
     }
     //Third case, the energy at the beginning of the step is larger than the resonant energy but smaller than Emax/xi
     else{
