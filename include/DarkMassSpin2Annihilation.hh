@@ -25,6 +25,7 @@ class DarkMassSpin2Annihilation : public DarkMatterAnnihilation
     virtual double CrossSectionDSDXDU(double Xev, double UThetaEv, double E0);
     virtual double Width();
     virtual void SetMA(double MAIn);
+    virtual double AngularDistributionResonant(double E0,double eta);
 };
 
 #endif

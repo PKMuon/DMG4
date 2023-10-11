@@ -56,16 +56,6 @@ double DarkMatterAnnihilation::SimulateEmissionResonant(double E0){
     return 1;
 }
 
-/*This method returns the angular distribution for e+e- --> A' --> ff in the CM frame
- * It has to be implemented in the derived classes (the default method is a dummy implementation)
- * eta: cosine of the f in the CM frame
- * E0: positron beam energy in LAB frame (GeV units)
- * IMPORTANT: it has to be normalized so that the maximum is one.
- */
-double DarkMatterAnnihilation::AngularDistributionResonant(double eta,double E0){
-    return (1+eta*eta)/2.;
-}
-
 //Input: E0, positron energy in GeV
 //output: total annihilation cross-section in pbarn.
 //Since the framework assumes this method is returning the total cross section per nucleous, for the moment I scale this by Z.

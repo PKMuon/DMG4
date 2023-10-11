@@ -27,7 +27,7 @@ class DarkMatterAnnihilation : public DarkMatter {
     // methods to be implemented in each derived class
     virtual double PreFactor(double E0) = 0;
     virtual double Width() = 0;
-    virtual double AngularDistributionResonant(double eta,double E0);
+    virtual double AngularDistributionResonant(double eta,double E0) = 0;
 
     //for resonant production e+ e- --> R --> f f, this function returns the cosine of the angle of the f in the CM frame.
     double SimulateEmissionResonant(double E0); //E0 in GeV

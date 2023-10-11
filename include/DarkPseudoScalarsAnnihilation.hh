@@ -32,6 +32,7 @@ public:
     virtual double CrossSectionDSDXDU(double Xev, double UThetaEv, double E0);
     virtual double Width();
     virtual void SetMA(double MAIn);
+    virtual double AngularDistributionResonant(double eta,double E0);
 
 };
 
