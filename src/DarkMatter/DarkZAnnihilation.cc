@@ -206,7 +206,7 @@ double DarkZAnnihilation::piF2(double m_q2) { //q2 in GeV^
   ret = ret - (one + 2. * rmu) * sqrt(one - 4. * rmu) * acoth(sqrt(one - 4. * rmu));
   ret = ret + (one + 2. * rtau) * sqrt(one - 4. * rtau) * acoth(sqrt(one - 4. * rtau));
 
-  ret = ret * ee / (2 * M_PI);
+  ret = ret * ee / (2 * M_PI * M_PI);
 
   ret = ret / 3.;
 
