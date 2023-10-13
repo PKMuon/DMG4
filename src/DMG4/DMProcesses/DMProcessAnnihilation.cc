@@ -72,6 +72,7 @@ G4ForceCondition* /*condition*/) {
 
   if (myDarkMatterAnnihilation->EmissionAllowed(ekin, DensityMat)) {
     G4double CrossSection =myDarkMatterAnnihilation->GetSigmaTot(ekin); //keep this line here
+    G4double Emax=(myDarkMatterAnnihilation->GetMA()*myDarkMatterAnnihilation->GetMA())/(2*Mel); //this is in GeV
 
 #ifdef EDEP_ALONG_STEP
     /*
@@ -79,12 +80,10 @@ G4ForceCondition* /*condition*/) {
      * See: https://gitlab.cern.ch/P348/DMG4/-/issues/14
      *
      * The xi parameter is set to Er/(Er+deltaE), where deltaE is the max energy loss across this step
-     * This is obtained from the step limiter
+     * This is obtained from the step limiter if it is available
      */
-
     if (m_limiter){
       G4double dEmax=m_limiter->GetMaxEloss(aTrack.GetKineticEnergy())/GeV;
-      G4double Emax=(myDarkMatterAnnihilation->GetMA()*myDarkMatterAnnihilation->GetMA())/(2*Mel); //this is in GeV
       xi=Emax/(Emax+dEmax);
       if (xi<.8) //G4 suggestion
         xi=.8;
