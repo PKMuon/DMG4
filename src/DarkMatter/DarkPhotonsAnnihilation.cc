@@ -21,6 +21,7 @@ DarkPhotonsAnnihilation::DarkPhotonsAnnihilation(double MAIn, double EThreshIn, 
                                                  DarkMatterAnnihilation(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn, rIn,alphaDIn, IBranchingIn,fIn)
 {
   DMType = 1; //A.C.
+  widthEnhancementFactor = 1;
 
   std::cout << "Initialized DarkPhotonsAnnihilation (e+ e- -> A' -> DM DM) for material density = " << DensityIn << std::endl;
   std::cout << "mA: "<<MA*1000<<" MeV "<<std::endl;
@@ -33,7 +34,7 @@ DarkPhotonsAnnihilation::DarkPhotonsAnnihilation(double MAIn, double EThreshIn, 
   }
   std::cout<<"Width: "<<this->Width()*1E3<<" MeV "<<std::endl;
 
-  widthEnhancementFactor = 1;
+
   if ((minWidth >0)&&(this->Width()<minWidth)){
     widthEnhancementFactor=minWidth/this->Width();
     std::cout<<"Width after artificial enhancement: "<<this->Width()<<std::endl;
