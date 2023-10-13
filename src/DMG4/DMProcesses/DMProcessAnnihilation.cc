@@ -16,6 +16,7 @@
 #include "G4ParticleTypes.hh"
 #include "G4Positron.hh"
 #include "G4ProcessManager.hh"
+#include "G4StepLimiterPhysics.hh"
 
 #include "DarkMatterParametersFactory.hh"
 
@@ -23,10 +24,10 @@
 
 #define EDEP_ALONG_STEP
 
-DMProcessAnnihilation::DMProcessAnnihilation(DarkMatterAnnihilation *DarkMatterPointerIn, G4ParticleDefinition *theDMParticlePtrIn, G4double BiasSigmaFactorIn) :
+DMProcessAnnihilation::DMProcessAnnihilation(DarkMatterAnnihilation *DarkMatterPointerIn, G4ParticleDefinition *theDMParticlePtrIn, G4double BiasSigmaFactorIn,AnnihilationStepLimiter *LimiterIn) :
     G4VDiscreteProcess("DMProcessAnnihilation", fUserDefined),  // fElectromagnetic
     myDarkMatterAnnihilation(DarkMatterPointerIn), theDMParticlePtr(theDMParticlePtrIn), BiasSigmaFactor(BiasSigmaFactorIn), DMpar(0), iBranchingType(0), mChi(0), mChi1(0), mChi2(
-        0),m_limiter(0) {
+        0),m_limiter(LimiterIn) {
   SetProcessSubType(1); //fBremsstrahlung? // TODO: verify this
 
   DMpar = DarkMatterParametersFactory::GetInstance();
@@ -66,10 +67,6 @@ G4double DMProcessAnnihilation::GetMeanFreePath(const G4Track &aTrack, G4double,
 G4ForceCondition* /*condition*/) {
 
 
-#ifdef EDEP_ALONG_STEP
-  this->SetStepLimiter();
-#endif
-
   G4double DensityMat = aTrack.GetMaterial()->GetDensity() / (g / cm3);
   G4double ekin = aTrack.GetKineticEnergy() / GeV; //this is the energy of the positron at the beginning of the step
 
@@ -91,7 +88,7 @@ G4ForceCondition* /*condition*/) {
     xi=Emax/(Emax+dEmax);
     if (xi<.8) xi=.8;
 
-    G4cout<<"DMProcessGetMeanFreePath: "<<aTrack.GetKineticEnergy()/GeV<<" "<<dEmax<<" "<<xi<<G4endl;
+    //G4cout<<"DMProcessGetMeanFreePath: "<<aTrack.GetKineticEnergy()/GeV<<" "<<dEmax<<" "<<xi<<G4endl;
 
     //First case, the energy at the beginning of the step is smaller than the resonant energy
     if (ekin < Emax){
@@ -326,23 +323,5 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
 }
 
 
-void DMProcessAnnihilation::SetStepLimiter() {
 
-  //step limits
-  if(!m_limiter) {
-    m_limiter = new AnnihilationStepLimiter(myDarkMatterAnnihilation,"StepLimiterAnnihilation");
-    G4ParticleDefinition* posi=G4Positron::Definition();
-    G4ProcessManager* processManager=posi->GetProcessManager();
-
-    /* Add the step limiter to the list of discrete processes for the e+
-     * and set it to be the first step to be called when checking the step length
-     * This will trigger the calculation of the max step length, including the maximum energy loss across the new step
-     * So these quantities can be used by this process for this step
-     */
-    processManager->AddDiscreteProcess(m_limiter);
-    //processManager->SetProcessOrderingToFirst(m_limiter,idxPostStep);
-
-    G4cout<<"DMProcessAnnihilation::SetStepLimiter() was called"<<G4endl;
-  }
-}
 

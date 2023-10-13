@@ -12,7 +12,7 @@ class DMProcessAnnihilation : public G4VDiscreteProcess
 {
   public:
 
-    DMProcessAnnihilation(DarkMatterAnnihilation* DarkMatterPointer, G4ParticleDefinition* theDMParticlePtrIn, G4double BiasSigmaFactor);
+    DMProcessAnnihilation(DarkMatterAnnihilation* DarkMatterPointer, G4ParticleDefinition* theDMParticlePtrIn, G4double BiasSigmaFactor,AnnihilationStepLimiter *LimiterIn=0);
 
     // Implements final state parameters when the process won.
     virtual G4VParticleChange* PostStepDoIt( const G4Track &, const G4Step & ) override;
@@ -41,5 +41,5 @@ class DMProcessAnnihilation : public G4VDiscreteProcess
     //Part for the step limit
     AnnihilationStepLimiter *m_limiter;
 
-    void SetStepLimiter();
+
 };

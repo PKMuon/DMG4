@@ -4,12 +4,13 @@
 #include "G4ios.hh"
 #include "globals.hh"
 #include "G4VProcess.hh"
-#include "G4StepLimiter.hh"
+#include "G4VDiscreteProcess.hh"
 #include "G4EmCalculator.hh"
+
 
 class DarkMatterAnnihilation;
 
-class AnnihilationStepLimiter : public G4StepLimiter
+class AnnihilationStepLimiter : public G4VDiscreteProcess
 {
   public:
 
@@ -28,6 +29,12 @@ class AnnihilationStepLimiter : public G4StepLimiter
                              const G4Step& 
                             );
                             
+
+     virtual G4bool IsApplicable(const G4ParticleDefinition&);
+     virtual G4double GetMeanFreePath(const G4Track&, G4double, G4ForceCondition*);
+
+
+
      void SetMaxStep(G4double MaxStepIn) {AnnihilationMaxStep = MaxStepIn;}
      double GetMaxStep() {return AnnihilationMaxStep;}
      G4double GetMaxEloss(G4double E);
@@ -45,6 +52,7 @@ class AnnihilationStepLimiter : public G4StepLimiter
     DarkMatterAnnihilation* m_DarkMatterAnnihilation;
     G4EmCalculator emCal;
     int factor;
+
 };
 
 #endif

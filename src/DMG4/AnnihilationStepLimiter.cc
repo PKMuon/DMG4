@@ -5,22 +5,34 @@
 #include "G4UserLimits.hh"
 #include "G4VParticleChange.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4Positron.hh"
 
 #include "DarkMatter.hh"
 #include "DarkMatterAnnihilation.hh"
 
 AnnihilationStepLimiter::AnnihilationStepLimiter(DarkMatterAnnihilation* m_DarkMatterAnnihilation_in,const G4String& aName)
-  : G4StepLimiter(aName),
+  : G4VDiscreteProcess(aName,fUserDefined),
     m_DarkMatterAnnihilation(m_DarkMatterAnnihilation_in),
     AnnihilationMaxStep(DBL_MAX)
 {
+  SetProcessSubType(2);
   factor=5;
 }
 
 
 AnnihilationStepLimiter::~AnnihilationStepLimiter()
-{}
+{
+}
 
+
+G4bool AnnihilationStepLimiter::IsApplicable(const G4ParticleDefinition& particle)
+{
+  return (particle==*(G4Positron::Definition()));
+}
+
+G4double AnnihilationStepLimiter::GetMeanFreePath(const G4Track&, G4double, G4ForceCondition*){
+  return DBL_MAX;
+}
 
 G4double 
   AnnihilationStepLimiter::PostStepGetPhysicalInteractionLength(
@@ -34,13 +46,11 @@ G4double
   G4double DensityMat = aTrack.GetMaterial()->GetDensity() / (g / cm3);
   G4double ekin = aTrack.GetKineticEnergy() / GeV; //this is the energy of the positron at the beginning of the step
 
-  G4cout<<"Calling AnnihilationStepLimiter::PostStepGetPhysicalInteractionLength "<<ekin<<G4endl;
-
   if (m_DarkMatterAnnihilation->EmissionAllowed(ekin, DensityMat)) {
 
     //G4 convention: put immediately units
     G4double Mres=m_DarkMatterAnnihilation->GetMA()*GeV;
-    G4double Eres=(Mres*Mres)/CLHEP::electron_mass_c2;
+    G4double Eres=(Mres*Mres)/(2*CLHEP::electron_mass_c2);
     G4double W=m_DarkMatterAnnihilation->Width()*GeV;
     G4double Wstar=W*(Mres/(2*CLHEP::electron_mass_c2));
 
@@ -48,7 +58,7 @@ G4double
     G4double E=aTrack.GetKineticEnergy();
 
     //compute dEdX and delta0
-    G4double dEdX=emCal.ComputeTotalDEDX(aTrack.GetKineticEnergy(),aTrack.GetParticleDefinition(),aTrack.GetMaterial());
+    G4double dEdX=emCal.GetDEDX(aTrack.GetKineticEnergy(),aTrack.GetParticleDefinition(),aTrack.GetMaterial());
     G4double delta0=Wstar/dEdX;
     delta0 = delta0 / factor;
 
@@ -56,11 +66,8 @@ G4double
     G4double maxStepDen=dSigmadEoverSigma(E);
     AnnihilationMaxStep=delta0/maxStepDen;
 
-    G4cout<<"AnnihilationStepLimiter kinE: "<<E/GeV<<" Eres: "<<Eres/GeV<<" Wstar: "<<Wstar/GeV<<" delta0: "<<delta0/cm<<G4endl;
-
     return AnnihilationMaxStep;
   }
-  G4cout<<"DEFAULT BIG STEP: "<<DBL_MAX<<G4endl;
   return DBL_MAX;
 }
 
@@ -85,14 +92,18 @@ G4double AnnihilationStepLimiter::GetMaxEloss(G4double E){
 
 G4double AnnihilationStepLimiter::dSigmadEoverSigma(G4double E){
   G4double Mres=m_DarkMatterAnnihilation->GetMA()*GeV;
-  G4double Eres=(Mres*Mres)/CLHEP::electron_mass_c2;
+  G4double Eres=(Mres*Mres)/(2*CLHEP::electron_mass_c2);
   G4double W=m_DarkMatterAnnihilation->Width()*GeV;
   G4double Wstar=W*(Mres/(2*CLHEP::electron_mass_c2));
+
+
 
   G4double ret=1;
   if (fabs(E-Eres)>Wstar){
     ret=Wstar*2*fabs(E-Eres)/((E-Eres)*(E-Eres)+Wstar*Wstar);
   }
+
+//  G4cout<<"dS: "<<Mres/GeV<<" "<<Eres/GeV<<" "<<W/GeV<<" "<<Wstar/GeV<<" "<<E/GeV<<" "<<ret<<G4endl;
   return ret;
 
 }
