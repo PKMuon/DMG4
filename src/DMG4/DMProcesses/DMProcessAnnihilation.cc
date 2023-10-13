@@ -82,12 +82,13 @@ G4ForceCondition* /*condition*/) {
      * This is obtained from the step limiter
      */
 
-    G4double dEmax=m_limiter->GetMaxEloss(aTrack.GetKineticEnergy())/GeV;
-    G4double Emax=(myDarkMatterAnnihilation->GetMA()*myDarkMatterAnnihilation->GetMA())/(2*Mel); //this is in GeV
-
-    xi=Emax/(Emax+dEmax);
-    if (xi<.8) xi=.8;
-
+    if (m_limiter){
+      G4double dEmax=m_limiter->GetMaxEloss(aTrack.GetKineticEnergy())/GeV;
+      G4double Emax=(myDarkMatterAnnihilation->GetMA()*myDarkMatterAnnihilation->GetMA())/(2*Mel); //this is in GeV
+      xi=Emax/(Emax+dEmax);
+      if (xi<.8) //G4 suggestion
+        xi=.8;
+    }
     //G4cout<<"DMProcessGetMeanFreePath: "<<aTrack.GetKineticEnergy()/GeV<<" "<<dEmax<<" "<<xi<<G4endl;
 
     //First case, the energy at the beginning of the step is smaller than the resonant energy
