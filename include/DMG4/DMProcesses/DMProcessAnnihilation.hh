@@ -6,7 +6,7 @@ class DarkMatter;
 class DarkMatterAnnihilation;
 class G4ParticleDefinition;
 class DarkMatterParametersFactory;
-
+class AnnihilationStepLimiter;
 
 class DMProcessAnnihilation : public G4VDiscreteProcess
 {
@@ -38,4 +38,8 @@ class DMProcessAnnihilation : public G4VDiscreteProcess
     G4double CrossSectionStepE;   //the energy used to compute the above
     G4double xi;
 
+    //Part for the step limit
+    AnnihilationStepLimiter *m_limiter;
+
+    void SetStepLimiter();
 };
