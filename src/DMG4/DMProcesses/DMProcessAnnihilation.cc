@@ -17,6 +17,8 @@
 #include "G4Positron.hh"
 #include "G4ProcessManager.hh"
 #include "G4StepLimiterPhysics.hh"
+#include "G4RunManager.hh"
+#include "G4Event.hh"
 
 #include "DarkMatterParametersFactory.hh"
 
@@ -192,7 +194,7 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
     aParticleChange.ProposeTrackStatus(fStopAndKill);
 
     std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding() << " emitted by " << aTrack.GetDefinition()->GetParticleName() << " with energy = "
-        << incidentE / GeV << " GeV, DM energy = " << incidentE / GeV << " GeV " << std::endl;
+        << incidentE / GeV << " GeV, DM energy = " << incidentE / GeV << " GeV [event n.: " <<G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID()<<"]"<<std::endl;
     std::cout << "DM cross section=" <<initialCrossSection<<" [MAX VALUE: "<<myDarkMatterAnnihilation->GetTotalCrossSectionMax()<<"]"<<std::endl;
 
     return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
