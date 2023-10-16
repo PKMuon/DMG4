@@ -12,6 +12,7 @@
 #include "G4TauMinus.hh"
 #include "G4TauPlus.hh"
 #include "G4MuonMinus.hh"
+#include "G4MuonPlus.hh"
 
 DMProcessLFConversion::DMProcessLFConversion(DarkMatter* DarkMatterPointerIn, G4ParticleDefinition* theDMParticlePtrIn,
     G4double BiasSigmaFactorIn)
@@ -25,7 +26,11 @@ DMProcessLFConversion::DMProcessLFConversion(DarkMatter* DarkMatterPointerIn, G4
 
 G4bool DMProcessLFConversion::IsApplicable(const G4ParticleDefinition& pDef)
 {
-  return ( "tau-" == pDef.GetParticleName() || "mu-" == pDef.GetParticleName() );
+  if(myDarkMatter->GetParentPDGID() == 15)
+    return ("tau-" == pDef.GetParticleName() || "tau+" == pDef.GetParticleName());
+  if(myDarkMatter->GetParentPDGID() == 13)
+    return ("mu-" == pDef.GetParticleName() || "mu+" == pDef.GetParticleName());
+  return false;
 }
 
 G4double DMProcessLFConversion::GetMeanFreePath( const G4Track& aTrack,
@@ -120,8 +125,13 @@ G4VParticleChange* DMProcessLFConversion::PostStepDoIt(const G4Track& aTrack,
   // create G4DynamicParticle object for the particle1
   G4DynamicParticle* aParticle1;
   // muon mode
-  if(myDarkMatter->GetParentPDGID() == 13) {
+  if(aTrack.GetDefinition()->GetPDGEncoding() == 13) {
     aParticle1 = new G4DynamicParticle(G4TauMinus::TauMinus(), 
+        projDirection,
+        recoilE);
+  } 
+  else if(aTrack.GetDefinition()->GetPDGEncoding() == -13) {
+    aParticle1 = new G4DynamicParticle(G4TauPlus::TauPlus(), 
         projDirection,
         recoilE);
   } 

@@ -390,8 +390,8 @@ double DarkLFCScalars::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double
   // one should multiply the prefactor written below by factor
   // alphaEW^2 to get diff_CS_WW_phi in GeV^(-2)
   // (see e.g. calling VEGAS MC  function)
-  double PrefactorWithoutAlphaEW=sqrt(x2-MA2/E02)/(1.0-XEv);
-  double DsDxDthetaWithoutAlphaEW=E0*sin(ThetaEv)*ChiWWAnalytical*PrefactorWithoutAlphaEW*AmplZpr2WWVEGAS;
+  double PrefactorWithoutAlphaEW=E0*sqrt(x2-MA2/E02)/(1.0-XEv);
+  double DsDxDthetaWithoutAlphaEW=-E0*sin(ThetaEv)*ChiWWAnalytical*PrefactorWithoutAlphaEW*AmplZpr2WWVEGAS;
 
   double ResTemporary;
   if (DsDxDthetaWithoutAlphaEW < 0.0 ) {
