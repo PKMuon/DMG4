@@ -45,6 +45,8 @@ G4double DMProcessLFConversion::GetMeanFreePath( const G4Track& aTrack,
     G4double CrossSection = myDarkMatter->GetSigmaTot(ekin); //A.C. by DarkMatter definition, this is in picobarn
     CrossSection *= picobarn;
 
+    //The DarkMatter classes compute the cross section for eps = epsilBench. Here, we revert back to epsilon
+    CrossSection *= (myDarkMatter->Getepsil()* myDarkMatter->Getepsil())/(myDarkMatter->GetepsilBench()* myDarkMatter->GetepsilBench());
     CrossSection /= myDarkMatter->GetSigmaNorm();
 
 
