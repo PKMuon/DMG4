@@ -16,7 +16,7 @@ AnnihilationStepLimiter::AnnihilationStepLimiter(DarkMatterAnnihilation* m_DarkM
     AnnihilationMaxStep(DBL_MAX)
 {
   SetProcessSubType(2);
-  factor=5;
+  factor=50;
 }
 
 
