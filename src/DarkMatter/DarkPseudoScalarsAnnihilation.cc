@@ -30,6 +30,7 @@ DarkPseudoScalarsAnnihilation::~DarkPseudoScalarsAnnihilation() {
 
 //Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
 //This is the total cross section without the BW denominator
+//E0: positron TOTAL energy in lab frame
 double DarkPseudoScalarsAnnihilation::PreFactor(double E0){
 
     double ss = 2. * Mel * E0+2*Mel*Mel;
@@ -57,10 +58,12 @@ double DarkPseudoScalarsAnnihilation::PreFactor(double E0){
     return sigma;
 }
 
+//E0: positron TOTAL energy in lab frame
 double DarkPseudoScalarsAnnihilation::GetSigmaTot(double E0) {
     return TotalCrossSectionCalc(E0);
 }
 
+//E0: positron TOTAL energy in lab frame
 bool DarkPseudoScalarsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
         {
 
@@ -116,7 +119,7 @@ void DarkPseudoScalarsAnnihilation::SetMA(double MAIn) {
     }
 }
 
-
+//E0: positron TOTAL energy in lab frame
 double DarkPseudoScalarsAnnihilation::AngularDistributionResonant(double eta,double E0){
    double val=1;
    double ss = 2. * Mel * E0+2*Mel*Mel;

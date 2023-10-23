@@ -37,6 +37,7 @@ DarkMassSpin2Annihilation::~DarkMassSpin2Annihilation(  ){ ; }
 
 
 // Total cross-section in pBarn
+//E0: positron TOTAL energy in lab frame
 double DarkMassSpin2Annihilation::PreFactor( double E0 )
 {
   // Invariant mass 
@@ -57,7 +58,7 @@ double DarkMassSpin2Annihilation::PreFactor( double E0 )
   return sigma;
 }
 
-
+//E0: positron TOTAL energy in lab frame
 double DarkMassSpin2Annihilation::GetSigmaTot( double E0 )
 {
   return TotalCrossSectionCalc( E0 );
@@ -65,6 +66,7 @@ double DarkMassSpin2Annihilation::GetSigmaTot( double E0 )
 
 
 // Different kinematic limit here
+//E0: positron TOTAL energy in lab frame
 bool DarkMassSpin2Annihilation::EmissionAllowed( double E0, double DensityMat )
 {
   if ( sqrt(2. * Mel * E0+2*Mel*Mel) < 2.0 * mChi ){ return false; }
@@ -108,6 +110,7 @@ void DarkMassSpin2Annihilation::SetMA(double MAIn) {
     mChi2 = mChi;
 }
 
+//E0: positron TOTAL energy in lab frame
 double DarkMassSpin2Annihilation::AngularDistributionResonant(double E0,double eta){
   return 1.;
 }

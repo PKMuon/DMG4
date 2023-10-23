@@ -29,6 +29,7 @@ DarkScalarsAnnihilation::~DarkScalarsAnnihilation() {
 
 //Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
 //This is the total cross section without the BW denominator
+//E0: positron TOTAL energy in lab frame
 double DarkScalarsAnnihilation::PreFactor(double E0) {
 
   double ss = 2. * Mel * E0;
@@ -57,10 +58,12 @@ double DarkScalarsAnnihilation::PreFactor(double E0) {
   return sigma;
 }
 
+//E0: positron TOTAL energy in lab frame
 double DarkScalarsAnnihilation::GetSigmaTot(double E0) {
   return TotalCrossSectionCalc(E0);
 }
 
+//E0: positron TOTAL energy in lab frame
 bool DarkScalarsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
     {
 
@@ -120,6 +123,7 @@ void DarkScalarsAnnihilation::SetMA(double MAIn) {
 }
 
 //e+e- --> S --> LDM LDM is uniform in cos(theta) CM, for both scalar and fermionic LDM
+//E0: positron TOTAL energy in lab frame
 double DarkScalarsAnnihilation::AngularDistributionResonant(double eta,double E0){
   double ret=1;
   return ret;

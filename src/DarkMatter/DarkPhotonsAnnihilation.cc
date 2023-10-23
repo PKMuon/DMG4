@@ -50,6 +50,7 @@ DarkPhotonsAnnihilation::~DarkPhotonsAnnihilation()
 
 //Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
 //This is the total cross section without the BW denominator
+//E0: positron TOTAL energy in lab frame
 double DarkPhotonsAnnihilation::PreFactor(double E0){
 
   double ss = 2. * Mel * E0+2*Mel*Mel;
@@ -103,11 +104,12 @@ double DarkPhotonsAnnihilation::PreFactor(double E0){
   return sigma;
 }
 
+//E0: positron TOTAL energy in lab frame
 double DarkPhotonsAnnihilation::GetSigmaTot(double E0) {
   return TotalCrossSectionCalc(E0);
 }
 
-
+//E0: positron TOTAL energy in lab frame
 bool DarkPhotonsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
 {
   if (sqrt(2.*Mel*E0+2*Mel*Mel) < 2.*mChi) return false;
@@ -182,7 +184,7 @@ void DarkPhotonsAnnihilation::SetMA(double MAIn) {
 
 }
 
-
+//E0: positron TOTAL energy in lab frame
 double DarkPhotonsAnnihilation::AngularDistributionResonant(double eta,double E0){
 
 
