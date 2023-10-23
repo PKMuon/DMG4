@@ -32,7 +32,7 @@ DarkPseudoScalarsAnnihilation::~DarkPseudoScalarsAnnihilation() {
 //This is the total cross section without the BW denominator
 double DarkPseudoScalarsAnnihilation::PreFactor(double E0){
 
-    double ss = 2. * Mel * E0;
+    double ss = 2. * Mel * E0+2*Mel*Mel;
     if (sqrt(ss) < 2. * mChi)
         return 0.;   // A.C. e+e- -> S -> chi chi can happen also for an S and chi with large mass,
                    // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
@@ -64,7 +64,7 @@ double DarkPseudoScalarsAnnihilation::GetSigmaTot(double E0) {
 bool DarkPseudoScalarsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
         {
 
-    if (sqrt(2. * Mel * E0) < 2. * mChi)
+    if (sqrt(2. * Mel * E0+2*Mel*Mel) < 2. * mChi)
         return false;
     if (E0 < EThresh)
         return false;
@@ -119,7 +119,7 @@ void DarkPseudoScalarsAnnihilation::SetMA(double MAIn) {
 
 double DarkPseudoScalarsAnnihilation::AngularDistributionResonant(double eta,double E0){
    double val=1;
-   double ss = 2. * Mel * E0;
+   double ss = 2. * Mel * E0+2*Mel*Mel;
    if (sqrt(ss) < 2.*mChi){
      printf("DarkScalarsAnnihilation::AngularDistribution error with threshold, E0=%f, m=%f\n",E0,mChi);
      exit(1);

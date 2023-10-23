@@ -31,7 +31,7 @@ DarkAxialsAnnihilation::~DarkAxialsAnnihilation() {
 //Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
 //This is the total cross section without the BW denominator
 double DarkAxialsAnnihilation::PreFactor(double E0) {
-    double ss = 2. * Mel * E0;
+    double ss = 2. * Mel * E0 +2*Mel*Mel;
 
     if (sqrt(ss) < 2. * mChi)
         return 0.;   // A.C. e+e- -> A' -> chi chi can happen also for an A' and chi with large mass,
@@ -62,7 +62,7 @@ double DarkAxialsAnnihilation::GetSigmaTot(double E0) {
 bool DarkAxialsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
         {
 
-    if (sqrt(2. * Mel * E0) < 2. * mChi)
+    if (sqrt(2. * Mel * E0+2*Mel*Mel) < 2. * mChi)
         return false;
     if (E0 < EThresh)
         return false;
@@ -116,7 +116,7 @@ void DarkAxialsAnnihilation::SetMA(double MAIn) {
 
 double DarkAxialsAnnihilation::AngularDistributionResonant(double eta,double E0){
   double val=1;
-  double ss = 2. * Mel * E0;
+  double ss = 2. * Mel * E0+2*Mel*Mel;
 
   if (sqrt(ss) < 2.*mChi){
     printf("DarkScalarsAnnihilation::AngularDistribution error with threshold, E0=%f, m=%f\n",E0,mChi);

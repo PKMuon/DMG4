@@ -52,7 +52,7 @@ DarkPhotonsAnnihilation::~DarkPhotonsAnnihilation()
 //This is the total cross section without the BW denominator
 double DarkPhotonsAnnihilation::PreFactor(double E0){
 
-  double ss = 2. * Mel * E0;
+  double ss = 2. * Mel * E0+2*Mel*Mel;
   double qq=0.,E1=0.,E2=0.;
   switch (iBranchingType) {
 
@@ -110,7 +110,7 @@ double DarkPhotonsAnnihilation::GetSigmaTot(double E0) {
 
 bool DarkPhotonsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
 {
-  if (sqrt(2.*Mel*E0) < 2.*mChi) return false;
+  if (sqrt(2.*Mel*E0+2*Mel*Mel) < 2.*mChi) return false;
   if(E0 < EThresh) return false;
   if(NEmissions) return false; // For G4 DM classes
   if(fabs(DensityMat - Density) > 0.1) return false;
@@ -186,7 +186,7 @@ void DarkPhotonsAnnihilation::SetMA(double MAIn) {
 double DarkPhotonsAnnihilation::AngularDistributionResonant(double eta,double E0){
 
 
-    double ss = 2. * Mel * E0;
+    double ss = 2. * Mel * E0+2*Mel*Mel;
     double qq;
     double val=0;
     switch (iBranchingType){
