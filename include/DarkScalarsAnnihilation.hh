@@ -33,6 +33,9 @@ class DarkScalarsAnnihilation : public DarkMatterAnnihilation
     virtual double Width();
     virtual void SetMA(double MAIn);
 
+    virtual double AngularDistributionResonant(double eta,double E0);
+
+
 };
 
 #endif /* INCLUDE_DarkScalarsANNIHILATION_HH_ */
