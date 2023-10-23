@@ -40,7 +40,7 @@ DarkMatterAnnihilation::~DarkMatterAnnihilation()
 
 
 /*This method returns a random cosine for e+e- --> A' --> ff in the CM frame
- * E0: positron energy in LAB frame (GeV units)
+ * E0: positron total energy in LAB frame (GeV units)
  */
 double DarkMatterAnnihilation::SimulateEmissionResonant(double E0){
 
@@ -56,12 +56,12 @@ double DarkMatterAnnihilation::SimulateEmissionResonant(double E0){
     return 1;
 }
 
-//Input: E0, positron energy in GeV
+//Input: E0, positron total energy in GeV
 //output: total annihilation cross-section in pbarn.
 //Since the framework assumes this method is returning the total cross section per nucleous, for the moment I scale this by Z.
 double DarkMatterAnnihilation::TotalCrossSectionCalc(double E0) {
 
-    double ss = 2. * Mel * E0;
+    double ss = 2. * Mel * E0 +2*Mel*Mel;
     double sigma=this->PreFactor(E0);
     double gg = this->Width();
     sigma=sigma/((ss - MA * MA) * (ss - MA * MA) + MA * MA * gg * gg);
@@ -70,8 +70,7 @@ double DarkMatterAnnihilation::TotalCrossSectionCalc(double E0) {
 
 //A.C. useful function to directly return the maximum cross section value (for numerical precision)
 double DarkMatterAnnihilation::GetTotalCrossSectionMax(){
-
-  double Eres = (MA*MA/(2.*Mel));
+  double Eres = (MA*MA-2*Mel*Mel)/(2.*Mel);
   double sigma=this->PreFactor(Eres);
   double gg = this->Width();
   sigma=sigma/(MA * MA * gg * gg);
