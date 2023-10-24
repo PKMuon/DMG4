@@ -53,8 +53,6 @@ double DarkScalarsAnnihilation::PreFactor(double E0) {
   //here sigma is in  1 /Energy^2. Move to pBarn;
   sigma = sigma * GeVtoPb;
 
-  //A.C. correct here for atomic effects
-  sigma = sigma * ZNucl;
   return sigma;
 }
 

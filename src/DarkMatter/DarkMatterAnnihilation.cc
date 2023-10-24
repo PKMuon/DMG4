@@ -57,6 +57,15 @@ double DarkMatterAnnihilation::SimulateEmissionResonant(double E0){
 }
 
 //Input: E0, positron total energy in GeV
+double DarkMatterAnnihilation::BreitWignerDenominator(double E0){
+  double ss = 2. * Mel * E0 +2*Mel*Mel;
+  double gg = this->Width();
+  double BWden=((ss - MA * MA) * (ss - MA * MA) + MA * MA * gg * gg);
+  return BWden;
+}
+
+
+//Input: E0, positron total energy in GeV
 //output: total annihilation cross-section in pbarn.
 //Since the framework assumes this method is returning the total cross section per nucleous, for the moment I scale this by Z.
 double DarkMatterAnnihilation::TotalCrossSectionCalc(double E0) {
@@ -64,7 +73,9 @@ double DarkMatterAnnihilation::TotalCrossSectionCalc(double E0) {
     double ss = 2. * Mel * E0 +2*Mel*Mel;
     double sigma=this->PreFactor(E0);
     double gg = this->Width();
-    sigma=sigma/((ss - MA * MA) * (ss - MA * MA) + MA * MA * gg * gg);
+    sigma=sigma/this->BreitWignerDenominator(E0);
+    //A.C. correct here for atomic effects
+    sigma=sigma*ZNucl;
     return sigma;
 }
 
@@ -74,7 +85,32 @@ double DarkMatterAnnihilation::GetTotalCrossSectionMax(){
   double sigma=this->PreFactor(Eres);
   double gg = this->Width();
   sigma=sigma/(MA * MA * gg * gg);
+  //A.C. correct here for atomic effects
+  sigma=sigma*ZNucl;
   return sigma;
 }
 
+//A.C. see: https://gitlab.cern.ch/P348/DMG4/-/issues/14?work_item_iid=21
+//E0: positron total energy in GeV
+//B: electron binding energy in GeV
+double DarkMatterAnnihilation::GetSigmaTotAtomicEffects(double E0,double B){
+  double Ep=E0;
+  double Pp=sqrt(Ep*Ep-Mel*Mel);
+  double Em=B+Mel;
+  double Pm=sqrt(Em*Em-Mel*Mel);
+  double W=this->Width();
+  double sigma=this->PreFactor(E0);
 
+  sigma=sigma/(4*MA*W);
+  sigma=sigma/(Pp*Pm);
+
+  double arg1=(2*Pp*Pm-2*Mel*Mel-2*Ep*Em+MA*MA)/(MA*W);
+  double arg2=(-2*Pp*Pm-2*Mel*Mel-2*Ep*Em+MA*MA)/(MA*W);
+
+  sigma=sigma*(atan(arg1)-atan(arg2));
+
+
+  return sigma;
+
+
+}

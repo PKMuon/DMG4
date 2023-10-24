@@ -95,9 +95,6 @@ double DarkPhotonsAnnihilation::PreFactor(double E0){
   sigma *= GeVtoPb;
 
 
-  //A.C. correct here for atomic effects
-  sigma = sigma * ZNucl;
-
   //A.C. width enhancement factor to avoid sharp variations of the cross section
   //Documentation: https://gitlab.cern.ch/P348/DMG4/-/issues/14
   sigma=sigma * widthEnhancementFactor;
