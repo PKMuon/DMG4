@@ -27,6 +27,7 @@ public:
 
     virtual double PreFactor(double E0);
     virtual double GetSigmaTot(double E0);
+
     virtual bool EmissionAllowed(double E0, double DensityMat); // E0 in GeV, density in g/cm3
     virtual double CrossSectionDSDX(double Xev, double E0);
     virtual double CrossSectionDSDXDU(double Xev, double UThetaEv, double E0);
@@ -34,6 +35,7 @@ public:
     virtual void SetMA(double MAIn);
 
     virtual double AngularDistributionResonant(double eta,double E0);
+
 
 private:
     double widthEnhancementFactor;

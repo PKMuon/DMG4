@@ -19,12 +19,17 @@
 #include "G4StepLimiterPhysics.hh"
 #include "G4RunManager.hh"
 #include "G4Event.hh"
+#include "G4Element.hh"
+#include "Randomize.hh"
+#include "G4ElementVector.hh"
 
 #include "DarkMatterParametersFactory.hh"
 
 #include "AnnihilationStepLimiter.hh"
 
 #define EDEP_ALONG_STEP
+#define ATOMIC_EFFECTS
+
 
 DMProcessAnnihilation::DMProcessAnnihilation(DarkMatterAnnihilation *DarkMatterPointerIn, G4ParticleDefinition *theDMParticlePtrIn, G4double BiasSigmaFactorIn,AnnihilationStepLimiter *LimiterIn) :
     G4VDiscreteProcess("DMProcessAnnihilation", fUserDefined),  // fElectromagnetic
@@ -70,11 +75,44 @@ G4ForceCondition* /*condition*/) {
 
 
   G4double DensityMat = aTrack.GetMaterial()->GetDensity() / (g / cm3);
-  G4double ekin = aTrack.GetKineticEnergy() / GeV; //this is the energy of the positron at the beginning of the step
+  G4double ekin = aTrack.GetKineticEnergy() / GeV; //this is the kinetic energy of the positron at the beginning of the step
+  G4double etot = aTrack.GetTotalEnergy() / GeV; //this is the total energy of the positron at the beginning of the step
 
-  if (myDarkMatterAnnihilation->EmissionAllowed(ekin, DensityMat)) {
-    G4double CrossSection =myDarkMatterAnnihilation->GetSigmaTot(ekin); //keep this line here
-    G4double Emax=(myDarkMatterAnnihilation->GetMA()*myDarkMatterAnnihilation->GetMA())/(2*Mel); //this is in GeV
+  if (myDarkMatterAnnihilation->EmissionAllowed(etot, DensityMat)) {
+    /*
+     * This part is related to atomic motion effects
+     * See: https://gitlab.cern.ch/P348/DMG4/-/issues/14?work_item_iid=21
+     *
+     *1- Select a random element for this material, by considering for simplicity a per-atom cross-section proportional to Z^2
+     *   FOR THE MOMENT, THIS ONLY SUPPORTS ELEMENTS with one-material only.
+     */
+
+    auto elms=aTrack.GetMaterial()->GetElementVector();
+
+    if ((*elms).size()>1){
+      G4cout<<"ERROR, DMProcessAnnihilation with multi-material elements not yet supported"<<G4endl;
+      exit(1);
+    }
+    const G4Element* elm=(*elms)[0];
+    G4int Z=(G4int)(elm->GetZ());
+
+    /*2- If necessary, compute the electron energies for this material*/
+    if (shellElectronEnergies.find(Z)==shellElectronEnergies.end()){
+        for (G4int is=0;is<elm->GetNbOfAtomicShells();is++){
+          shellElectronZ[Z][is]=elm->GetNbOfShellElectrons(is);
+          shellElectronEnergies[Z][is]=this->SimulateElectronEnergies(elm,is);
+        }
+    }
+
+#ifdef ATOMIC_EFFECTS
+    G4double CrossSection =myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(etot, shellElectronZ[Z],shellElectronEnergies[Z]);
+#else
+    G4double CrossSection =myDarkMatterAnnihilation->GetSigmaTot(etot); //keep this line here
+#endif
+
+
+    G4double Emax=(myDarkMatterAnnihilation->GetMA()*myDarkMatterAnnihilation->GetMA()-2*Mel*Mel)/(2*Mel); //this is in GeV
+
 
 #ifdef EDEP_ALONG_STEP
     /*
@@ -85,7 +123,7 @@ G4ForceCondition* /*condition*/) {
      * This is obtained from the step limiter if it is available
      */
     if (m_limiter){
-      G4double dEmax=m_limiter->GetMaxEloss(aTrack.GetKineticEnergy())/GeV;
+      G4double dEmax=m_limiter->GetMaxEloss(etot)/GeV;
       xi=Emax/(Emax+dEmax);
       if (xi<.8) //G4 suggestion
         xi=.8;
@@ -93,20 +131,33 @@ G4ForceCondition* /*condition*/) {
     //G4cout<<"DMProcessGetMeanFreePath: "<<aTrack.GetKineticEnergy()/GeV<<" "<<dEmax<<" "<<xi<<G4endl;
 
     //First case, the energy at the beginning of the step is smaller than the resonant energy
-    if (ekin < Emax){
-      this->CrossSectionStepE=ekin;
+    if (etot < Emax){
+      this->CrossSectionStepE=etot;
+#ifdef ATOMIC_EFFECTS
+      this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(this->CrossSectionStepE, shellElectronZ[Z],shellElectronEnergies[Z]);
+#else
       this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTot(this->CrossSectionStepE);
+#endif
+
     }
     //Second case, the energy at the beginning of the step is larger than the resonant energy and also than Emax/xi
     //take the value xi*E (0<xi<1)
     else if (ekin > (Emax/xi)){
       this->CrossSectionStepE=xi*ekin;
+#ifdef ATOMIC_EFFECTS
+      this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(this->CrossSectionStepE, shellElectronZ[Z],shellElectronEnergies[Z]);
+#else
       this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTot(this->CrossSectionStepE);
+#endif
     }
     //Third case, the energy at the beginning of the step is larger than the resonant energy but smaller than Emax/xi
     else{
       this->CrossSectionStepE=Emax;
+#ifdef ATOMIC_EFFECTS
+      this->CrossSectionStepVal=myDarkMatterAnnihilation->GetTotalCrossSectionMaxAtomicEffects(shellElectronZ[Z],shellElectronEnergies[Z]);
+#else
       this->CrossSectionStepVal=myDarkMatterAnnihilation->GetTotalCrossSectionMax();
+#endif
     }
     //avoid numerical manipulations of this->CrossSectionStepVal
     CrossSection = this->CrossSectionStepVal;
@@ -131,10 +182,29 @@ G4ForceCondition* /*condition*/) {
 G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, const G4Step &aStep) {
   const G4double incidentE = aTrack.GetKineticEnergy(); //this is the energy at the end of the step
   const G4double initialE =  aStep.GetPreStepPoint()->GetKineticEnergy(); //this is the energy at the beginning of the step
-
   G4double DMMass = myDarkMatterAnnihilation->GetMA()*GeV; // in MeV
+
+  auto elms=aTrack.GetMaterial()->GetElementVector();
+  if ((*elms).size()>1){
+    G4cout<<"ERROR, DMProcessAnnihilation with multi-material elements not yet supported"<<G4endl;
+    exit(1);
+  }
+  const G4Element* elm=GetRandomElement(elms);
+  G4int Z=(G4int)(elm->GetZ());
+
+
+
+
+#ifdef ATOMIC_EFFECTS
+  const G4double initialCrossSection=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(initialE/GeV,shellElectronZ[Z],shellElectronEnergies[Z]); //this is the cross section at the beginning of the step
+  const G4double finalCrossSection=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(incidentE/GeV,shellElectronZ[Z],shellElectronEnergies[Z]); //this is the cross section at the end of the step
+#else
   const G4double initialCrossSection=myDarkMatterAnnihilation->GetSigmaTot(initialE/GeV); //this is the cross section at the beginning of the step
   const G4double finalCrossSection=myDarkMatterAnnihilation->GetSigmaTot(incidentE/GeV); //this is the cross section at the end of the step
+#endif
+
+
+
   G4double diffE = (initialE - incidentE)/GeV; // in GeV
   /*
    * Here are the calculations needed for the average cross-section
@@ -206,10 +276,22 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
       G4double DMeta_CM = myDarkMatterAnnihilation->SimulateEmissionResonant(incidentE);
       //2: Get the phi angle of the final state f in the CM frame
       G4double DMphi_CM = G4UniformRand() * 2 * CLHEP::pi;
-      //3: Define the Lorentz Vector of the CM (e+ + e-)
-      G4LorentzVector vCM(aTrack.GetMomentum(), aTrack.GetTotalEnergy() + CLHEP::electron_mass_c2);
 
-      G4double ss = 2 * (incidentE) * CLHEP::electron_mass_c2 + 2 * CLHEP::electron_mass_c2 * CLHEP::electron_mass_c2;
+      G4LorentzVector p4_posi(aTrack.GetMomentum(),aTrack.GetTotalEnergy());
+#ifdef ATOMIC_EFFECTS
+      G4double zEle=2*G4UniformRand()-1;
+      G4double phiEle=2*G4UniformRand()*CLHEP::pi;
+      G4double kinEle=0;
+      G4double momEle=0;
+
+      G4LorentzVector p4_ele(G4ThreeVector(momEle*sqrt(1-zEle*zEle)*cos(phiEle),momEle*sqrt(1-zEle*zEle)*sin(phiEle),momEle*zEle),kinEle+CLHEP::electron_mass_c2);
+#else
+      G4LorentzVector p4_ele(G4ThreeVector(0,0,0),CLHEP::electron_mass_c2);
+#endif
+      //3: Define the Lorentz Vector of the CM (e+ + e-)
+      G4LorentzVector vCM=p4_posi+p4_ele;
+      G4double ss = vCM.m2();
+
       G4double Pcm, Px_cm, Py_cm, Pz_cm;
       switch (iBranchingType) {
       case 0: //fermionic and scalar elastic
@@ -326,4 +408,53 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
 
 
 
+G4Element* DMProcessAnnihilation::GetRandomElement(const G4ElementVector *elms){
+  G4int idx=0;
+  if (elms->size()==1){
+    idx=0;
+  }
+  else{
 
+    G4cerr<<"ERROR! DMProcessAnnihilation::GetRandomElement called for a multi-element material, not yet implemented"<<G4endl;
+    exit(1);
+
+    /*If there's more than one element in the material,
+      consider a probability proportional to Z^2
+    */
+    std::vector<G4double> cumulativeProd;
+    G4double totProd=0;
+    for (auto elem : (*elms)){
+      totProd+=elem->GetZ()*elem->GetZ();
+      cumulativeProd.push_back(totProd);
+    }
+    G4double xprob =  totProd*G4UniformRand();
+    // select material
+    for(idx=0; idx<cumulativeProd.size(); ++idx) {
+      if(xprob <= cumulativeProd[idx]) {
+        break;
+      }
+    }
+  }
+  return (*elms)[idx];
+}
+
+//A.C. use an exponential model, as in G4 Compton model
+//An exponential model
+G4double DMProcessAnnihilation::GetOneRandomEleEnergy(G4double B){
+  G4double u=G4UniformRand();
+  G4double x=-B*log(u);
+  return x;
+}
+
+std::vector<G4double> DMProcessAnnihilation::SimulateElectronEnergies(const G4Element *elm,G4int is){
+
+  std::vector<G4double> v;
+  G4double B=elm->GetAtomicShell(is); //binding energy, positive, in g4 units
+
+  const G4int nEne=100;
+  for (G4int ii=0;ii<nEne;ii++){
+    G4double x=this->GetOneRandomEleEnergy(B); //in G4 units
+    v.push_back(x/GeV); //convert it in GeV
+  }
+  return v;
+}

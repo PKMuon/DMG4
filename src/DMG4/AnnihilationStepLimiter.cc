@@ -44,13 +44,14 @@ G4double
   *condition = NotForced;
 
   G4double DensityMat = aTrack.GetMaterial()->GetDensity() / (g / cm3);
-  G4double ekin = aTrack.GetKineticEnergy() / GeV; //this is the energy of the positron at the beginning of the step
+  G4double ekin = aTrack.GetKineticEnergy() / GeV; //this is the kinetic energy of the positron at the beginning of the step
+  G4double etot = aTrack.GetTotalEnergy() / GeV; //this is the total energy of the positron at the beginning of the step
 
-  if (m_DarkMatterAnnihilation->EmissionAllowed(ekin, DensityMat)) {
+  if (m_DarkMatterAnnihilation->EmissionAllowed(etot, DensityMat)) {
 
     //G4 convention: put immediately units
     G4double Mres=m_DarkMatterAnnihilation->GetMA()*GeV;
-    G4double Eres=(Mres*Mres)/(2*CLHEP::electron_mass_c2);
+    G4double Eres=(Mres*Mres-2*CLHEP::electron_mass_c2)/(2*CLHEP::electron_mass_c2);
     G4double W=m_DarkMatterAnnihilation->Width()*GeV;
     G4double Wstar=W*(Mres/(2*CLHEP::electron_mass_c2));
 
@@ -90,9 +91,10 @@ G4double AnnihilationStepLimiter::GetMaxEloss(G4double E){
   return maxEloss;
 }
 
+//E is the TOTAL POSITRON energy
 G4double AnnihilationStepLimiter::dSigmadEoverSigma(G4double E){
   G4double Mres=m_DarkMatterAnnihilation->GetMA()*GeV;
-  G4double Eres=(Mres*Mres)/(2*CLHEP::electron_mass_c2);
+  G4double Eres=(Mres*Mres-2*CLHEP::electron_mass_c2)/(2*CLHEP::electron_mass_c2);
   G4double W=m_DarkMatterAnnihilation->Width()*GeV;
   G4double Wstar=W*(Mres/(2*CLHEP::electron_mass_c2));
 
