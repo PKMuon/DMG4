@@ -115,10 +115,7 @@ double DarkAxials::TotalCrossSectionCalc(double E0)
 
 double DarkAxials::GetSigmaTot(double E0)
 {
-  if(MA > 0.001) {
-    return GetSigmaTot0(E0);
-  } else {
-    return TotCSAxialParticle(MA);  }
+  return GetSigmaTot0(E0);
 }
 
 
