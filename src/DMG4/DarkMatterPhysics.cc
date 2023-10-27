@@ -21,6 +21,7 @@
 #include "DMProcessDMBrem.hh"
 #include "DMProcessPrimakoffALP.hh"
 #include "DMProcessAnnihilation.hh"
+#include "AnnihilationStepLimiter.hh"
 
 #include "DMParticleAPrime.hh"
 #include "DMParticleZPrime.hh"
@@ -43,6 +44,7 @@
 
 #include "G4BuilderType.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4ProcessManager.hh"
 
 
 DarkMatterPhysics::DarkMatterPhysics() 
@@ -96,6 +98,9 @@ void DarkMatterPhysics::Init(){
   //G4double IDMTheta = DMpar->GetRegisteredParam("IDMTheta",1.e-3); // is it to be used somewhere as argument?
   G4int BranchingType = DMpar->GetRegisteredParam("BranchingType",0);
 
+
+  G4double minWidth =  DMpar->GetRegisteredParam("AnnihilationMinWidth",0);
+
 /*
  * A.C. all quantities obtained from DMPar have intrinsic G4 units
  * In the following, we pass them to DarkMatter classes, that use following convention:
@@ -109,6 +114,7 @@ void DarkMatterPhysics::Init(){
   EThresh/=GeV;
   DMMass/=GeV;
   Density/=(g/cm3);
+  minWidth/=GeV;
 
 
   switch(DMProcessType)
@@ -164,7 +170,7 @@ void DarkMatterPhysics::Init(){
     case 11:
       G4cout << "Initialize DarkPhotonsAnnihilation\n";
       myDarkMatter = new DarkPhotonsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
-                                                 DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor );
+                                                 DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor,minWidth);
       break;
     case 12:
       G4cout << "Initialize DarkScalarsAnnihilation\n";
@@ -238,7 +244,7 @@ void DarkMatterPhysics::ConstructParticle()
         if ((BranchingType == 0) || (BranchingType == 1)) {
           DMParticleChi::Definition();
         } else {
-          if ((BranchingType == 3)) {
+          if (BranchingType == 3) {
             G4cout << G4endl << "Several decay channels according to BranchingType are not allowed in annihilation, exiting " << G4endl << G4endl;
             exit(1);
           }
@@ -327,8 +333,25 @@ void DarkMatterPhysics::ConstructProcess()
                                 G4Positron::PositronDefinition() );
   }
   if(myDarkMatter->GetParentPDGID() == -11) {
-    phLHelper->RegisterProcess( new DMProcessAnnihilation(dynamic_cast<DarkMatterAnnihilation*>(myDarkMatter), theDMParticlePtr, BiasSigmaFactor),
-                                G4Positron::PositronDefinition() );
+
+    DarkMatterAnnihilation *dmAnnihil=dynamic_cast<DarkMatterAnnihilation*>(myDarkMatter);
+    AnnihilationStepLimiter *dmLimiterProc=new AnnihilationStepLimiter(dmAnnihil,"StepLimiterAnnihilation");
+    DMProcessAnnihilation *dmAnnihilProc=new DMProcessAnnihilation(dmAnnihil, theDMParticlePtr, BiasSigmaFactor,dmLimiterProc);
+
+    /* Add the step limiter to the list of discrete processes for the e+
+     * before adding the annihilation process
+     * This will trigger the calculation of the max step length, including the maximum energy loss across the new step
+     * So these quantities can be used by this process for this step
+     */
+    G4ParticleDefinition* posi=G4Positron::Definition();
+    G4ProcessManager* processManager=posi->GetProcessManager();
+    processManager->AddDiscreteProcess(dmLimiterProc);
+
+    //Now add the annihilation process
+    phLHelper->RegisterProcess(dmAnnihilProc,G4Positron::PositronDefinition());
+
+
+
   }
   if(myDarkMatter->GetParentPDGID() == 13) {
     phLHelper->RegisterProcess( new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),

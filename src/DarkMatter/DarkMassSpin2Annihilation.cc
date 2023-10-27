@@ -37,10 +37,11 @@ DarkMassSpin2Annihilation::~DarkMassSpin2Annihilation(  ){ ; }
 
 
 // Total cross-section in pBarn
+//E0: positron TOTAL energy in lab frame
 double DarkMassSpin2Annihilation::PreFactor( double E0 )
 {
   // Invariant mass 
-  double ss = 2.0 * Mel * E0, rsChi = mChi*mChi / ss, rsEl = Mel*Mel / ss;
+  double ss = 2.0 * Mel * E0+2*Mel*Mel, rsChi = mChi*mChi / ss, rsEl = Mel*Mel / ss;
   // A.C. e+e- -> G -> chi chi can happen also for an G and chi with large 
   // mass, i.e. through the off-shell tail of the resonance, but this still 
   // needs to be kinematically allowed.
@@ -52,12 +53,10 @@ double DarkMassSpin2Annihilation::PreFactor( double E0 )
   // here sigma is in  1 /Energy^2. Move to pBarn
   sigma = sigma * GeVtoPb * 4*M_PI * alphaD * epsilBench*epsilBench;
 
-  // A.C. correct here for atomic effects
-  sigma = sigma * ZNucl;
   return sigma;
 }
 
-
+//E0: positron TOTAL energy in lab frame
 double DarkMassSpin2Annihilation::GetSigmaTot( double E0 )
 {
   return TotalCrossSectionCalc( E0 );
@@ -65,9 +64,10 @@ double DarkMassSpin2Annihilation::GetSigmaTot( double E0 )
 
 
 // Different kinematic limit here
+//E0: positron TOTAL energy in lab frame
 bool DarkMassSpin2Annihilation::EmissionAllowed( double E0, double DensityMat )
 {
-  if ( sqrt(2. * Mel * E0) < 2.0 * mChi ){ return false; }
+  if ( sqrt(2. * Mel * E0+2*Mel*Mel) < 2.0 * mChi ){ return false; }
   if ( E0 < EThresh ){ return false; }
   if ( NEmissions ){ return false; }   // For G4 DM classes
   if ( fabs(DensityMat - Density) > 0.1 ){ return false; }
@@ -108,6 +108,7 @@ void DarkMassSpin2Annihilation::SetMA(double MAIn) {
     mChi2 = mChi;
 }
 
+//E0: positron TOTAL energy in lab frame
 double DarkMassSpin2Annihilation::AngularDistributionResonant(double E0,double eta){
   return 1.;
 }

@@ -81,14 +81,25 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure(void *ptr)
       */
      //DMpar->RegisterNewParam("BranchingType", 0.);
 
-     // additional parameters for annihilation (if absent the default ones will be used)
+     /* additional parameters for annihilation (if absent the default ones will be used)
+      * RDM -> mChi/mA ratio
+      * AlphaD -> value of alphaDark
+      * */
      //DMpar->RegisterNewParam("RDM", 1./3.);
      //DMpar->RegisterNewParam("AlphaD", 0.5);
 
-     // additional parameters for semivisible DM, in addition to above parameters for annihilation (if absent the default ones will be used)
+     /* additional parameters for semivisible DM, in addition to above parameters for annihilation (if absent the default ones will be used)*/
      //DMpar->RegisterNewParam("Ffactor", 0.4);
-     // additional parameter for Dirac DM, describing the dark fermion mixing (if absent the default ones will be used)
+
+     /* additional parameter for Dirac DM, describing the dark fermion mixing (if absent the default ones will be used)*/
      //DMpar->RegisterNewParam("IDMTheta", 1.e-3);
+
+     /* Additional parameters to handle narrow width resonances in annihilation
+      * dEmaxPerStep -> the maximum energy loss per step in the material(s) where the annihilation is allowed
+      * AnnihilationMinWidth -> the minimum value of the cross section width; if it is smaller than this, the width is artificially increase, and the cross section corrected for so that the yield is constant
+      */
+     //DMpar->RegisterNewParam("dEmaxPerStep",5*MeV)
+     //DMpar->RegisterNewParam("AnnihilationMinWidth",10*keV);
 
   return true;
 }

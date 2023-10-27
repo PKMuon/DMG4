@@ -17,10 +17,11 @@
 
 
 DarkPhotonsAnnihilation::DarkPhotonsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
-                                                 double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
+                                                 double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn, double minWidth) :
                                                  DarkMatterAnnihilation(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn, rIn,alphaDIn, IBranchingIn,fIn)
 {
   DMType = 1; //A.C.
+  widthEnhancementFactor = 1;
 
   std::cout << "Initialized DarkPhotonsAnnihilation (e+ e- -> A' -> DM DM) for material density = " << DensityIn << std::endl;
   std::cout << "mA: "<<MA*1000<<" MeV "<<std::endl;
@@ -34,6 +35,11 @@ DarkPhotonsAnnihilation::DarkPhotonsAnnihilation(double MAIn, double EThreshIn, 
   std::cout<<"Width: "<<this->Width()*1E3<<" MeV "<<std::endl;
 
 
+  if ((minWidth >0)&&(this->Width()<minWidth)){
+    widthEnhancementFactor=minWidth/this->Width();
+    std::cout<<"Width after artificial enhancement: "<<this->Width()<<std::endl;
+  }
+
   std::cout << std::endl;
 }
 
@@ -44,9 +50,10 @@ DarkPhotonsAnnihilation::~DarkPhotonsAnnihilation()
 
 //Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
 //This is the total cross section without the BW denominator
+//E0: positron TOTAL energy in lab frame
 double DarkPhotonsAnnihilation::PreFactor(double E0){
 
-  double ss = 2. * Mel * E0;
+  double ss = 2. * Mel * E0+2*Mel*Mel;
   double qq=0.,E1=0.,E2=0.;
   switch (iBranchingType) {
 
@@ -88,19 +95,21 @@ double DarkPhotonsAnnihilation::PreFactor(double E0){
   sigma *= GeVtoPb;
 
 
-  //A.C. correct here for atomic effects
-  sigma = sigma * ZNucl;
+  //A.C. width enhancement factor to avoid sharp variations of the cross section
+  //Documentation: https://gitlab.cern.ch/P348/DMG4/-/issues/14
+  sigma=sigma * widthEnhancementFactor;
   return sigma;
 }
 
+//E0: positron TOTAL energy in lab frame
 double DarkPhotonsAnnihilation::GetSigmaTot(double E0) {
   return TotalCrossSectionCalc(E0);
 }
 
-
+//E0: positron TOTAL energy in lab frame
 bool DarkPhotonsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
 {
-  if (sqrt(2.*Mel*E0) < 2.*mChi) return false;
+  if (sqrt(2.*Mel*E0+2*Mel*Mel) < 2.*mChi) return false;
   if(E0 < EThresh) return false;
   if(NEmissions) return false; // For G4 DM classes
   if(fabs(DensityMat - Density) > 0.1) return false;
@@ -145,8 +154,9 @@ double DarkPhotonsAnnihilation::Width() {
       }
       break;
   }
-
-
+  //A.C. add width-enhancement factor
+  //Documentation: https://gitlab.cern.ch/P348/DMG4/-/issues/14
+  ret=ret*widthEnhancementFactor;
 
   return ret;
 }
@@ -171,11 +181,11 @@ void DarkPhotonsAnnihilation::SetMA(double MAIn) {
 
 }
 
-
+//E0: positron TOTAL energy in lab frame
 double DarkPhotonsAnnihilation::AngularDistributionResonant(double eta,double E0){
 
 
-    double ss = 2. * Mel * E0;
+    double ss = 2. * Mel * E0+2*Mel*Mel;
     double qq;
     double val=0;
     switch (iBranchingType){
