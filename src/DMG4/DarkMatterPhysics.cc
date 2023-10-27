@@ -189,7 +189,8 @@ void DarkMatterPhysics::Init(){
        break;
     case 15:
       G4cout << "Initialize DarkMassSpin2Annihilation\n";
-      myDarkMatter = new DarkMassSpin2Annihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM);
+      myDarkMatter = new DarkMassSpin2Annihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
+              DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor );
        break;
      default:
        G4cout << G4endl << "Wrong DM process type specified: " << DMProcessType << " , exiting" << G4endl << G4endl;
@@ -238,6 +239,7 @@ void DarkMatterPhysics::ConstructParticle()
     case 12:
     case 13:
     case 14:
+    case 15:
       if (DecayType == 0) { //Only invisible, do nothing
       }
       else {  //Require final state particles
