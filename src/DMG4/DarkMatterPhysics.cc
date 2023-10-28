@@ -195,7 +195,8 @@ void DarkMatterPhysics::Init(){
        break;
     case 16:
       G4cout << "Initialize DarkZAnnihilation\n";
-      myDarkMatter = new DarkZAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM);
+      myDarkMatter = new DarkZAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
+          DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType,fFactor);
       break;
      default:
        G4cout << G4endl << "Wrong DM process type specified: " << DMProcessType << " , exiting" << G4endl << G4endl;
