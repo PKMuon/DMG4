@@ -43,9 +43,10 @@ DarkZAnnihilation::~DarkZAnnihilation() {
 
 //Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
 //This is the total cross section without the BW denominator
+//E0: positron total energy in GeV
 double DarkZAnnihilation::PreFactor(double E0) {
 
-  double ss = 2. * Mel * E0;
+  double ss = 2. * Mel * E0 + 2*Mel*Mel;
   double qq = 0., E1 = 0., E2 = 0.;
 
   double sMin = 0;
@@ -93,12 +94,14 @@ double DarkZAnnihilation::GetSigmaTot(double E0) {
   return TotalCrossSectionCalc(E0);
 }
 
+
+//E0: positron total energy in GeV
 bool DarkZAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
 {
   switch (iBranchingType){
   case 1: //DM
   case 3:
-    if (sqrt(2. * Mel * E0) < 2. * mChi)
+    if (sqrt(2. * Mel * E0 + 2*Mel*Mel) < 2. * mChi)
       return false;
     break;
   }
