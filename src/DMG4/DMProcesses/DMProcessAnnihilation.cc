@@ -165,6 +165,7 @@ G4ForceCondition* /*condition*/) {
 
     CrossSection *= picobarn;
     //The DarkMatterAnnihilation classes compute the cross section for eps = epsilBench. Here, we revert back to epsilon
+    //We do not do this for Z' annihilation, since in that case the eps passed by user is used.
     if (myDarkMatterAnnihilation->GetDMType()!=11){
       CrossSection *= (myDarkMatterAnnihilation->Getepsil() * myDarkMatterAnnihilation->Getepsil()) / (myDarkMatterAnnihilation->GetepsilBench() * myDarkMatterAnnihilation->GetepsilBench());
     }
@@ -265,10 +266,14 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
     // Kill projectile:
     aParticleChange.ProposeEnergy(0.);
     aParticleChange.ProposeTrackStatus(fStopAndKill);
-
+#ifdef ATOMIC_EFFECTS
+    static double maxV=myDarkMatterAnnihilation->GetTotalCrossSectionMaxAtomicEffects(shellElectronZ[Z],shellElectronEnergies[Z]);
+#else
+    static double maxV=myDarkMatterAnnihilation->GetTotalCrossSectionMax();
+#endif
     std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding() << " emitted by " << aTrack.GetDefinition()->GetParticleName() << " with energy = "
         << incidentE / GeV << " GeV, DM energy = " << incidentE / GeV << " GeV [event n.: " <<G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID()<<"]"<<std::endl;
-    std::cout << "DM cross section=" <<initialCrossSection<<" [MAX VALUE: "<<myDarkMatterAnnihilation->GetTotalCrossSectionMax()<<"]"<<std::endl;
+    std::cout << "DM cross section=" <<initialCrossSection<<" [MAX VALUE: "<<maxV<<"]"<<std::endl;
 
     return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
   } else { //simulate the decay e+e- -->A' -->ff
