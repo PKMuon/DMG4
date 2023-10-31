@@ -267,9 +267,9 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
     aParticleChange.ProposeEnergy(0.);
     aParticleChange.ProposeTrackStatus(fStopAndKill);
 #ifdef ATOMIC_EFFECTS
-    static double maxV=myDarkMatterAnnihilation->GetTotalCrossSectionMaxAtomicEffects(shellElectronZ[Z],shellElectronEnergies[Z]);
+    double maxV=myDarkMatterAnnihilation->GetTotalCrossSectionMaxAtomicEffects(shellElectronZ[Z],shellElectronEnergies[Z]);
 #else
-    static double maxV=myDarkMatterAnnihilation->GetTotalCrossSectionMax();
+    double maxV=myDarkMatterAnnihilation->GetTotalCrossSectionMax();
 #endif
     std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding() << " emitted by " << aTrack.GetDefinition()->GetParticleName() << " with energy = "
         << incidentE / GeV << " GeV, DM energy = " << incidentE / GeV << " GeV [event n.: " <<G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID()<<"]"<<std::endl;
