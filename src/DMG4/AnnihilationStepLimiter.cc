@@ -9,14 +9,19 @@
 
 #include "DarkMatter.hh"
 #include "DarkMatterAnnihilation.hh"
+#include "DarkMatterParametersFactory.hh"
 
 AnnihilationStepLimiter::AnnihilationStepLimiter(DarkMatterAnnihilation* m_DarkMatterAnnihilation_in,const G4String& aName)
   : G4VDiscreteProcess(aName,fUserDefined),
     m_DarkMatterAnnihilation(m_DarkMatterAnnihilation_in),
-    AnnihilationMaxStep(DBL_MAX)
+    AnnihilationMaxStep(DBL_MAX),
+    factor(1.)
 {
   SetProcessSubType(2);
-  factor=50;
+
+
+
+
 }
 
 
