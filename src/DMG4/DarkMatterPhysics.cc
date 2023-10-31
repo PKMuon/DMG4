@@ -102,6 +102,7 @@ void DarkMatterPhysics::Init(){
 
   G4double minWidth =  DMpar->GetRegisteredParam("AnnihilationMinWidth",0);
 
+
 /*
  * A.C. all quantities obtained from DMPar have intrinsic G4 units
  * In the following, we pass them to DarkMatter classes, that use following convention:
@@ -349,9 +350,12 @@ void DarkMatterPhysics::ConstructProcess()
                                 G4Positron::PositronDefinition() );
   }
   if(myDarkMatter->GetParentPDGID() == -11) {
-
+    DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
+    G4double annihilationStepLimiterFactor=DMpar->GetRegisteredParam("AnnihilationStepLimiterFactor",5.);
     DarkMatterAnnihilation *dmAnnihil=dynamic_cast<DarkMatterAnnihilation*>(myDarkMatter);
     AnnihilationStepLimiter *dmLimiterProc=new AnnihilationStepLimiter(dmAnnihil,"StepLimiterAnnihilation");
+    dmLimiterProc->SetFactor(annihilationStepLimiterFactor);
+
     DMProcessAnnihilation *dmAnnihilProc=new DMProcessAnnihilation(dmAnnihil, theDMParticlePtr, BiasSigmaFactor,dmLimiterProc);
 
     /* Add the step limiter to the list of discrete processes for the e+

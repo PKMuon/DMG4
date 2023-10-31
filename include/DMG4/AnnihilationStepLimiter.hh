@@ -39,6 +39,11 @@ class AnnihilationStepLimiter : public G4VDiscreteProcess
      double GetMaxStep() {return AnnihilationMaxStep;}
      G4double GetMaxEloss(G4double E);
 
+     void SetFactor(double m_factor){
+           factor=(m_factor >= 1 ? m_factor : 1.);
+           G4cout<<"Annihilation step limiter, factor set to: "<<factor<<G4endl;
+     }
+
   private:
   
   // hide assignment operator as private 
@@ -51,7 +56,9 @@ class AnnihilationStepLimiter : public G4VDiscreteProcess
     G4double AnnihilationMaxStep;
     DarkMatterAnnihilation* m_DarkMatterAnnihilation;
     G4EmCalculator emCal;
-    int factor;
+    double factor;
+
+
 
 };
 

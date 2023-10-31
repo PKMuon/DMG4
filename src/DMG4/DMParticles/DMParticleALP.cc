@@ -19,12 +19,21 @@ DMParticleALP* DMParticleALP::Definition()
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
   G4double MassIn    = DMpar->GetRegisteredParam("DMMass");
   G4double epsilIn   = DMpar->GetRegisteredParam("Epsilon");
+  G4double DecayType = DMpar->GetRegisteredParam("DecayType");
 
-  const G4String name = "DMParticleALP";
+  G4String name = "DMParticleDarkALP";
   // search in particle table]
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition * anInstance = pTable->FindParticle(name);
-  G4double WidthIn = 1./(64.*pi)*MassIn*MassIn*MassIn*epsilIn*epsilIn;
+
+  G4bool isStable = DecayType > 0 ? false : true;
+  G4int IDPDG = 5300022; // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
+  G4double WidthIn = 0.;
+  if(!isStable) {
+    G4double WidthIn = 1./(64.*pi)*MassIn*MassIn*MassIn*epsilIn*epsilIn;
+    G4int IDPDG = 5300122;
+    name = "DMParticleALP";
+  }
   if( !anInstance ) {
     anInstance = new G4ParticleDefinition(
         /* Name ..................... */ name,
@@ -40,28 +49,31 @@ DMParticleALP* DMParticleALP::Definition()
         /* type ..................... */ "boson",
         /* lepton number ............ */ 0,
         /* baryon number ............ */ 0,
-        /* PDG encoding ............. */ 5300122, // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
-        /* stable ................... */ false,
+        /* PDG encoding ............. */ IDPDG,
+        /* stable ................... */ isStable,
         /* lifetime.................. */ 0,
         /* decay table .............. */ NULL,
         /* shortlived ............... */ false,
         /* subType .................. */ "DMParticleALP",
-        /* anti particle encoding ... */ 5300122
+        /* anti particle encoding ... */ IDPDG
           );
 
-    // Life time is given from width
-    ((DMParticle*)anInstance)->CalculateLifeTime();
+    if(!isStable)
+    {
+      // Life time is given from width
+      ((DMParticle*)anInstance)->CalculateLifeTime();
 
-    //create Decay Table
-    G4DecayTable* table = new G4DecayTable();
+      //create Decay Table
+      G4DecayTable* table = new G4DecayTable();
 
-    // create a decay channel
-    G4VDecayChannel* mode;
-    // ALP -> gamma + gamma
-    mode = new G4PhaseSpaceDecayChannel(name, 1., 2, "gamma", "gamma");
-    table->Insert(mode);
+      // create a decay channel
+      G4VDecayChannel* mode;
+      // ALP -> gamma + gamma
+      mode = new G4PhaseSpaceDecayChannel(name, 1., 2, "gamma", "gamma");
+      table->Insert(mode);
 
-    anInstance->SetDecayTable(table);
+      anInstance->SetDecayTable(table);
+    }
   }
   theInstance = reinterpret_cast<DMParticleALP*>(anInstance);
   return theInstance;
