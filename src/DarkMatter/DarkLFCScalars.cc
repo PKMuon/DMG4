@@ -373,7 +373,7 @@ double DarkLFCScalars::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double
   double E02= E0*E0;
   double u = -XEv*E02*theta2 - MA2*(1.0-XEv)/XEv + Mmu2*(1.0-XEv);
   double s = Mmu2 - (u-Mtau2)/(1.0-XEv);
-  double gV = epsil;
+  double gV = epsilBench;
   double gA = 0.;
   double tmax = MA2;
   const double pi = 3.141592654;
