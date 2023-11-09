@@ -47,7 +47,7 @@ DarkZAnnihilation::~DarkZAnnihilation() {
 double DarkZAnnihilation::PreFactor(double E0) {
 
   double ss = 2. * Mel * E0 + 2*Mel*Mel;
-  double qq = 0., E1 = 0., E2 = 0.;
+  double E1 = 0., E2 = 0.;
 
   double sMin = 0;
   if ((iBranchingType == 1) || (iBranchingType == 3)) //DM
@@ -56,8 +56,6 @@ double DarkZAnnihilation::PreFactor(double E0) {
   if (ss < sMin)
     return 0.;   // A.C. e+e- -> Z' -> ff can happen also for an A' and chi with large mass,
                  // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
-
-  qq = sqrt(ss) / 2. * sqrt(1 - sMin / ss);
 
   double sigma = 1;
   switch (iBranchingType) {
