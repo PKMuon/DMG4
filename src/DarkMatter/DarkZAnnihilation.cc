@@ -138,6 +138,11 @@ double DarkZAnnihilation::Width() {
         ret += MA/3 * epsil*epsil/(4*M_PI)*(1+2*Mmu*Mmu/(MA*MA))*sqrt(1-4*Mmu*Mmu/(MA*MA)); //Z->mu mu
     break;
   case 1: //B-L, vanilla
+      ret=MA*epsil*epsil/(4*M_PI); //Z->nu nu
+      if (MA > 2*Mel)
+        ret += MA/3 * epsil*epsil/(4*M_PI)*(1+2*Mel*Mel/(MA*MA))*sqrt(1-4*Mel*Mel/(MA*MA)); //Z->el el
+      if (MA > 2*Mmu)
+        ret += MA/3 * epsil*epsil/(4*M_PI)*(1+2*Mmu*Mmu/(MA*MA))*sqrt(1-4*Mmu*Mmu/(MA*MA)); //Z->mu mu
     break;
   case 2: //Lmu-Ltau, DM
     ret=MA/3*epsil*epsil/(4*M_PI);//Z->nu nu
@@ -184,7 +189,7 @@ double DarkZAnnihilation::AngularDistributionResonant(double eta, double E0) {
     //Scalar LDM, Angular distribution f(eta) ~ 1-eta*eta. Max: eta=0;
     val = 1-eta*eta;
     break;
-  case 3: //Lmu-Ltau, DM, scalar
+  case 3: //B-L, DM, scalar
     //Scalar LDM, Angular distribution f(eta) ~ 1-eta*eta. Max: eta=0;
     val = 1-eta*eta;
     break;
