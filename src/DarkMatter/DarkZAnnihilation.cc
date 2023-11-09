@@ -66,6 +66,9 @@ double DarkZAnnihilation::PreFactor(double E0) {
     sigma = sigma * ss;
     break;
   case 1: //B-L, vanilla, neutrinos
+    sigma = sigma * epsil * epsil / 3.; // for e+e- --> Z'
+    sigma = sigma * epsil * epsil / (4 * M_PI); //alphaZ' for Z' -> nunu
+    sigma = sigma * ss;
     break;
   case 2: //Lmu-Ltau, scalar DM.  See 2206.03101 Eq. A.4.
     sigma = (M_PI * alphaEW) / 3.;
