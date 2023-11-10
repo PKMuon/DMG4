@@ -30,8 +30,8 @@ DMParticleALP* DMParticleALP::Definition()
   G4int IDPDG = 5300022; // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
   G4double WidthIn = 0.;
   if(!isStable) {
-    G4double WidthIn = 1./(64.*pi)*MassIn*MassIn*MassIn*epsilIn*epsilIn;
-    G4int IDPDG = 5300122;
+    WidthIn = 1./(64.*pi)*MassIn*MassIn*MassIn*epsilIn*epsilIn;
+    IDPDG = 5300122;
     name = "DMParticleALP";
   }
   if( !anInstance ) {
