@@ -22,6 +22,12 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../modules_cmake_standalone)
 # Find GSL
 #
 find_package(GSL REQUIRED)
+if(ROOTSYS)
+  message(STATUS "* DMG4 example * INFO: ROOT will be used")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+  SET(CMAKE_CXX_STANDARD 14)
+  find_package(ROOT REQUIRED COMPONENTS Core RIO Hist Graf Gpad Geom GenVector Physics MathCore)
+endif(ROOTSYS)
 
 #----------------------------------------------------------------------------
 # Setup Geant4 include directories and compile definitions
@@ -29,7 +35,11 @@ find_package(GSL REQUIRED)
 #
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include(${Geant4_USE_FILE})
-include_directories(${PROJECT_SOURCE_DIR}/../include ${PROJECT_SOURCE_DIR}/../include/DMG4 ${GSL_INCLUDE_DIR})
+if(ROOTSYS)
+  include_directories(${PROJECT_SOURCE_DIR}/../include ${PROJECT_SOURCE_DIR}/../include/DMG4 ${GSL_INCLUDE_DIR} ${ROOTSYS}/include)
+else(ROOTSYS)
+  include_directories(${PROJECT_SOURCE_DIR}/../include ${PROJECT_SOURCE_DIR}/../include/DMG4 ${GSL_INCLUDE_DIR})
+endif(ROOTSYS)
 
 #----------------------------------------------------------------------------
 # Locate sources and libraries for this project
@@ -41,8 +51,17 @@ link_directories (${PROJECT_SOURCE_DIR}/../lib)
 # Add the executable, and link it to the Geant4 and other libraries
 #
 add_executable(mkgeant4 ${sources})
-target_link_libraries(mkgeant4 DarkMatter DMG4 UtilsDM ${Geant4_LIBRARIES} ${GSL_LIBRARIES})
+if(ROOTSYS)
+  target_link_libraries(mkgeant4 DarkMatter DMG4 UtilsDM ${Geant4_LIBRARIES} ${GSL_LIBRARIES} ${ROOT_LIBARIES})
+  #set_target_properties(mkgeant4 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
+  set_property(TARGET mkgeant4 PROPERTY CXX_STANDARD 14)
+else(ROOTSYS)
+  target_link_libraries(mkgeant4 DarkMatter DMG4 UtilsDM ${Geant4_LIBRARIES} ${GSL_LIBRARIES})
+endif(ROOTSYS)
 
+if(ROOTSYS)
+  target_link_libraries(mkgeant4 ${ROOT_LIBRARIES})
+endif(ROOTSYS)
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
 install(TARGETS mkgeant4 DESTINATION bin)

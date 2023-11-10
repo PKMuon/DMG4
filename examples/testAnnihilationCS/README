@@ -1,0 +1,14 @@
+# Resonant Annihilation Cross-Section Test
+
+## Overview
+
+This repository contains an example script to test the implementation of the resonant annihilation
+production cross-section in the DMG4 package.
+
+## Usage
+
+Run the example script:
+
+```bash
+./mkgeant
+```
