@@ -204,7 +204,7 @@ void DarkMatterPhysics::Init(){
        exit(1);
      }
 
-   BiasSigmaFactor = DMpar->GetRegisteredParam("BiasSigmaFactor0") * 0.0001 * 0.0001 / (myDarkMatter->Getepsil()*myDarkMatter->Getepsil());
+   BiasSigmaFactor = DMpar->GetRegisteredParam("BiasSigmaFactor0") * (myDarkMatter->GetepsilBench()*myDarkMatter->GetepsilBench()) / (myDarkMatter->Getepsil()*myDarkMatter->Getepsil());
 
    //For the e+ e- --> Z' --> ff process, we compute the cross section using epsil, so the code above has to be changed
    if (DMProcessType==16){
