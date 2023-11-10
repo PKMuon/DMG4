@@ -23,14 +23,14 @@ int main() {
   //G4double EThresh = 2000.; // to turn off A emissions
 
   // Set parameters to be passed to DarkMatterAnnihilation class
-  G4double MA = 0.220;
-  G4double coupling = 1e-3;
+  G4double MA = 0.25;
+  G4double coupling = 1e-5;
   G4double SigmaNorm = 1.;
   G4double ANuclPb = 207.;
   G4double ZNuclPb = 82.;
   G4double DensityPb = 11.35;
   G4int IDecayIn = 1;
-  G4int IBranchingIn = 0;
+  G4int IBranchingIn = 0; // 0-9: Lmu-Ltau, 10-19: B-L
   G4double rIn = 1./3.;
   G4double alphaD = 1./3.;
 
@@ -47,8 +47,10 @@ int main() {
 
   // Define output ROOT files with plots
   TFile* hOutputFile = new TFile("result.root", "RECREATE");
-  TGraph *hSigma = new TGraph(nSteps);
-  //TH1D *hSigmaAE = new TH1D("hSigmaAE","hSigma Atomic Effects", nSteps+1,Emin,Emax);
+  TGraph *gSigma = new TGraph(nSteps);
+  TGraph *gPreFactor = new TGraph(nSteps);
+  TGraph *gBW = new TGraph(nSteps);
+  //TH1D *gSigmaAE = new TH1D("gSigmaAE","gSigma Atomic Effects", nSteps+1,Emin,Emax);
 
   G4double width = myDarkMatter->Width();
 
@@ -62,10 +64,12 @@ int main() {
       double totalCS = myDarkMatter->GetSigmaTot(ekin);
       double preF = myDarkMatter->PreFactor(ekin);
       double BW = myDarkMatter->BreitWignerDenominator(ekin);
-      //std::cout << ekin << ", prefactor: " << preF << ", 1/BW: " << 1./BW << ", total CS: " << totalCS << std::endl;
+      //std::cout << Form("%3.2f GeV:   Prefactor = %5.2e [pb]  --  1/BW = %3.2e [GeV^4]  --  total CS = %5.2e [pb]\n", ekin, preF, 1./BW, totalCS);
       //double totalCS_AE = myDarkMatter->GetSigmaTotAtomicEffectsOneShell(ekin);
-      hSigma->SetPoint(i, ekin, totalCS);
-      //hSigmaAE->Fill(totalCS_AE);
+      gSigma->SetPoint(i, ekin, totalCS);
+      gPreFactor->SetPoint(i, ekin, preF);
+      gBW->SetPoint(i, ekin, BW);
+      //gSigmaAE->Fill(totalCS_AE);
     }
   }
 
@@ -73,14 +77,44 @@ int main() {
   G4cout << "Cross section in pb for eps=0.0001 cs = " << myDarkMatter->GetAccumulatedProbability() << G4endl;
 
   TCanvas *c=new TCanvas("c","c");
-    
-  hSigma->SetLineColor(1);
-  hSigma->SetTitle(Form("Total CS for resonant annihilation production with #Gamma = %3.2e MeV", width*1.e3));
-  hSigma->Draw("AC*");
+
+  // Save CS graph
+  c->SetName("totalCS");
+  c->SetGrid();
+  gSigma->SetTitle(Form("Total CS for MA = %3.2e MeV and coupling = %3.2e with #Gamma = %3.2e MeV", MA*1.e3, coupling, width*1.e3));
+  gSigma->SetMarkerStyle(21);
+  gSigma->SetMarkerColor(kBlue);
+  gSigma->Draw("ACP");
+  gSigma->GetXaxis()->SetTitle("E_{primary} [GeV]");
+  gSigma->GetYaxis()->SetTitle("Cross-section [pb]");
   c->SetLogy();
   c->Write();
-  //hSigmaAE->SetLineColor(2);
-  //hSigmaAE->Draw("SAMES");
+
+  // Save prefactor graph
+  c->Clear();
+  c->SetName("CSprefactor");
+  c->SetGrid();
+  gPreFactor->SetTitle(Form("Prefactor of resonant CS for MA = %3.2e MeV and coupling = %3.2e with #Gamma = %3.2e MeV", MA*1.e3, coupling, width*1.e3));
+  gPreFactor->SetMarkerStyle(21);
+  gPreFactor->SetMarkerColor(kBlue);
+  gPreFactor->Draw("ACP");
+  gPreFactor->GetXaxis()->SetTitle("E_{primary} [GeV]");
+  gPreFactor->GetYaxis()->SetTitle("CS prefactor [pb*GeV^{4}]");
+  c->SetLogy();
+  c->Write();
+
+  // Save Breit-Wigner denominator graph
+  c->Clear();
+  c->SetName("BWdenominator");
+  c->SetGrid();
+  gBW->SetTitle(Form("Breit-Wigner denominator for resonant annihilation production with #Gamma = %3.2e MeV", width*1.e3));
+  gBW->SetMarkerStyle(21);
+  gBW->SetMarkerColor(kBlue);
+  gBW->Draw("ACP");
+  gBW->GetXaxis()->SetTitle("E_{primary} [GeV]");
+  gBW->GetYaxis()->SetTitle("Denominator [GeV^{-4}]");
+  c->SetLogy();
+  c->Write();
 
   hOutputFile->Write();
 
