@@ -32,6 +32,7 @@
 #include "DMParticleAxial.hh"
 
 #include "DMParticleChi.hh"
+#include "DMParticleChiScalar.hh"
 #include "DMParticleChi1.hh"
 #include "DMParticleChi2.hh"
 
@@ -271,7 +272,7 @@ void DarkMatterPhysics::ConstructParticle()
       else {  //Require final state particles
         if ((BranchingType == 0) || (BranchingType == 10)) { // neutrinos final state
         } else if ((BranchingType == 1) || (BranchingType == 11)) { // DM final state
-          DMParticleChi::Definition();
+          DMParticleChiScalar::Definition();
         } else {
           G4cout << G4endl << "BranchingType not implemented, exiting " << G4endl << G4endl;
           exit(1);
