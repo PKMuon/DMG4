@@ -1,2 +1,14 @@
 *.so
 *.a
+
+# cmake-generated files
+Makefile
+cmake_install.cmake
+install_manifest.txt
+CMakeCache.txt
+CMakeFiles/
+
+# configure-generated files
+config.txt
+config.sh
+config.csh
