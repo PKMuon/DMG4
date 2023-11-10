@@ -267,6 +267,19 @@ void DarkMatterPhysics::ConstructParticle()
         }
         break;
       }
+    case 16:
+      if (DecayType == 0) { //Only invisible, do nothing
+      }
+      else {  //Require final state particles
+        if ((BranchingType == 0) || (BranchingType == 10)) { // neutrinos final state
+        } else if ((BranchingType == 1) || (BranchingType == 11)) { // DM final state
+          DMParticleChi::Definition();
+        } else {
+          G4cout << G4endl << "BranchingType not implemented, exiting " << G4endl << G4endl;
+          exit(1);
+        }
+      }
+      break;
     default:
       break;
     }
@@ -311,7 +324,7 @@ void DarkMatterPhysics::ConstructProcess()
       theDMParticlePtr = DMParticleAPrime::Definition();
     }
     if(myDarkMatter->GetDMType() == 11) {                    // Annihilation through Z' (Lmu-Ltau or B-L models)
-          theDMParticlePtr = DMParticleZPrime::Definition();
+      theDMParticlePtr = DMParticleZPrime::Definition();
     }
   }
   if(myDarkMatter->GetParentPDGID() == 13) {
