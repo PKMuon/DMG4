@@ -34,9 +34,9 @@ DMParticleZPrime* DMParticleZPrime::Definition()
   DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
   G4double MassIn    = DMpar->GetRegisteredParam("DMMass");
   G4double epsilIn   = DMpar->GetRegisteredParam("Epsilon");
-  G4double alphaD = DMpar->GetRegisteredParam("AlphaD");
+  G4double alphaD = DMpar->GetRegisteredParam("AlphaD", 0.5);
   G4double DecayType = DMpar->GetRegisteredParam("DecayType");
-  G4double BranchingType = DMpar->GetRegisteredParam("BranchingType");
+  G4double BranchingType = DMpar->GetRegisteredParam("BranchingType", 0);
   const G4double mChi = (DMpar->GetRegisteredParam("DMMass")) * DMpar->GetRegisteredParam("RDM", 1./3.);
 
   G4String name = "DMParticleZPrime";
