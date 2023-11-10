@@ -77,7 +77,7 @@ double DarkZAnnihilation::PreFactor(double E0) {
     sigma = sigma * epsil * epsil * piF2(ss); //|Pi(S)|^2 for e+e- --> Z'
     sigma = sigma * ss;
     break;
-  case 1: //Lmu-Ltau, scalar DM.  See 2206.03101 Eq. A.4.
+  case 1: //Lmu-Ltau, scalar DM.  See 2206.03101 Eq. A.3.
     sigma = (M_PI * alphaEW) / 3.;
     sigma = sigma * alphaD; //alphaD for Z' -> DM-DM
     sigma = sigma * epsil * epsil * piF2(ss); //|Pi(S)|^2 for e+e- --> Z'
