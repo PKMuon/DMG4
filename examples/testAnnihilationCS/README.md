@@ -23,4 +23,4 @@ Run the example script:
 
 The output is a ROOT file containing plots for the total resonant annihilation cross-section as 
 a function of the energy as well as for the angular sampling for the maximum cross-section at
-$`MA^2/(2\times m_{e^{-}}`$.
+$`m_{Z'}^2/(2\times m_{e^{-}})`$.
