@@ -214,15 +214,6 @@ void DarkMatterPhysics::Init(){
 
 void DarkMatterPhysics::ConstructParticle()
 {
-  // This call to particle definition must be first or at least go before
-  // Physics::ConstructProcess()
-  DMParticleAPrime::Definition();
-  DMParticleZPrime::Definition();
-  DMParticleALP::Definition();
-  DMParticleScalar::Definition();
-  DMParticlePseudoScalar::Definition();
-  DMParticleAxial::Definition();
-
   /*A.C.
    * The following lines are necessary to construct the particles that will be propagated for annihilation
    *
@@ -236,6 +227,7 @@ void DarkMatterPhysics::ConstructParticle()
   switch(DMProcessType)
     {
     case 1:  //dark-photon bremmstrahlung
+      DMParticleAPrime::Definition();
       if (DecayType == 0) { //Only invisible, do nothing
       }
       else {  //Require final state particles
@@ -245,12 +237,32 @@ void DarkMatterPhysics::ConstructParticle()
         }
       }
       break;
-
+    case 2:
+      DMParticleScalar::Definition();
+      break;
+    case 3:
+      DMParticleAxial::Definition();
+      break;
+    case 4:
+      DMParticlePseudoScalar::Definition();
+      break;
+    case 5:
+      DMParticleAPrime::Definition();
+      break;
     case 11: //annihilation processes
+      DMParticleAPrime::Definition();
+      break;
     case 12:
+      DMParticleScalar::Definition();
+      break;
     case 13:
+      DMParticleAxial::Definition();
+      break;
     case 14:
+      DMParticlePseudoScalar::Definition();
+      break;
     case 15:
+      DMParticleAPrime::Definition(); // A' for the moment, the spin 2 particle not yet implemented
       if (DecayType == 0) { //Only invisible, do nothing
       }
       else {  //Require final state particles
@@ -267,6 +279,7 @@ void DarkMatterPhysics::ConstructParticle()
         break;
       }
     case 16:
+      DMParticleZPrime::Definition();
       if (DecayType == 0) { //Only invisible, do nothing
       }
       else {  //Require final state particles
@@ -278,6 +291,18 @@ void DarkMatterPhysics::ConstructParticle()
           exit(1);
         }
       }
+      break;
+    case 21:
+      DMParticleALP::Definition();
+      break;
+    case 31:
+      DMParticleZPrime::Definition();
+      break;
+    case 32:
+      DMParticleZPrime::Definition();
+      break;
+    case 34:
+      DMParticleZPrime::Definition();
       break;
     default:
       break;
