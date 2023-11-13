@@ -83,7 +83,7 @@ int main() {
   // Test sampling of cross-section at peak E0 = MA*MA / 2*m_e
   // ---------------------------------------------------------
 
-  ekin = MA*MA/(2*5.11e-7);
+  ekin = MA*MA/(2*5.11e-4);
 
   G4cout << "Testing sampling for resonant annihilation at E = " << ekin << " GeV, for coupling = " << coupling << ", mass = " << MA << " GeV" << G4endl;
 
