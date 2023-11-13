@@ -44,12 +44,14 @@ int main() {
   G4double Emin = EThresh;
   unsigned int nSteps = 1000;
   G4double Ediff = (Emax - Emin)/nSteps;
+  double ekin;
 
   // Define output ROOT files with plots
   TFile* hOutputFile = new TFile("result.root", "RECREATE");
   TGraph *gSigma = new TGraph(nSteps);
   TGraph *gPreFactor = new TGraph(nSteps);
   TGraph *gBW = new TGraph(nSteps);
+  TH1D *hAngle = new TH1D("hAngle","Angular distribution; #cos(#theta); nevts [-]", 100,-1,1);
   //TH1D *gSigmaAE = new TH1D("gSigmaAE","gSigma Atomic Effects", nSteps+1,Emin,Emax);
 
   G4double width = myDarkMatter->Width();
@@ -59,7 +61,7 @@ int main() {
   G4cout << G4endl;
 
   for(unsigned int i=0; i<nSteps; i++) {
-    double ekin = Emin + Ediff * i;
+    ekin = Emin + Ediff * i;
     if (myDarkMatter->EmissionAllowed(ekin, DensityPb)) {
       double totalCS = myDarkMatter->GetSigmaTot(ekin);
       double preF = myDarkMatter->PreFactor(ekin);
@@ -72,6 +74,27 @@ int main() {
       //gSigmaAE->Fill(totalCS_AE);
     }
   }
+
+  // Test sampling of cross-section at peak E0 = MA*MA / 2*m_e
+  ekin = MA*MA/(2*5.11e-7);
+
+  G4cout << "Testing sampling for resonant annihilation at E = " << ekin << " GeV, for coupling = " << coupling << ", mass = " << MA << " GeV" << G4endl;
+
+  int NTry=1000;
+  int ITry;
+  double angle;
+  for(int i=0; i<NTry; i++) {
+
+    ITry = myDarkMatter->Emission(ekin, DensityPb, 1.);
+    angle = myDarkMatter->SimulateEmissionResonant(ekin);
+    hAngle->Fill(angle);
+
+    G4cout << "Emission simulated, Theta = " << angle << G4endl;
+    G4cout << angle << G4endl;
+
+  }
+  (void)ITry; // to avoid warning
+
 
   G4cout << G4endl;
   G4cout << "Cross section in pb for eps=0.0001 cs = " << myDarkMatter->GetAccumulatedProbability() << G4endl;
@@ -115,6 +138,15 @@ int main() {
   gBW->GetYaxis()->SetTitle("Denominator [GeV^{-4}]");
   c->SetLogy();
   c->Write();
+
+  // Save angular distribution histogram
+  c->Clear();
+  c->SetName("angle");
+  c->SetGrid();
+  hAngle->Draw("hist");
+  c->SetLogy();
+  c->Write();
+
 
   hOutputFile->Write();
 
