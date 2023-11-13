@@ -71,7 +71,7 @@ DMParticleZPrime* DMParticleZPrime::Definition()
       IDPDG = 5500123;
       name = "DMParticleZPrimeVis";
       // Calculate widths
-      nuWidth = epsilIn*epsilIn*CLHEP::fine_structure_const*(1./3.)*MassIn;
+      nuWidth = epsilIn*epsilIn*(1./3.)*MassIn/(4*M_PI);
       if (MassIn > 2.*muMass) muWidth = nuWidth*(1.+2.*massRatio2)*sqrt(1.-4.*massRatio2);
       // Define total width and branching ratios
       WidthIn = nuWidth + muWidth;
@@ -83,7 +83,7 @@ DMParticleZPrime* DMParticleZPrime::Definition()
       IDPDG = 5500123;
       name = "DMParticleZPrimeVis";
       // Calculate widths
-      nuWidth = epsilIn*epsilIn*CLHEP::fine_structure_const*(1./3.)*MassIn;
+      nuWidth = epsilIn*epsilIn*(1./3.)*MassIn/(4*M_PI);
       if (MassIn > 2.*muMass) muWidth = nuWidth*(1.+2.*massRatio2)*sqrt(1.-4.*massRatio2);
       if (MassIn > 2.*mChi) chiWidth= MassIn/12*alphaD*pow((1-4*mChi*mChi/(MassIn*MassIn)),3./2); //Z->DM DM
       // Define total width and branching ratios
@@ -98,14 +98,14 @@ DMParticleZPrime* DMParticleZPrime::Definition()
       name = "DMParticleB-LBoson";
       // Calculate widths
       if(MassIn > 600.) {G4cout << "Branching ratios for this BranchingType and this mass are not yet implemented, exiting" << G4endl; exit(1);}
-      nuWidth = epsilIn*epsilIn*CLHEP::fine_structure_const*MassIn;
-      if(MassIn > 2.*CLHEP::electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * ZPrimeWidth(CLHEP::electron_mass_c2, CLHEP::electron_mass_c2, MassIn);
-      if(MassIn > 2.*muMass) muWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * ZPrimeWidth(muMass, muMass, MassIn);
+      nuWidth = epsilIn*epsilIn*MassIn/(4*M_PI);
+      if(MassIn > 2.*CLHEP::electron_mass_c2) eWidth = epsilIn * epsilIn / (4*M_PI) * ZPrimeWidth(CLHEP::electron_mass_c2, CLHEP::electron_mass_c2, MassIn);
+      if(MassIn > 2.*muMass) muWidth = epsilIn * epsilIn / (4*M_PI) * ZPrimeWidth(muMass, muMass, MassIn);
       if(MassIn > pi0Mass) {
-        hWidth = (CLHEP::fine_structure_const*CLHEP::fine_structure_const*epsilIn*epsilIn*MassIn*MassIn*MassIn) /
-                 (96.*3.141*3.141*3.141*0.93*0.93*pi0Mass*pi0Mass);
+        hWidth = (CLHEP::fine_structure_const*epsilIn*epsilIn/(4*M_PI)*MassIn*MassIn*MassIn) /
+                 (96.*M_PI*M_PI*M_PI*0.93*0.93*pi0Mass*pi0Mass);
         hWidth *= (1. - pi0Mass*pi0Mass/(MassIn*MassIn));
-        G4double a = 1. - (MassIn*MassIn)/(782.66*782.66);
+        G4double a = 1. - (MassIn*MassIn)/(782.66*782.66); // 782.66 MeV is the mass of omega meson
         G4double b = 12.3/782.66;
         G4double mod2 = 1./(a*a + b*b);
         hWidth *= mod2;
@@ -123,14 +123,14 @@ DMParticleZPrime* DMParticleZPrime::Definition()
       name = "DMParticleB-LBoson";
       // Calculate widths
       if(MassIn > 600.) {G4cout << "Branching ratios for this BranchingType and this mass are not yet implemented, exiting" << G4endl; exit(1);}
-      nuWidth = epsilIn*epsilIn*CLHEP::fine_structure_const*MassIn;
-      if(MassIn > 2.*CLHEP::electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * ZPrimeWidth(CLHEP::electron_mass_c2, CLHEP::electron_mass_c2, MassIn);
-      if(MassIn > 2.*muMass) muWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * ZPrimeWidth(muMass, muMass, MassIn);
+      nuWidth = epsilIn*epsilIn*MassIn/(4*M_PI);
+      if(MassIn > 2.*CLHEP::electron_mass_c2) eWidth = epsilIn * epsilIn / (4*M_PI) * ZPrimeWidth(CLHEP::electron_mass_c2, CLHEP::electron_mass_c2, MassIn);
+      if(MassIn > 2.*muMass) muWidth = epsilIn * epsilIn / (4*M_PI) * ZPrimeWidth(muMass, muMass, MassIn);
       if(MassIn > pi0Mass) {
-        hWidth = (CLHEP::fine_structure_const*CLHEP::fine_structure_const*epsilIn*epsilIn*MassIn*MassIn*MassIn) /
-                 (96.*3.141*3.141*3.141*0.93*0.93*pi0Mass*pi0Mass);
+        hWidth = (CLHEP::fine_structure_const*epsilIn*epsilIn/(4*M_PI)*MassIn*MassIn*MassIn) /
+                 (96.*M_PI*M_PI*M_PI*0.93*0.93*pi0Mass*pi0Mass);
         hWidth *= (1. - pi0Mass*pi0Mass/(MassIn*MassIn));
-        G4double a = 1. - (MassIn*MassIn)/(782.66*782.66);
+        G4double a = 1. - (MassIn*MassIn)/(782.66*782.66); // 782.66 MeV is the mass of omega meson
         G4double b = 12.3/782.66;
         G4double mod2 = 1./(a*a + b*b);
         hWidth *= mod2;

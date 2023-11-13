@@ -215,7 +215,7 @@ double DarkZAnnihilation::AngularDistributionResonant(double eta, double E0) {
     val = 1-eta*eta;
     break;
   case 10: //B-L, vanilla, neutrino
-    val = 1;
+    val=(1+eta*eta)/2; //Max: eta=1
     break;
   case 11: //B-L, DM, scalar
     //Scalar LDM, Angular distribution f(eta) ~ 1-eta*eta. Max: eta=0;
