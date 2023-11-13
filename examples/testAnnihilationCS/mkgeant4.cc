@@ -51,10 +51,14 @@ int main() {
   TGraph *gSigma = new TGraph(nSteps);
   TGraph *gPreFactor = new TGraph(nSteps);
   TGraph *gBW = new TGraph(nSteps);
-  TH1D *hAngle = new TH1D("hAngle","Angular distribution; #cos(#theta); nevts [-]", 100,-1,1);
+  TH1D *hAngle = new TH1D("hAngle","Angular distribution; cos(#theta); nevts [-]", 100,-1,1);
   //TH1D *gSigmaAE = new TH1D("gSigmaAE","gSigma Atomic Effects", nSteps+1,Emin,Emax);
 
   G4double width = myDarkMatter->Width();
+
+  // ---------------------------------------------------------------
+  // Test of total cross-section as a function of the primary energy
+  // ---------------------------------------------------------------
 
   G4cout << G4endl;
   G4cout << "Test of the DarkMatter package: Resonant Annihilation production simulation, coupling = " << coupling << ", mass = " << MA << " GeV" << G4endl;
@@ -75,7 +79,10 @@ int main() {
     }
   }
 
+  // ---------------------------------------------------------
   // Test sampling of cross-section at peak E0 = MA*MA / 2*m_e
+  // ---------------------------------------------------------
+
   ekin = MA*MA/(2*5.11e-7);
 
   G4cout << "Testing sampling for resonant annihilation at E = " << ekin << " GeV, for coupling = " << coupling << ", mass = " << MA << " GeV" << G4endl;
@@ -98,6 +105,10 @@ int main() {
 
   G4cout << G4endl;
   G4cout << "Cross section in pb for eps=0.0001 cs = " << myDarkMatter->GetAccumulatedProbability() << G4endl;
+
+  // ------------------------------
+  // Save plots to ROOT output file
+  // ------------------------------
 
   TCanvas *c=new TCanvas("c","c");
 
