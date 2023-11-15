@@ -116,13 +116,15 @@ double DarkZAnnihilation::GetSigmaTot(double E0) {
 bool DarkZAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
 {
   switch (iBranchingType){
-  case 0: //Lmu-Ltau, vanilla, neutrino
-  case 1:
+  case 0: //Lmu-Ltau, vanilla, neutrino: always allowed by energy conservation
+    break;
+  case 1: //Lmu-Ltau,DM
     if (sqrt(2. * Mel * E0 + 2*Mel*Mel) < 2. * mChi)
       return false;
     break;
-  case 10: //B-L, vanilla, neutrino
-  case 11:
+  case 10: //B-L, vanilla, neutrino: always allowed by energy conservation
+    break;
+  case 11: //B-L, DM
     if (sqrt(2. * Mel * E0 + 2*Mel*Mel) < 2. * mChi)
       return false;
     break;
