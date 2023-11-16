@@ -22,7 +22,7 @@ class DarkPhotonsAnnihilation: public DarkMatterAnnihilation
 
 public:
 
-    DarkPhotonsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn = 1., double ANuclIn = 207., double ZNuclIn = 82., double DensityIn = 11.35, double epsilIn = 0.0001, int IDecayIn = 0,double rIn=1./3,double alphaD=0.5,int IBranchingIn=0, double fIn=0.1,double minWidth=0);
+    DarkPhotonsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn = 1., double ANuclIn = 207., double ZNuclIn = 82., double DensityIn = 11.35, double epsilIn = 0.0001, int IDecayIn = 0,double rIn=1./3,double alphaD=0.5,int IBranchingIn=0, double fIn=0.1);
     virtual ~DarkPhotonsAnnihilation();
 
     virtual double PreFactor(double E0);
@@ -37,8 +37,6 @@ public:
     virtual double AngularDistributionResonant(double eta,double E0);
 
 
-private:
-    double widthEnhancementFactor;
 
 };
 

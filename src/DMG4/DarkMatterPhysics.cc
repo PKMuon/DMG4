@@ -99,7 +99,6 @@ void DarkMatterPhysics::Init(){
   G4int BranchingType = DMpar->GetRegisteredParam("BranchingType",0);
 
 
-  G4double minWidth =  DMpar->GetRegisteredParam("AnnihilationMinWidth",0);
 
 
 /*
@@ -171,7 +170,7 @@ void DarkMatterPhysics::Init(){
     case 11:
       G4cout << "Initialize DarkPhotonsAnnihilation\n";
       myDarkMatter = new DarkPhotonsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
-                                                 DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor,minWidth);
+                                                 DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor);
       break;
     case 12:
       G4cout << "Initialize DarkScalarsAnnihilation\n";

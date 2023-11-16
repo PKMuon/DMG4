@@ -17,11 +17,10 @@
 
 
 DarkPhotonsAnnihilation::DarkPhotonsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
-                                                 double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn, double minWidth) :
+                                                 double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
                                                  DarkMatterAnnihilation(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn, rIn,alphaDIn, IBranchingIn,fIn)
 {
   DMType = 1; //A.C.
-  widthEnhancementFactor = 1;
 
   std::cout << "Initialized DarkPhotonsAnnihilation (e+ e- -> A' -> DM DM) for material density = " << DensityIn << std::endl;
   std::cout << "mA: "<<MA*1000<<" MeV "<<std::endl;
@@ -35,10 +34,7 @@ DarkPhotonsAnnihilation::DarkPhotonsAnnihilation(double MAIn, double EThreshIn, 
   std::cout<<"Width: "<<this->Width()*1E3<<" MeV "<<std::endl;
 
 
-  if ((minWidth >0)&&(this->Width()<minWidth)){
-    widthEnhancementFactor=minWidth/this->Width();
-    std::cout<<"Width after artificial enhancement: "<<this->Width()<<std::endl;
-  }
+
 
   std::cout << std::endl;
 }
@@ -94,10 +90,6 @@ double DarkPhotonsAnnihilation::PreFactor(double E0){
   //here sigma is in G4 internal units, 1 /Energy^2. Move to pBarn;
   sigma *= GeVtoPb;
 
-
-  //A.C. width enhancement factor to avoid sharp variations of the cross section
-  //Documentation: https://gitlab.cern.ch/P348/DMG4/-/issues/14
-  sigma=sigma * widthEnhancementFactor;
   return sigma;
 }
 
@@ -154,9 +146,6 @@ double DarkPhotonsAnnihilation::Width() {
       }
       break;
   }
-  //A.C. add width-enhancement factor
-  //Documentation: https://gitlab.cern.ch/P348/DMG4/-/issues/14
-  ret=ret*widthEnhancementFactor;
 
   return ret;
 }
