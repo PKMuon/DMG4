@@ -102,8 +102,6 @@ double DarkZAnnihilation::PreFactor(double E0) {
   //here sigma is in G4 internal units, 1 /Energy^2. Move to pBarn;
   sigma *= GeVtoPb;
 
-  //A.C. correct here for atomic effects
-  sigma = sigma * ZNucl;
   return sigma;
 }
 
