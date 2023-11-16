@@ -114,7 +114,7 @@ void DarkMatterPhysics::Init(){
   EThresh/=GeV;
   DMMass/=GeV;
   Density/=(g/cm3);
-  minWidth/=GeV;
+
 
 
   switch(DMProcessType)
@@ -263,6 +263,7 @@ void DarkMatterPhysics::ConstructParticle()
     case 15:
       DMParticleAPrime::Definition(); // A' for the moment, the spin 2 particle not yet implemented
       if (DecayType == 0) { //Only invisible, do nothing
+        break;
       }
       else {  //Require final state particles
         if ((BranchingType == 0) || (BranchingType == 1)) {
