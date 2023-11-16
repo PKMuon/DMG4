@@ -51,7 +51,7 @@ int main() {
   TGraph *gSigma = new TGraph(nSteps);
   TGraph *gPreFactor = new TGraph(nSteps);
   TGraph *gBW = new TGraph(nSteps);
-  TH1D *hAngle = new TH1D("hAngle","Angular distribution; cos(#theta); nevts [-]", 100,-1,1);
+  TH1D *hAngle = new TH1D("hAngle","Angular distribution; #eta; nevts [-]", 100,-1,1);
   //TH1D *gSigmaAE = new TH1D("gSigmaAE","gSigma Atomic Effects", nSteps+1,Emin,Emax);
 
   G4double width = myDarkMatter->Width();
