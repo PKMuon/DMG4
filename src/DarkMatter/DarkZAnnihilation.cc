@@ -3,8 +3,16 @@
  *
  *  Created on: Oct 6, 2023
  *      Author: celentan
+ *  B-L implementation added on: Nov 10, 2023 by B. Banto
  *
- *  In this class, the parameter "epsilon" is actually the coupling "g" between Z' and mu-tau current (see 2206.03101)
+ *  In this class, the parameter "epsilon" is actually the coupling "g" between Z' and mu-tau current (see 2206.03101 and 2207.09979)
+ *
+ *  The different BranchingTypes implemented refer to the following models:
+ *  0: Lmu-Ltau vanilla (decay to neutrinos)
+ *  1: Lmu-Ltau scalar DM
+ *  10: B-L vanilla (decay to neutrinos)
+ *  11: B-L scalar DM
+ *  12: TODO: B-L fermionic DM
  *
  */
 
@@ -22,15 +30,19 @@ DarkZAnnihilation::DarkZAnnihilation(double MAIn, double EThreshIn, double Sigma
                                                  double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
                                                  DarkMatterAnnihilation(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn, rIn,alphaDIn, IBranchingIn,fIn){
   DMType = 11; //A.C.
+  ParentPDGID = -11;
 
   std::cout << "Initialized DarkZAnnihilation (e+ e- -> Z' -> DM DM) for material density = " << DensityIn << std::endl;
-  std::cout << "mA: " << MA * 1000 << " MeV " << std::endl;
-  std::cout << "IbranchingType: " << iBranchingType << std::endl;
-  if (iBranchingType == 2) {
-    std::cout << "mChi1: " << mChi1 * 1000 << " MeV " << std::endl;
-    std::cout << "mChi2: " << mChi2 * 1000 << " MeV " << std::endl;
+  std::cout << "mA: " << MA * 1E3 << " MeV " << std::endl;
+  std::cout << "IBranchingType: " << iBranchingType << std::endl;
+  if (iBranchingType == 0 || iBranchingType == 10) {
+    std::cout << "decay to neutrinos, mass is negligible m_nu << mA" << std::endl;
+  }
+  else if (iBranchingType == 1 || iBranchingType == 11) {
+    std::cout << "mChi1: " << mChi1 * 1E3 << " MeV " << std::endl;
+    std::cout << "mChi2: " << mChi2 * 1E3 << " MeV " << std::endl;
   } else {
-    std::cout << "mChi: " << mChi * 1000 << " MeV " << std::endl;
+    std::cout << "mChi: " << mChi * 1E3 << " MeV " << std::endl;
   }
   std::cout << "Width: " << this->Width() * 1E3 << " MeV " << std::endl;
 
@@ -47,17 +59,15 @@ DarkZAnnihilation::~DarkZAnnihilation() {
 double DarkZAnnihilation::PreFactor(double E0) {
 
   double ss = 2. * Mel * E0 + 2*Mel*Mel;
-  double qq = 0., E1 = 0., E2 = 0.;
+  double E1 = 0., E2 = 0.;
 
   double sMin = 0;
-  if ((iBranchingType == 1) || (iBranchingType == 3)) //DM
+  if (iBranchingType == 1 || iBranchingType == 11) //scalar DM
     sMin = 4 * mChi * mChi;
 
   if (ss < sMin)
     return 0.;   // A.C. e+e- -> Z' -> ff can happen also for an A' and chi with large mass,
                  // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
-
-  qq = sqrt(ss) / 2. * sqrt(1 - sMin / ss);
 
   double sigma = 1;
   switch (iBranchingType) {
@@ -67,16 +77,23 @@ double DarkZAnnihilation::PreFactor(double E0) {
     sigma = sigma * epsil * epsil * piF2(ss); //|Pi(S)|^2 for e+e- --> Z'
     sigma = sigma * ss;
     break;
-  case 1: //B-L, vanilla, neutrinos
-    break;
-  case 2: //Lmu-Ltau, scalar DM.  See 2206.03101 Eq. A.4.
+  case 1: //Lmu-Ltau, scalar DM.  See 2206.03101 Eq. A.3.
     sigma = (M_PI * alphaEW) / 3.;
     sigma = sigma * alphaD; //alphaD for Z' -> DM-DM
     sigma = sigma * epsil * epsil * piF2(ss); //|Pi(S)|^2 for e+e- --> Z'
     sigma = sigma * ss;
     sigma = sigma * pow(1-sMin/ss,3./2);
     break;
-  case 3: //B-L, scalar DM
+  case 10: //B-L, vanilla, neutrinos
+    sigma = epsil * epsil / 3.; // for e+e- --> Z'
+    sigma = sigma * epsil * epsil / (4 * M_PI); //alphaZ' for Z' -> nunu
+    sigma = sigma * ss;
+    break;
+  case 11: //B-L, scalar DM
+    sigma = (2 * epsil * epsil) / 3.; // for e+e- --> Z'
+    sigma = sigma * alphaD; //alphaD for Z' -> DM-DM
+    sigma = sigma * ss;
+    sigma = sigma * pow(1-sMin/ss,3./2);
     break;
   default:
     break;
@@ -99,12 +116,20 @@ double DarkZAnnihilation::GetSigmaTot(double E0) {
 bool DarkZAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
 {
   switch (iBranchingType){
-  case 1: //DM
-  case 3:
+  case 0: //Lmu-Ltau, vanilla, neutrino: always allowed by energy conservation
+    break;
+  case 1: //Lmu-Ltau,DM
+    if (sqrt(2. * Mel * E0 + 2*Mel*Mel) < 2. * mChi)
+      return false;
+    break;
+  case 10: //B-L, vanilla, neutrino: always allowed by energy conservation
+    break;
+  case 11: //B-L, DM
     if (sqrt(2. * Mel * E0 + 2*Mel*Mel) < 2. * mChi)
       return false;
     break;
   }
+
   if (E0 < EThresh)
     return false;
   if (NEmissions)
@@ -133,19 +158,30 @@ double DarkZAnnihilation::Width() {
   double ret=0;
   switch (iBranchingType) {
   case 0: //Lmu-Ltau, vanilla
-      ret=MA/3*epsil*epsil/(4*M_PI); //Z->nu nu (mu+tau)
-      if (MA > 2*Mmu)
+    ret=MA/3*epsil*epsil/(4*M_PI); //Z->nu nu (mu+tau)
+    if (MA > 2*Mmu)
         ret += MA/3 * epsil*epsil/(4*M_PI)*(1+2*Mmu*Mmu/(MA*MA))*sqrt(1-4*Mmu*Mmu/(MA*MA)); //Z->mu mu
     break;
-  case 1: //B-L, vanilla
-    break;
-  case 2: //Lmu-Ltau, DM
+  case 1: //Lmu-Ltau, scalar DM
     ret=MA/3*epsil*epsil/(4*M_PI);//Z->nu nu
     if (MA > 2*Mmu)
       ret += MA/3 * epsil*epsil/(4*M_PI)*(1+2*Mmu*Mmu/(MA*MA))*sqrt(1-4*Mmu*Mmu/(MA*MA)); //Z->mu mu
     ret+= MA/12*alphaD*pow((1-4*mChi*mChi/(MA*MA)),3./2); //Z->DM DM
     break;
-  case 3: //B-L, DM
+  case 10: //B-L, vanilla
+    ret=MA*epsil*epsil/(4*M_PI); //Z->nu nu
+    if (MA > 2*Mel)
+      ret += MA/3 * epsil*epsil/(4*M_PI)*(1+2*Mel*Mel/(MA*MA))*sqrt(1-4*Mel*Mel/(MA*MA)); //Z->el el
+    if (MA > 2*Mmu)
+      ret += MA/3 * epsil*epsil/(4*M_PI)*(1+2*Mmu*Mmu/(MA*MA))*sqrt(1-4*Mmu*Mmu/(MA*MA)); //Z->mu mu
+    break;
+  case 11: //B-L, scalar DM
+    ret=MA*epsil*epsil/(4*M_PI);//Z->nu nu
+    if (MA > 2*Mel)
+      ret += MA/3 * epsil*epsil/(4*M_PI)*(1+2*Mel*Mel/(MA*MA))*sqrt(1-4*Mel*Mel/(MA*MA)); //Z->el el
+    if (MA > 2*Mmu)
+      ret += MA/3 * epsil*epsil/(4*M_PI)*(1+2*Mmu*Mmu/(MA*MA))*sqrt(1-4*Mmu*Mmu/(MA*MA)); //Z->mu mu
+    ret+= MA/12*alphaD*pow((1-4*mChi*mChi/(MA*MA)),3./2); //Z->DM DM
     break;
   }
 
@@ -155,12 +191,11 @@ double DarkZAnnihilation::Width() {
 void DarkZAnnihilation::SetMA(double MAIn) {
   std::cout << "DarkZAnnihilation::SetMA was called with MAIn = " << MAIn << std::endl;
 
-  if (iBranchingType == 2) {
-
+  // B.B: Not used at the moment!
+  if (iBranchingType == 100) {
     mChi1 = MA * r;
     mChi2 = (1. + f) * mChi1;
   } else {
-
     mChi = MA * r;
     mChi1 = mChi;
     mChi2 = mChi;
@@ -177,14 +212,14 @@ double DarkZAnnihilation::AngularDistributionResonant(double eta, double E0) {
   case 0: //Lmu-Ltau, vanilla, neutrino --> 1+eta*eta
     val=(1+eta*eta)/2; //Max: eta=1
     break;
-  case 1: //B-L, vanilla, neutrino
-    val = 1;
-    break;
-  case 2: //Lmu-Ltau, DM, scalar
+  case 1: //Lmu-Ltau, DM, scalar
     //Scalar LDM, Angular distribution f(eta) ~ 1-eta*eta. Max: eta=0;
     val = 1-eta*eta;
     break;
-  case 3: //Lmu-Ltau, DM, scalar
+  case 10: //B-L, vanilla, neutrino
+    val=(1+eta*eta)/2; //Max: eta=1
+    break;
+  case 11: //B-L, DM, scalar
     //Scalar LDM, Angular distribution f(eta) ~ 1-eta*eta. Max: eta=0;
     val = 1-eta*eta;
     break;

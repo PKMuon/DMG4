@@ -30,10 +30,9 @@
 #include "DMParticleScalar.hh"
 #include "DMParticlePseudoScalar.hh"
 #include "DMParticleAxial.hh"
-#include "DMParticleChi1.hh"
-#include "DMParticleChi2.hh"
 
 #include "DMParticleChi.hh"
+#include "DMParticleChiScalar.hh"
 #include "DMParticleChi1.hh"
 #include "DMParticleChi2.hh"
 
@@ -204,7 +203,7 @@ void DarkMatterPhysics::Init(){
        exit(1);
      }
 
-   BiasSigmaFactor = DMpar->GetRegisteredParam("BiasSigmaFactor0") * 0.0001 * 0.0001 / (myDarkMatter->Getepsil()*myDarkMatter->Getepsil());
+   BiasSigmaFactor = DMpar->GetRegisteredParam("BiasSigmaFactor0") * (myDarkMatter->GetepsilBench()*myDarkMatter->GetepsilBench()) / (myDarkMatter->Getepsil()*myDarkMatter->Getepsil());
 
    //For the e+ e- --> Z' --> ff process, we compute the cross section using epsil, so the code above has to be changed
    if (DMProcessType==16){
@@ -215,15 +214,6 @@ void DarkMatterPhysics::Init(){
 
 void DarkMatterPhysics::ConstructParticle()
 {
-  // This call to particle definition must be first or at least go before
-  // Physics::ConstructProcess()
-  DMParticleAPrime::Definition();
-  DMParticleZPrime::Definition();
-  DMParticleALP::Definition();
-  DMParticleScalar::Definition();
-  DMParticlePseudoScalar::Definition();
-  DMParticleAxial::Definition();
-
   /*A.C.
    * The following lines are necessary to construct the particles that will be propagated for annihilation
    *
@@ -237,6 +227,7 @@ void DarkMatterPhysics::ConstructParticle()
   switch(DMProcessType)
     {
     case 1:  //dark-photon bremmstrahlung
+      DMParticleAPrime::Definition();
       if (DecayType == 0) { //Only invisible, do nothing
       }
       else {  //Require final state particles
@@ -246,12 +237,32 @@ void DarkMatterPhysics::ConstructParticle()
         }
       }
       break;
-
+    case 2:
+      DMParticleScalar::Definition();
+      break;
+    case 3:
+      DMParticleAxial::Definition();
+      break;
+    case 4:
+      DMParticlePseudoScalar::Definition();
+      break;
+    case 5:
+      DMParticleAPrime::Definition();
+      break;
     case 11: //annihilation processes
+      DMParticleAPrime::Definition();
+      break;
     case 12:
+      DMParticleScalar::Definition();
+      break;
     case 13:
+      DMParticleAxial::Definition();
+      break;
     case 14:
+      DMParticlePseudoScalar::Definition();
+      break;
     case 15:
+      DMParticleAPrime::Definition(); // A' for the moment, the spin 2 particle not yet implemented
       if (DecayType == 0) { //Only invisible, do nothing
       }
       else {  //Require final state particles
@@ -267,6 +278,32 @@ void DarkMatterPhysics::ConstructParticle()
         }
         break;
       }
+    case 16:
+      DMParticleZPrime::Definition();
+      if (DecayType == 0) { //Only invisible, do nothing
+      }
+      else {  //Require final state particles
+        if ((BranchingType == 0) || (BranchingType == 10)) { // neutrinos final state
+        } else if ((BranchingType == 1) || (BranchingType == 11)) { // DM final state
+          DMParticleChiScalar::Definition();
+        } else {
+          G4cout << G4endl << "BranchingType not implemented, exiting " << G4endl << G4endl;
+          exit(1);
+        }
+      }
+      break;
+    case 21:
+      DMParticleALP::Definition();
+      break;
+    case 31:
+      DMParticleZPrime::Definition();
+      break;
+    case 32:
+      DMParticleZPrime::Definition();
+      break;
+    case 34:
+      DMParticleZPrime::Definition();
+      break;
     default:
       break;
     }
@@ -311,7 +348,7 @@ void DarkMatterPhysics::ConstructProcess()
       theDMParticlePtr = DMParticleAPrime::Definition();
     }
     if(myDarkMatter->GetDMType() == 11) {                    // Annihilation through Z' (Lmu-Ltau or B-L models)
-          theDMParticlePtr = DMParticleZPrime::Definition();
+      theDMParticlePtr = DMParticleZPrime::Definition();
     }
   }
   if(myDarkMatter->GetParentPDGID() == 13) {
