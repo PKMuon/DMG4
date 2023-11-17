@@ -79,7 +79,7 @@ DMParticleAPrime* DMParticleAPrime::Definition()
       if(MassIn > 2.*electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(electron_mass_c2, electron_mass_c2, MassIn);
       if(MassIn > 2.*muMass) muWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(muMass, muMass, MassIn);
       if(MassIn > pi0Mass) {
-        hWidth = (CLHEP::fine_structure_const*fine_structure_const*epsilIn*epsilIn*MassIn*MassIn*MassIn) /
+        hWidth = (CLHEP::fine_structure_const*CLHEP::fine_structure_const*epsilIn*epsilIn*MassIn*MassIn*MassIn) /
                  (96.*3.141*3.141*3.141*0.93*0.93*pi0Mass*pi0Mass);
         hWidth *= (1. - pi0Mass*pi0Mass/(MassIn*MassIn));
         G4double a = 1. - (MassIn*MassIn)/(782.66*782.66);

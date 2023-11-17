@@ -5,6 +5,7 @@
 #include "DarkMatterAnnihilation.hh"
 #include "DarkPhotons.hh"
 #include "DarkZ.hh"
+#include "DarkZAnnihilation.hh"
 #include "DarkMuPhilicScalars.hh"
 #include "DarkMuPhilicPseudoScalars.hh"
 #include "ALP.hh"
@@ -29,10 +30,9 @@
 #include "DMParticleScalar.hh"
 #include "DMParticlePseudoScalar.hh"
 #include "DMParticleAxial.hh"
-#include "DMParticleChi1.hh"
-#include "DMParticleChi2.hh"
 
 #include "DMParticleChi.hh"
+#include "DMParticleChiScalar.hh"
 #include "DMParticleChi1.hh"
 #include "DMParticleChi2.hh"
 
@@ -99,7 +99,6 @@ void DarkMatterPhysics::Init(){
   G4int BranchingType = DMpar->GetRegisteredParam("BranchingType",0);
 
 
-  G4double minWidth =  DMpar->GetRegisteredParam("AnnihilationMinWidth",0);
 
 
 /*
@@ -115,7 +114,7 @@ void DarkMatterPhysics::Init(){
   EThresh/=GeV;
   DMMass/=GeV;
   Density/=(g/cm3);
-  minWidth/=GeV;
+
 
 
   switch(DMProcessType)
@@ -171,7 +170,7 @@ void DarkMatterPhysics::Init(){
     case 11:
       G4cout << "Initialize DarkPhotonsAnnihilation\n";
       myDarkMatter = new DarkPhotonsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
-                                                 DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor,minWidth);
+                                                 DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor);
       break;
     case 12:
       G4cout << "Initialize DarkScalarsAnnihilation\n";
@@ -193,26 +192,27 @@ void DarkMatterPhysics::Init(){
       myDarkMatter = new DarkMassSpin2Annihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
               DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType, fFactor );
        break;
+    case 16:
+      G4cout << "Initialize DarkZAnnihilation\n";
+      myDarkMatter = new DarkZAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
+          DMpar->GetRegisteredParam("AlphaD", 0.5), BranchingType,fFactor);
+      break;
      default:
        G4cout << G4endl << "Wrong DM process type specified: " << DMProcessType << " , exiting" << G4endl << G4endl;
        exit(1);
      }
 
-   BiasSigmaFactor = DMpar->GetRegisteredParam("BiasSigmaFactor0") * 0.0001 * 0.0001 / (myDarkMatter->Getepsil()*myDarkMatter->Getepsil());
+   BiasSigmaFactor = DMpar->GetRegisteredParam("BiasSigmaFactor0") * (myDarkMatter->GetepsilBench()*myDarkMatter->GetepsilBench()) / (myDarkMatter->Getepsil()*myDarkMatter->Getepsil());
+
+   //For the e+ e- --> Z' --> ff process, we compute the cross section using epsil, so the code above has to be changed
+   if (DMProcessType==16){
+     BiasSigmaFactor = DMpar->GetRegisteredParam("BiasSigmaFactor0");
+   }
 }
 
 
 void DarkMatterPhysics::ConstructParticle()
 {
-  // This call to particle definition must be first or at least go before
-  // Physics::ConstructProcess()
-  DMParticleAPrime::Definition();
-  DMParticleZPrime::Definition();
-  DMParticleALP::Definition();
-  DMParticleScalar::Definition();
-  DMParticlePseudoScalar::Definition();
-  DMParticleAxial::Definition();
-
   /*A.C.
    * The following lines are necessary to construct the particles that will be propagated for annihilation
    *
@@ -226,6 +226,7 @@ void DarkMatterPhysics::ConstructParticle()
   switch(DMProcessType)
     {
     case 1:  //dark-photon bremmstrahlung
+      DMParticleAPrime::Definition();
       if (DecayType == 0) { //Only invisible, do nothing
       }
       else {  //Require final state particles
@@ -235,13 +236,34 @@ void DarkMatterPhysics::ConstructParticle()
         }
       }
       break;
-
+    case 2:
+      DMParticleScalar::Definition();
+      break;
+    case 3:
+      DMParticleAxial::Definition();
+      break;
+    case 4:
+      DMParticlePseudoScalar::Definition();
+      break;
+    case 5:
+      DMParticleAPrime::Definition();
+      break;
     case 11: //annihilation processes
+      DMParticleAPrime::Definition();
+      break;
     case 12:
+      DMParticleScalar::Definition();
+      break;
     case 13:
+      DMParticleAxial::Definition();
+      break;
     case 14:
+      DMParticlePseudoScalar::Definition();
+      break;
     case 15:
+      DMParticleAPrime::Definition(); // A' for the moment, the spin 2 particle not yet implemented
       if (DecayType == 0) { //Only invisible, do nothing
+        break;
       }
       else {  //Require final state particles
         if ((BranchingType == 0) || (BranchingType == 1)) {
@@ -256,6 +278,32 @@ void DarkMatterPhysics::ConstructParticle()
         }
         break;
       }
+    case 16:
+      DMParticleZPrime::Definition();
+      if (DecayType == 0) { //Only invisible, do nothing
+      }
+      else {  //Require final state particles
+        if ((BranchingType == 0) || (BranchingType == 10)) { // neutrinos final state
+        } else if ((BranchingType == 1) || (BranchingType == 11)) { // DM final state
+          DMParticleChiScalar::Definition();
+        } else {
+          G4cout << G4endl << "BranchingType not implemented, exiting " << G4endl << G4endl;
+          exit(1);
+        }
+      }
+      break;
+    case 21:
+      DMParticleALP::Definition();
+      break;
+    case 31:
+      DMParticleZPrime::Definition();
+      break;
+    case 32:
+      DMParticleZPrime::Definition();
+      break;
+    case 34:
+      DMParticleZPrime::Definition();
+      break;
     default:
       break;
     }
@@ -298,6 +346,9 @@ void DarkMatterPhysics::ConstructProcess()
     }
     if(myDarkMatter->GetDMType() == 5) {                    // Annihilation through spin 2 DM, A' for the moment
       theDMParticlePtr = DMParticleAPrime::Definition();
+    }
+    if(myDarkMatter->GetDMType() == 11) {                    // Annihilation through Z' (Lmu-Ltau or B-L models)
+      theDMParticlePtr = DMParticleZPrime::Definition();
     }
   }
   if(myDarkMatter->GetParentPDGID() == 13) {

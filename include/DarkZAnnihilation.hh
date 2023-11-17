@@ -1,5 +1,5 @@
 /*
- * DarkPhotonsAnnihilation.hh
+ * DarkZAnnihilation.hh
  *
  *  Created on: Oct 6, 2020
  *      Author: celentan
@@ -11,23 +11,22 @@
  *      namely PreFactor
  */
 
-#ifndef INCLUDE_DARKPHOTONSANNIHILATION_HH_
-#define INCLUDE_DARKPHOTONSANNIHILATION_HH_
+#ifndef INCLUDE_DarkZANNIHILATION_HH_
+#define INCLUDE_DarkZANNIHILATION_HH_
 
 #include "DarkMatterAnnihilation.hh"
 
 
-class DarkPhotonsAnnihilation: public DarkMatterAnnihilation
+class DarkZAnnihilation: public DarkMatterAnnihilation
 {
 
 public:
 
-    DarkPhotonsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn = 1., double ANuclIn = 207., double ZNuclIn = 82., double DensityIn = 11.35, double epsilIn = 0.0001, int IDecayIn = 0,double rIn=1./3,double alphaD=0.5,int IBranchingIn=0, double fIn=0.1);
-    virtual ~DarkPhotonsAnnihilation();
+    DarkZAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn = 1., double ANuclIn = 207., double ZNuclIn = 82., double DensityIn = 11.35, double epsilIn = 0.0001, int IDecayIn = 0,double rIn=1./3,double alphaD=0.5,int IBranchingIn=0, double fIn=0.1);
+    virtual ~DarkZAnnihilation();
 
     virtual double PreFactor(double E0);
     virtual double GetSigmaTot(double E0);
-
     virtual bool EmissionAllowed(double E0, double DensityMat); // E0 in GeV, density in g/cm3
     virtual double CrossSectionDSDX(double Xev, double E0);
     virtual double CrossSectionDSDXDU(double Xev, double UThetaEv, double E0);
@@ -36,8 +35,9 @@ public:
 
     virtual double AngularDistributionResonant(double eta,double E0);
 
-
+private:
+    double piF2(double q2); //q2 in GeV^2
 
 };
 
-#endif /* INCLUDE_DARKPHOTONSANNIHILATION_HH_ */
+#endif /* INCLUDE_DarkZANNIHILATION_HH_ */

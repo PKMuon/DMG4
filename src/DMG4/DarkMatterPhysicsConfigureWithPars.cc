@@ -96,10 +96,8 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure(void *ptr)
 
      /* Additional parameters to handle narrow width resonances in annihilation
       * dEmaxPerStep -> the maximum energy loss per step in the material(s) where the annihilation is allowed
-      * AnnihilationMinWidth -> the minimum value of the cross section width; if it is smaller than this, the width is artificially increase, and the cross section corrected for so that the yield is constant
       */
      //DMpar->RegisterNewParam("dEmaxPerStep",5*MeV)
-     //DMpar->RegisterNewParam("AnnihilationMinWidth",10*keV);
 
   return true;
 }
