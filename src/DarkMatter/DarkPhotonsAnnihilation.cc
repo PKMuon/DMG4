@@ -46,10 +46,9 @@ DarkPhotonsAnnihilation::~DarkPhotonsAnnihilation()
 
 //Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
 //This is the total cross section without the BW denominator
-//E0: positron TOTAL energy in lab frame
-double DarkPhotonsAnnihilation::PreFactor(double E0){
+//s: e+e- invariant mass squared
+double DarkPhotonsAnnihilation::PreFactor(double ss){
 
-  double ss = 2. * Mel * E0+2*Mel*Mel;
   double qq=0.,E1=0.,E2=0.;
   switch (iBranchingType) {
 

@@ -28,7 +28,7 @@ class DarkMatterAnnihilation : public DarkMatter {
     virtual ~DarkMatterAnnihilation()=0;
 
     // methods to be implemented in each derived class
-    virtual double PreFactor(double E0) = 0;
+    virtual double PreFactor(double s) = 0; //s is the e+e- invariant mass
     virtual double Width() = 0;
     virtual double AngularDistributionResonant(double eta,double E0) = 0;
 

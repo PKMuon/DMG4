@@ -37,11 +37,10 @@ DarkMassSpin2Annihilation::~DarkMassSpin2Annihilation(  ){ ; }
 
 
 // Total cross-section in pBarn
-//E0: positron TOTAL energy in lab frame
-double DarkMassSpin2Annihilation::PreFactor( double E0 )
+//s: e+e- invariant mass squared
+double DarkMassSpin2Annihilation::PreFactor( double ss )
 {
-  // Invariant mass 
-  double ss = 2.0 * Mel * E0+2*Mel*Mel, rsChi = mChi*mChi / ss, rsEl = Mel*Mel / ss;
+  double  rsChi = mChi*mChi / ss, rsEl = Mel*Mel / ss;
   // A.C. e+e- -> G -> chi chi can happen also for an G and chi with large 
   // mass, i.e. through the off-shell tail of the resonance, but this still 
   // needs to be kinematically allowed.

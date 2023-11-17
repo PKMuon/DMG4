@@ -55,10 +55,9 @@ DarkZAnnihilation::~DarkZAnnihilation() {
 
 //Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
 //This is the total cross section without the BW denominator
-//E0: positron total energy in GeV
-double DarkZAnnihilation::PreFactor(double E0) {
+//s: e+e- invariant mass squared
+double DarkZAnnihilation::PreFactor(double ss) {
 
-  double ss = 2. * Mel * E0 + 2*Mel*Mel;
   double E1 = 0., E2 = 0.;
 
   double sMin = 0;

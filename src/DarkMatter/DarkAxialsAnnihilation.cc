@@ -30,9 +30,8 @@ DarkAxialsAnnihilation::~DarkAxialsAnnihilation() {
 
 //Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
 //This is the total cross section without the BW denominator
-//E0: positron TOTAL energy in lab frame
-double DarkAxialsAnnihilation::PreFactor(double E0) {
-    double ss = 2. * Mel * E0 +2*Mel*Mel;
+//s: e+e- invariant mass GeV^2
+double DarkAxialsAnnihilation::PreFactor(double ss) {
 
     if (sqrt(ss) < 2. * mChi)
         return 0.;   // A.C. e+e- -> A' -> chi chi can happen also for an A' and chi with large mass,

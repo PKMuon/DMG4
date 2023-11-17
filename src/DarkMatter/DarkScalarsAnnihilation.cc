@@ -29,10 +29,9 @@ DarkScalarsAnnihilation::~DarkScalarsAnnihilation() {
 
 //Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
 //This is the total cross section without the BW denominator
-//E0: positron TOTAL energy in lab frame
-double DarkScalarsAnnihilation::PreFactor(double E0) {
+//s: e+e- invariant mass squared
+double DarkScalarsAnnihilation::PreFactor(double ss) {
 
-  double ss = 2. * Mel * E0;
   if (sqrt(ss) < 2. * mChi)
     return 0.; // A.C. e+e- -> S -> chi chi can happen also for an S and chi with large mass,
                // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed

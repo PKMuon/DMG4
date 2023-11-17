@@ -18,7 +18,7 @@ class DarkMassSpin2Annihilation : public DarkMatterAnnihilation
                              , int IBranchingIn = 0, double fIn = 0.1 );
     virtual ~DarkMassSpin2Annihilation();
 
-    virtual double PreFactor(double E0);
+    virtual double PreFactor(double s);
     virtual double GetSigmaTot(double E0);
     virtual bool EmissionAllowed(double E0, double DensityMat); 
     virtual double CrossSectionDSDX(double Xev, double E0);
