@@ -17,11 +17,10 @@
 
 
 DarkPhotonsAnnihilation::DarkPhotonsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
-                                                 double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn, double minWidth) :
+                                                 double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
                                                  DarkMatterAnnihilation(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn, rIn,alphaDIn, IBranchingIn,fIn)
 {
   DMType = 1; //A.C.
-  widthEnhancementFactor = 1;
 
   std::cout << "Initialized DarkPhotonsAnnihilation (e+ e- -> A' -> DM DM) for material density = " << DensityIn << std::endl;
   std::cout << "mA: "<<MA*1000<<" MeV "<<std::endl;
@@ -35,10 +34,7 @@ DarkPhotonsAnnihilation::DarkPhotonsAnnihilation(double MAIn, double EThreshIn, 
   std::cout<<"Width: "<<this->Width()*1E3<<" MeV "<<std::endl;
 
 
-  if ((minWidth >0)&&(this->Width()<minWidth)){
-    widthEnhancementFactor=minWidth/this->Width();
-    std::cout<<"Width after artificial enhancement: "<<this->Width()<<std::endl;
-  }
+
 
   std::cout << std::endl;
 }
@@ -50,24 +46,21 @@ DarkPhotonsAnnihilation::~DarkPhotonsAnnihilation()
 
 //Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
 //This is the total cross section without the BW denominator
-//E0: positron TOTAL energy in lab frame
-double DarkPhotonsAnnihilation::PreFactor(double E0){
+//s: e+e- invariant mass squared
+double DarkPhotonsAnnihilation::PreFactor(double ss){
 
-  double ss = 2. * Mel * E0+2*Mel*Mel;
   double qq=0.,E1=0.,E2=0.;
-  switch (iBranchingType) {
 
-  case 0:
-  case 1:
-      if (sqrt(ss) < 2.*mChi) return 0.;   // A.C. e+e- -> A' -> chi chi can happen also for an A' and chi with large mass,
-                                           // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
-      qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
-      break;
+  if (ss<this->sMin()){
+    return 0;
+  }
+
+  qq = this->q(ss);
+
+  switch (iBranchingType) {
   case 2:
-      if (sqrt(ss) < (mChi1+mChi2)) return 0.;
       E1=(ss-mChi2*mChi2+mChi1*mChi1)/(2*sqrt(ss));
       E2=(ss+mChi2*mChi2-mChi1*mChi1)/(2*sqrt(ss));
-      qq = sqrt(E1*E1-mChi1*mChi1);
       break;
   }
 
@@ -94,10 +87,6 @@ double DarkPhotonsAnnihilation::PreFactor(double E0){
   //here sigma is in G4 internal units, 1 /Energy^2. Move to pBarn;
   sigma *= GeVtoPb;
 
-
-  //A.C. width enhancement factor to avoid sharp variations of the cross section
-  //Documentation: https://gitlab.cern.ch/P348/DMG4/-/issues/14
-  sigma=sigma * widthEnhancementFactor;
   return sigma;
 }
 
@@ -106,15 +95,6 @@ double DarkPhotonsAnnihilation::GetSigmaTot(double E0) {
   return TotalCrossSectionCalc(E0);
 }
 
-//E0: positron TOTAL energy in lab frame
-bool DarkPhotonsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
-{
-  if (sqrt(2.*Mel*E0+2*Mel*Mel) < 2.*mChi) return false;
-  if(E0 < EThresh) return false;
-  if(NEmissions) return false; // For G4 DM classes
-  if(fabs(DensityMat - Density) > 0.1) return false;
-  return true;
-}
 
 
 double DarkPhotonsAnnihilation::CrossSectionDSDX(double XEv, double E0) {
@@ -154,9 +134,6 @@ double DarkPhotonsAnnihilation::Width() {
       }
       break;
   }
-  //A.C. add width-enhancement factor
-  //Documentation: https://gitlab.cern.ch/P348/DMG4/-/issues/14
-  ret=ret*widthEnhancementFactor;
 
   return ret;
 }
@@ -186,17 +163,18 @@ double DarkPhotonsAnnihilation::AngularDistributionResonant(double eta,double E0
 
 
     double ss = 2. * Mel * E0+2*Mel*Mel;
-    double qq;
+
+    //TODO for atomic effects
+    if (ss<this->sMin()){
+      printf("DarkPhotonsAnnihilation::AngularDistribution error with threshold, E0=%f, m=%f\n",E0,mChi);
+      exit(1);
+    }
+
+    double qq=this->q(ss);
     double val=0;
     switch (iBranchingType){
      case 0:
          //Fermionic LDM. Angular distribution f(eta) ~ s+4*qq*qq*eta*eta+4*m*m. Max for eta=+-1
-         if (sqrt(ss) < 2.*mChi){
-             printf("DarkPhotonsAnnihilation::AngularDistribution error with threshold, E0=%f, m=%f\n",E0,mChi);
-             exit(1);
-         }
-         qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
-
          val=ss+4*qq*qq*eta*eta+4*mChi*mChi;
          val/=(ss+4*qq*qq+4*mChi*mChi);
          break;
@@ -206,14 +184,9 @@ double DarkPhotonsAnnihilation::AngularDistributionResonant(double eta,double E0
          break;
      case 2:
          //Asymmetric LDM. Angular distribution f(eta)=(m1*m2+E1*E2+qq*qq*eta*eta). Max for eta=+-1
-         if (sqrt(ss) < (mChi1+mChi2)){
-             printf("DarkPhotonsAnnihilation::AngularDistribution error with threshold, E0=%f, m1=%f m2=%f\n",E0,mChi1,mChi2);
-             exit(1);
-         }
          double E1=(ss+mChi1*mChi1-mChi2*mChi2)/(2*sqrt(ss));
          double E2=(ss-mChi1*mChi1+mChi2*mChi2)/(2*sqrt(ss));
 
-         qq=sqrt(E1*E1-mChi1*mChi1);
 
          val=(mChi1*mChi2+E1*E2+qq*qq*eta*eta);
          val/=(mChi1*mChi2+E1*E2+qq*qq);

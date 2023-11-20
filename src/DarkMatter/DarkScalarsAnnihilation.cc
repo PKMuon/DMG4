@@ -29,14 +29,13 @@ DarkScalarsAnnihilation::~DarkScalarsAnnihilation() {
 
 //Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
 //This is the total cross section without the BW denominator
-//E0: positron TOTAL energy in lab frame
-double DarkScalarsAnnihilation::PreFactor(double E0) {
+//s: e+e- invariant mass squared
+double DarkScalarsAnnihilation::PreFactor(double ss) {
 
-  double ss = 2. * Mel * E0;
-  if (sqrt(ss) < 2. * mChi)
+  if (ss < this->sMin())
     return 0.; // A.C. e+e- -> S -> chi chi can happen also for an S and chi with large mass,
                // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
-  double qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
+  double qq = this->q(ss);
 
   double sigma = 4 * M_PI * alphaEW * epsilBench * epsilBench * alphaD;
   sigma = sigma * qq / sqrt(ss);
@@ -61,20 +60,7 @@ double DarkScalarsAnnihilation::GetSigmaTot(double E0) {
   return TotalCrossSectionCalc(E0);
 }
 
-//E0: positron TOTAL energy in lab frame
-bool DarkScalarsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
-    {
 
-  if (sqrt(2. * Mel * E0) < 2. * mChi)
-    return false;
-  if (E0 < EThresh)
-    return false;
-  if (NEmissions)
-    return false; // For G4 DM classes
-  if (fabs(DensityMat - Density) > 0.1)
-    return false;
-  return true;
-}
 
 double DarkScalarsAnnihilation::CrossSectionDSDX(double XEv, double E0) {
   (void) (E0);

@@ -26,9 +26,8 @@ class DarkAxialsAnnihilation : public DarkMatterAnnihilation
                            double epsilIn = 0.0001, int IDecayIn = 0, double rIn=1./3, double alphaD=0.5, int IBranchingIn=0, double fIn=0.1);
     virtual ~DarkAxialsAnnihilation();
 
-    virtual double PreFactor(double E0);
+    virtual double PreFactor(double s);
     virtual double GetSigmaTot(double E0);
-    virtual bool EmissionAllowed(double E0, double DensityMat); // E0 in GeV, density in g/cm3
     virtual double CrossSectionDSDX(double Xev, double E0);
     virtual double CrossSectionDSDXDU(double Xev, double UThetaEv, double E0);
     virtual double Width();

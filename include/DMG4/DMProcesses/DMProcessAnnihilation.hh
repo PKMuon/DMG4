@@ -5,6 +5,8 @@
 
 #include <G4VDiscreteProcess.hh>
 
+#include <fstream>
+
 class DarkMatter;
 class DarkMatterAnnihilation;
 class G4ParticleDefinition;
@@ -29,6 +31,8 @@ class DMProcessAnnihilation : public G4VDiscreteProcess
 
     virtual G4bool IsApplicable(const G4ParticleDefinition &) override;
 
+    ~DMProcessAnnihilation();
+
   private:
 
     G4Element *GetRandomElement(const G4ElementVector *elms);
@@ -51,11 +55,21 @@ class DMProcessAnnihilation : public G4VDiscreteProcess
 
 
     //Part for the atomic motion
-    //Key: Z, payload: for each shell index, a vector of the energies of the electrons in that shell, extracted by MC, in GeV
+    //Key: Z, payload: for each shell index, a vector of the kinetic energies of the electrons in that shell, extracted by MC, in GeV
     std::map<G4int, std::map<G4int,std::vector<G4double> > > shellElectronEnergies;
+
     //Key: Z, payload: for each shell index, the number of electrons in that shell
     std::map<G4int, std::map<G4int,G4int> > shellElectronZ;
 
+
+    //The largest kinetic energy of all atomic electrons generated
+    G4double maxShellElectronEnergy;
+
     G4double GetOneRandomEleEnergy(G4double B);
     std::vector<G4double> SimulateElectronEnergies(const G4Element *elm,G4int is);
+
+
+
+    std::ofstream *fout;
+
 };

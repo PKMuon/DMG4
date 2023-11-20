@@ -30,14 +30,13 @@ DarkAxialsAnnihilation::~DarkAxialsAnnihilation() {
 
 //Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
 //This is the total cross section without the BW denominator
-//E0: positron TOTAL energy in lab frame
-double DarkAxialsAnnihilation::PreFactor(double E0) {
-    double ss = 2. * Mel * E0 +2*Mel*Mel;
+//s: e+e- invariant mass GeV^2
+double DarkAxialsAnnihilation::PreFactor(double ss) {
 
-    if (sqrt(ss) < 2. * mChi)
+    if (ss<this->sMin())
         return 0.;   // A.C. e+e- -> A' -> chi chi can happen also for an A' and chi with large mass,
                      // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
-    double qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
+    double qq = this->q(ss);
 
     double sigma = 4 * M_PI * alphaEW * epsilBench * epsilBench * alphaD;
     sigma = sigma * qq / sqrt(ss);
@@ -59,20 +58,7 @@ double DarkAxialsAnnihilation::GetSigmaTot(double E0) {
     return TotalCrossSectionCalc(E0);
 }
 
-//E0: positron TOTAL energy in lab frame
-bool DarkAxialsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
-        {
 
-    if (sqrt(2. * Mel * E0+2*Mel*Mel) < 2. * mChi)
-        return false;
-    if (E0 < EThresh)
-        return false;
-    if (NEmissions)
-        return false; // For G4 DM classes
-    if (fabs(DensityMat - Density) > 0.1)
-        return false;
-    return true;
-}
 
 double DarkAxialsAnnihilation::CrossSectionDSDX(double XEv, double E0) {
     (void)(E0);
@@ -116,11 +102,13 @@ void DarkAxialsAnnihilation::SetMA(double MAIn) {
 }
 
 //E0: positron TOTAL energy in lab frame
+//TODO: atomic effects are probably breaking the "ss"
 double DarkAxialsAnnihilation::AngularDistributionResonant(double eta,double E0){
   double val=1;
   double ss = 2. * Mel * E0+2*Mel*Mel;
 
-  if (sqrt(ss) < 2.*mChi){
+
+  if (ss < this->sMin()){
     printf("DarkScalarsAnnihilation::AngularDistribution error with threshold, E0=%f, m=%f\n",E0,mChi);
     exit(1);
   }

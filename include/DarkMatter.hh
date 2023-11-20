@@ -33,6 +33,7 @@ class DarkMatter
   friend class DarkScalarsAnnihilation;
   friend class DarkPseudoScalarsAnnihilation;
   friend class DarkAxialsAnnihilation;
+  friend class DarkZAnnihilation;
   public:
 
     DarkMatter(double MAIn, double EThreshIn, double SigmaNormIn=1., double ANuclIn=207., double ZNuclIn=82., double DensityIn=11.35,
@@ -105,7 +106,7 @@ class DarkMatter
     double Density;
     double epsilBench;
     double epsil;
-    int DMType; // 1 - Dark Photon; 2 - Dark Scalar; 3 - Dark Axials; 4 - Dark Pseudoscalars; 11 - Z'; 21 - ALP.
+    int DMType; // 1 - Dark Photon; 2 - Dark Scalar; 3 - Dark Axials; 4 - Dark Pseudoscalars; 11 - Z' (muon); 12 - Z' (electron) ; 21 - ALP.
                 // For annihilation, this is the "resonance R" in e+e- --> R --> final-state
     int ParentPDGID;
     double MParent;

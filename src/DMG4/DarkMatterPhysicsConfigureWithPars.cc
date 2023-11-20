@@ -74,10 +74,19 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure(void *ptr)
       * Optional to make different decay table; 0 : invisible decays or SM lepton decays, depending on DecayType; 1 : B - L model; 2 : Semivisible: Inelastic DM; 3 : Semivisible: Dirac Inelastic DM    
       * For annihilation e+e- --> R --> ff the meaning is DIFFERENT!
 
-        0: default: fermionic ff final state
-        1: scalar ff final state
-        2: asymmetric fermionic DM final state produced (iDM)
-        3: Dirac DM final state produced (i2DM)
+       CASE Dark Photon, Dark Scalar, Dark Axial Vector, Dark Pseudo Scalar
+
+       0: default: fermionic ff final state
+       1: scalar ff final state
+       2: asymmetric fermionic DM final state produced (iDM)
+       3: Dirac DM final state produced (i2DM)
+
+       CASE Dark Z'
+
+       0: Lmu-Ltau vanilla model,  nu-nu final state - sum nuMu + nuTau (default)
+       1: Lmu-Ltau DM model,       scalar DM final state
+       10: B-L vanilla model,      nu-nu final state
+       11: B-L DM model,           scalar DM final state
       */
      //DMpar->RegisterNewParam("BranchingType", 0.);
 
@@ -96,10 +105,8 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure(void *ptr)
 
      /* Additional parameters to handle narrow width resonances in annihilation
       * dEmaxPerStep -> the maximum energy loss per step in the material(s) where the annihilation is allowed
-      * AnnihilationMinWidth -> the minimum value of the cross section width; if it is smaller than this, the width is artificially increase, and the cross section corrected for so that the yield is constant
       */
      //DMpar->RegisterNewParam("dEmaxPerStep",5*MeV)
-     //DMpar->RegisterNewParam("AnnihilationMinWidth",10*keV);
 
   return true;
 }

@@ -27,7 +27,7 @@
 
 #include "AnnihilationStepLimiter.hh"
 
-#define EDEP_ALONG_STEP
+//#define EDEP_ALONG_STEP
 #define ATOMIC_EFFECTS
 
 
@@ -62,13 +62,21 @@ DMProcessAnnihilation::DMProcessAnnihilation(DarkMatterAnnihilation *DarkMatterP
   G4cout<<"DMProcessAnnihilation, init xi: "<<xi<<G4endl;
 
 
+  //Atomic parts
+  maxShellElectronEnergy=0;
 
+
+  fout=new std::ofstream("out.dat");
 
 }
-
+DMProcessAnnihilation::~DMProcessAnnihilation(){
+  fout->close();
+}
 G4bool DMProcessAnnihilation::IsApplicable(const G4ParticleDefinition &pDef) {
   return ("e+" == pDef.GetParticleName());
 }
+
+
 
 G4double DMProcessAnnihilation::GetMeanFreePath(const G4Track &aTrack, G4double, /*previousStepSize*/
 G4ForceCondition* /*condition*/) {
@@ -78,6 +86,8 @@ G4ForceCondition* /*condition*/) {
   G4double ekin = aTrack.GetKineticEnergy() / GeV; //this is the kinetic energy of the positron at the beginning of the step
   G4double etot = aTrack.GetTotalEnergy() / GeV; //this is the total energy of the positron at the beginning of the step
 
+
+  //this method only checks if the material is ok, and if the energy is above threshold
   if (myDarkMatterAnnihilation->EmissionAllowed(etot, DensityMat)) {
     /*
      * This part is related to atomic motion effects
@@ -98,18 +108,42 @@ G4ForceCondition* /*condition*/) {
 
     /*2- If necessary, compute the electron energies for this material*/
     if (shellElectronEnergies.find(Z)==shellElectronEnergies.end()){
+
         for (G4int is=0;is<elm->GetNbOfAtomicShells();is++){
+          auto v=this->SimulateElectronEnergies(elm,is);
           shellElectronZ[Z][is]=elm->GetNbOfShellElectrons(is);
-          shellElectronEnergies[Z][is]=this->SimulateElectronEnergies(elm,is);
+          shellElectronEnergies[Z][is]=v;
+          auto m=*max_element(v.begin(),v.end());
+          if (m>maxShellElectronEnergy){
+            maxShellElectronEnergy=m;
+          }
         }
     }
 
+    /*3- Now check if the positron energy is above threshold for e+e- --> A+B (where A,B are the particles in the final state)*/
+    double smin=myDarkMatterAnnihilation->sMin();
+    double s=2*Mel*Mel+2*Mel*etot; //GeV^2
+
 #ifdef ATOMIC_EFFECTS
-    G4double CrossSection =myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(etot, shellElectronZ[Z],shellElectronEnergies[Z]);
+    /*If atomic effects are included, we should write s=2Mel*Mel+2*Mel(E_-zP_-).
+      Largest s value: z=-1, s=2Mel*Mel+2*E+*(E_- + P_-).
+      Take the largest positron energy for the most energetic shell*/
+    double EeleMAX=maxShellElectronEnergy+Mel;
+    double PeleMAX=sqrt(EeleMAX*EeleMAX-Mel*Mel);
+    s=2*Mel*Mel+2*etot*(EeleMAX+PeleMAX);
+#endif
+
+
+    if (s<smin) return DBL_MAX;
+
+    /*Finally compute the cross section*/
+#ifdef ATOMIC_EFFECTS
+    G4double CrossSection=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(etot, shellElectronZ[Z], shellElectronEnergies[Z]);
 #else
     G4double CrossSection =myDarkMatterAnnihilation->GetSigmaTot(etot); //keep this line here
 #endif
 
+    *fout<<etot<<" "<<CrossSection<<std::endl;
 
     G4double Emax=(myDarkMatterAnnihilation->GetMA()*myDarkMatterAnnihilation->GetMA()-2*Mel*Mel)/(2*Mel); //this is in GeV
 
@@ -134,7 +168,7 @@ G4ForceCondition* /*condition*/) {
     if (etot < Emax){
       this->CrossSectionStepE=etot;
 #ifdef ATOMIC_EFFECTS
-      this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(this->CrossSectionStepE, shellElectronZ[Z],shellElectronEnergies[Z]);
+      this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(etot, shellElectronZ[Z], shellElectronEnergies[Z]);
 #else
       this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTot(this->CrossSectionStepE);
 #endif
@@ -145,7 +179,7 @@ G4ForceCondition* /*condition*/) {
     else if (ekin > (Emax/xi)){
       this->CrossSectionStepE=xi*ekin;
 #ifdef ATOMIC_EFFECTS
-      this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(this->CrossSectionStepE, shellElectronZ[Z],shellElectronEnergies[Z]);
+      this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(etot, shellElectronZ[Z], shellElectronEnergies[Z]);
 #else
       this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTot(this->CrossSectionStepE);
 #endif
@@ -154,7 +188,7 @@ G4ForceCondition* /*condition*/) {
     else{
       this->CrossSectionStepE=Emax;
 #ifdef ATOMIC_EFFECTS
-      this->CrossSectionStepVal=myDarkMatterAnnihilation->GetTotalCrossSectionMaxAtomicEffects(shellElectronZ[Z],shellElectronEnergies[Z]);
+      this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(etot, shellElectronZ[Z], shellElectronEnergies[Z]);
 #else
       this->CrossSectionStepVal=myDarkMatterAnnihilation->GetTotalCrossSectionMax();
 #endif
@@ -165,8 +199,15 @@ G4ForceCondition* /*condition*/) {
 
     CrossSection *= picobarn;
     //The DarkMatterAnnihilation classes compute the cross section for eps = epsilBench. Here, we revert back to epsilon
-    CrossSection *= (myDarkMatterAnnihilation->Getepsil() * myDarkMatterAnnihilation->Getepsil()) / (myDarkMatterAnnihilation->GetepsilBench() * myDarkMatterAnnihilation->GetepsilBench());
+    //We do not do this for Z' annihilation, since in that case the eps passed by user is used.
+    if (myDarkMatterAnnihilation->GetDMType()!=11){
+      CrossSection *= (myDarkMatterAnnihilation->Getepsil() * myDarkMatterAnnihilation->Getepsil()) / (myDarkMatterAnnihilation->GetepsilBench() * myDarkMatterAnnihilation->GetepsilBench());
+    }
     CrossSection /= myDarkMatterAnnihilation->GetSigmaNorm();
+
+    if (CrossSection<=0.){
+      return DBL_MAX;
+    }
 
     G4double n = aTrack.GetMaterial()->GetTotNbOfAtomsPerVolume(); //The annihilation cross section already contains a multiplicative factor "Z".
     G4double XMeanFreePath = 1. / (n * CrossSection);
@@ -196,8 +237,8 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
 
 
 #ifdef ATOMIC_EFFECTS
-  const G4double initialCrossSection=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(initialE/GeV,shellElectronZ[Z],shellElectronEnergies[Z]); //this is the cross section at the beginning of the step
-  const G4double finalCrossSection=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(incidentE/GeV,shellElectronZ[Z],shellElectronEnergies[Z]); //this is the cross section at the end of the step
+  const G4double initialCrossSection=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(initialE/GeV,shellElectronZ[Z], shellElectronEnergies[Z]);
+  const G4double finalCrossSection=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(incidentE/GeV,shellElectronZ[Z], shellElectronEnergies[Z]);
 #else
   const G4double initialCrossSection=myDarkMatterAnnihilation->GetSigmaTot(initialE/GeV); //this is the cross section at the beginning of the step
   const G4double finalCrossSection=myDarkMatterAnnihilation->GetSigmaTot(incidentE/GeV); //this is the cross section at the end of the step
@@ -262,10 +303,14 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
     // Kill projectile:
     aParticleChange.ProposeEnergy(0.);
     aParticleChange.ProposeTrackStatus(fStopAndKill);
-
+#ifdef ATOMIC_EFFECTS
+    double maxV=myDarkMatterAnnihilation->GetTotalCrossSectionMaxAtomicEffects(shellElectronZ[Z],shellElectronEnergies[Z]);
+#else
+    double maxV=myDarkMatterAnnihilation->GetTotalCrossSectionMax();
+#endif
     std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding() << " emitted by " << aTrack.GetDefinition()->GetParticleName() << " with energy = "
         << incidentE / GeV << " GeV, DM energy = " << incidentE / GeV << " GeV [event n.: " <<G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID()<<"]"<<std::endl;
-    std::cout << "DM cross section=" <<initialCrossSection<<" [MAX VALUE: "<<myDarkMatterAnnihilation->GetTotalCrossSectionMax()<<"]"<<std::endl;
+    std::cout << "DM cross section=" <<initialCrossSection<<" [MAX VALUE: "<<maxV<<"]"<<std::endl;
 
     return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
   } else { //simulate the decay e+e- -->A' -->ff
@@ -281,7 +326,7 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
 #ifdef ATOMIC_EFFECTS
       G4double zEle=2*G4UniformRand()-1;
       G4double phiEle=2*G4UniformRand()*CLHEP::pi;
-      G4double kinEle=0;
+      G4double kinEle=0; //TODO
       G4double momEle=0;
 
       G4LorentzVector p4_ele(G4ThreeVector(momEle*sqrt(1-zEle*zEle)*cos(phiEle),momEle*sqrt(1-zEle*zEle)*sin(phiEle),momEle*zEle),kinEle+CLHEP::electron_mass_c2);
