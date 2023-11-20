@@ -85,9 +85,9 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
 
      CASE Dark Z'
      0: Lmu-Ltau vanilla model, nu-nu final state - sum nuMu + nuTau (default)
-     1: B-L vanilla model,      nu-nu final state
-     2: Lmu-Ltau DM model,      scalar DM final state
-     3: B-L DM model,           scalar DM final state
+     1: Lmu-Ltau DM model,      scalar DM final state
+     10: B-L vanilla model,      nu-nu final state
+     11: B-L DM model,           scalar DM final state
    */
   //DMpar->RegisterNewParam("BranchingType", 0.);
 

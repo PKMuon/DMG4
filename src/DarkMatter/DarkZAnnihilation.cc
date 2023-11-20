@@ -36,6 +36,9 @@ DarkZAnnihilation::DarkZAnnihilation(double MAIn, double EThreshIn, double Sigma
   std::cout << "mA: " << MA * 1E3 << " MeV " << std::endl;
   std::cout << "IBranchingType: " << iBranchingType << std::endl;
   if (iBranchingType == 0 || iBranchingType == 10) {
+    mChi=0;
+    mChi1=0;
+    mChi2=0;
     std::cout << "decay to neutrinos, mass is negligible m_nu << mA" << std::endl;
   }
   else if (iBranchingType == 1 || iBranchingType == 11) {
@@ -53,6 +56,23 @@ DarkZAnnihilation::~DarkZAnnihilation() {
   ;
 }
 
+double DarkZAnnihilation::q(double s){
+  if ((iBranchingType == 1)||(iBranchingType == 11)){//DM
+    return sqrt(s/4-mChi*mChi);
+  }
+  else{ //neutrino
+    return sqrt(s)/2;
+  }
+}
+
+double DarkZAnnihilation::sMin(){
+  double smin=0; //neutrino
+  if ((iBranchingType == 1)||(iBranchingType == 11)){//DM
+    smin=(4*mChi*mChi);
+  }
+  return smin;
+}
+
 //Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
 //This is the total cross section without the BW denominator
 //s: e+e- invariant mass squared
@@ -60,9 +80,7 @@ double DarkZAnnihilation::PreFactor(double ss) {
 
   double E1 = 0., E2 = 0.;
 
-  double sMin = 0;
-  if (iBranchingType == 1 || iBranchingType == 11) //scalar DM
-    sMin = 4 * mChi * mChi;
+  double sMin = this->sMin();
 
   if (ss < sMin)
     return 0.;   // A.C. e+e- -> Z' -> ff can happen also for an A' and chi with large mass,
@@ -109,32 +127,6 @@ double DarkZAnnihilation::GetSigmaTot(double E0) {
 }
 
 
-//E0: positron total energy in GeV
-bool DarkZAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
-{
-  switch (iBranchingType){
-  case 0: //Lmu-Ltau, vanilla, neutrino: always allowed by energy conservation
-    break;
-  case 1: //Lmu-Ltau,DM
-    if (sqrt(2. * Mel * E0 + 2*Mel*Mel) < 2. * mChi)
-      return false;
-    break;
-  case 10: //B-L, vanilla, neutrino: always allowed by energy conservation
-    break;
-  case 11: //B-L, DM
-    if (sqrt(2. * Mel * E0 + 2*Mel*Mel) < 2. * mChi)
-      return false;
-    break;
-  }
-
-  if (E0 < EThresh)
-    return false;
-  if (NEmissions)
-    return false; // For G4 DM classes
-  if (fabs(DensityMat - Density) > 0.1)
-    return false;
-  return true;
-}
 
 double DarkZAnnihilation::CrossSectionDSDX(double XEv, double E0) {
   (void) (E0);
@@ -188,15 +180,18 @@ double DarkZAnnihilation::Width() {
 void DarkZAnnihilation::SetMA(double MAIn) {
   std::cout << "DarkZAnnihilation::SetMA was called with MAIn = " << MAIn << std::endl;
 
-  // B.B: Not used at the moment!
-  if (iBranchingType == 100) {
-    mChi1 = MA * r;
-    mChi2 = (1. + f) * mChi1;
-  } else {
+  if ((iBranchingType==0)||(iBranchingType==10)){ //neutrino
+    mChi1=0;
+    mChi2=0;
+    mChi=0;
+  }
+  else if ((iBranchingType==1)||(iBranchingType==11)){ //DM
     mChi = MA * r;
     mChi1 = mChi;
     mChi2 = mChi;
   }
+
+
 
 }
 

@@ -50,19 +50,17 @@ DarkPhotonsAnnihilation::~DarkPhotonsAnnihilation()
 double DarkPhotonsAnnihilation::PreFactor(double ss){
 
   double qq=0.,E1=0.,E2=0.;
-  switch (iBranchingType) {
 
-  case 0:
-  case 1:
-      if (sqrt(ss) < 2.*mChi) return 0.;   // A.C. e+e- -> A' -> chi chi can happen also for an A' and chi with large mass,
-                                           // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
-      qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
-      break;
+  if (ss<this->sMin()){
+    return 0;
+  }
+
+  qq = this->q(ss);
+
+  switch (iBranchingType) {
   case 2:
-      if (sqrt(ss) < (mChi1+mChi2)) return 0.;
       E1=(ss-mChi2*mChi2+mChi1*mChi1)/(2*sqrt(ss));
       E2=(ss+mChi2*mChi2-mChi1*mChi1)/(2*sqrt(ss));
-      qq = sqrt(E1*E1-mChi1*mChi1);
       break;
   }
 
@@ -97,15 +95,6 @@ double DarkPhotonsAnnihilation::GetSigmaTot(double E0) {
   return TotalCrossSectionCalc(E0);
 }
 
-//E0: positron TOTAL energy in lab frame
-bool DarkPhotonsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
-{
-  if (sqrt(2.*Mel*E0+2*Mel*Mel) < 2.*mChi) return false;
-  if(E0 < EThresh) return false;
-  if(NEmissions) return false; // For G4 DM classes
-  if(fabs(DensityMat - Density) > 0.1) return false;
-  return true;
-}
 
 
 double DarkPhotonsAnnihilation::CrossSectionDSDX(double XEv, double E0) {
@@ -174,17 +163,18 @@ double DarkPhotonsAnnihilation::AngularDistributionResonant(double eta,double E0
 
 
     double ss = 2. * Mel * E0+2*Mel*Mel;
-    double qq;
+
+    //TODO for atomic effects
+    if (ss<this->sMin()){
+      printf("DarkPhotonsAnnihilation::AngularDistribution error with threshold, E0=%f, m=%f\n",E0,mChi);
+      exit(1);
+    }
+
+    double qq=this->q(ss);
     double val=0;
     switch (iBranchingType){
      case 0:
          //Fermionic LDM. Angular distribution f(eta) ~ s+4*qq*qq*eta*eta+4*m*m. Max for eta=+-1
-         if (sqrt(ss) < 2.*mChi){
-             printf("DarkPhotonsAnnihilation::AngularDistribution error with threshold, E0=%f, m=%f\n",E0,mChi);
-             exit(1);
-         }
-         qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
-
          val=ss+4*qq*qq*eta*eta+4*mChi*mChi;
          val/=(ss+4*qq*qq+4*mChi*mChi);
          break;
@@ -194,14 +184,9 @@ double DarkPhotonsAnnihilation::AngularDistributionResonant(double eta,double E0
          break;
      case 2:
          //Asymmetric LDM. Angular distribution f(eta)=(m1*m2+E1*E2+qq*qq*eta*eta). Max for eta=+-1
-         if (sqrt(ss) < (mChi1+mChi2)){
-             printf("DarkPhotonsAnnihilation::AngularDistribution error with threshold, E0=%f, m1=%f m2=%f\n",E0,mChi1,mChi2);
-             exit(1);
-         }
          double E1=(ss+mChi1*mChi1-mChi2*mChi2)/(2*sqrt(ss));
          double E2=(ss-mChi1*mChi1+mChi2*mChi2)/(2*sqrt(ss));
 
-         qq=sqrt(E1*E1-mChi1*mChi1);
 
          val=(mChi1*mChi2+E1*E2+qq*qq*eta*eta);
          val/=(mChi1*mChi2+E1*E2+qq*qq);
