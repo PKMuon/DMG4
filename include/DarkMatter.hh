@@ -10,6 +10,9 @@
 
 #include <stdlib.h>
 
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_spline.h>
+
 struct ParamsForChi {double AA; double ZZ; double MMA; double EE0;};
 
 struct ParamsForMuonTotCS {double AA; double ZZ; double MMA; double EE0;};
@@ -125,4 +128,7 @@ class DarkMatter
     double AccumulatedProbability;
 
     int NEmissions;
+
+    gsl_interp_accel *acc;
+    gsl_spline *spline_steffen;
 };
