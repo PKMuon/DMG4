@@ -40,7 +40,10 @@ AccumulatedProbability(0.), NEmissions(0)
 
 
 DarkMatter::~DarkMatter()
-{;}
+{
+  gsl_spline_free(spline_steffen);
+  gsl_interp_accel_free(acc);
+}
 
 
 void DarkMatter::PrepareTable()
@@ -59,12 +62,18 @@ void DarkMatter::PrepareTable()
     if(fabs(ParentPDGID) == 13) sigmaxpsi[ip] = MaxCrossSectionPsiCalc(ep[ip]);
     if(fabs(ParentPDGID) == 13) sigmaxtheta[ip] = MaxCrossSectionThetaCalc(ep[ip]);
   }
+  //initializing Steffen interpolation with GSL
+  const size_t N = NPTAB;
+  acc = gsl_interp_accel_alloc();
+  spline_steffen = gsl_spline_alloc(gsl_interp_steffen, N);
+  gsl_spline_init(spline_steffen, ep, sigmap, N);
 }
 
 
 double DarkMatter::GetSigmaTot0(double E0)
 {
-  return parinv(E0, ep, sigmap, nptable);
+  //return parinv(E0, ep, sigmap, nptable);
+  return gsl_spline_eval(spline_steffen, E0, acc);
 }
 
 
