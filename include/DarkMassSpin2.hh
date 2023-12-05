@@ -1,4 +1,6 @@
-class DarkMatter;
+#pragma once
+
+#include "DarkMatter.hh"
 
 class DarkMassSpin2 : public DarkMatter {
   public:

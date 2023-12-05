@@ -3,7 +3,6 @@
 // To be used in a Geant4 application.
 //
 //
-#include "DarkMatter.hh"
 #include "DarkMuPhilicPseudoScalars.hh"
 #include "Utils.hh"
 

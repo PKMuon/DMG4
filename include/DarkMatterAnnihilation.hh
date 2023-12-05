@@ -1,16 +1,16 @@
+#pragma once
+
+#include "DarkMatter.hh"
+
+#include <map>
+#include <vector>
+
 /*
  * DarkMatterAnnihilation.hh
  *
  *  Created on: Sep, 2023
  *      Author: bbantoob
  */
-
-#ifndef INCLUDE_DARKMATTERANNIHILATION_HH_
-#define INCLUDE_DARKMATTERANNIHILATION_HH_
-
-#include <map>
-#include <vector>
-class DarkMatter;
 
 class DarkMatterAnnihilation : public DarkMatter {
   friend class DarkMassSpin2Annihilation;
@@ -61,4 +61,3 @@ class DarkMatterAnnihilation : public DarkMatter {
     double funIntegral(double x,double eta2,double delta2);
 };
 
-#endif /* INCLUDE_DARKMATTERANNIHILATION_HH_ */

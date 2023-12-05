@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * DarkScalarsAnnihilation.hh
  *
@@ -10,9 +12,6 @@
  *      - Included missing implementations from abstract methods in new class
  *      namely PreFactor
  */
-
-#ifndef INCLUDE_DarkScalarsANNIHILATION_HH_
-#define INCLUDE_DarkScalarsANNIHILATION_HH_
 
 #include "DarkMatterAnnihilation.hh"
 
@@ -37,4 +36,3 @@ class DarkScalarsAnnihilation : public DarkMatterAnnihilation
 
 };
 
-#endif /* INCLUDE_DarkScalarsANNIHILATION_HH_ */

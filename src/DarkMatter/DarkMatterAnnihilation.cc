@@ -3,7 +3,6 @@
 //
 // Concrete implementations: DarkPhotonsAnnihilation, DarkScalarsAnnihilation, ...
 //
-#include "DarkMatter.hh"
 #include "DarkMatterAnnihilation.hh"
 #include "Randomize.hh"
 #include <iostream>

@@ -1,7 +1,4 @@
-
-
-#ifndef INCLUDE_DarkMassSpin2ANNIHILATION_HH_
-#define INCLUDE_DarkMassSpin2ANNIHILATION_HH_
+#pragma once
 
 #include "DarkMatterAnnihilation.hh"
 
@@ -28,4 +25,3 @@ class DarkMassSpin2Annihilation : public DarkMatterAnnihilation
     virtual double AngularDistributionResonant(double E0,double eta);
 };
 
-#endif

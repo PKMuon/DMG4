@@ -1,7 +1,7 @@
-#ifndef H_MJ1_SAMPLER_H
-#define H_MJ1_SAMPLER_H
+#pragma once
 
-#undef NDEBUG  // XXX
+#include "DarkMatter.hh"
+
 #include <cassert>
 
 // NOTE: this file will be apparently moved to the library further
@@ -204,4 +204,3 @@ public:
     }
 };
 
-#endif  // H_MJ1_SAMPLER_H

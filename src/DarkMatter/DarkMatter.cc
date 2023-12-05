@@ -5,7 +5,6 @@
 //
 // Concrete implementations: DarkPhotons, DarkScalars, ...
 //
-#include "DarkMatter.hh"
 #include "Utils.hh"
 
 #include "Randomize.hh"
