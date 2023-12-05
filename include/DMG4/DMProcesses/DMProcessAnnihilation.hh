@@ -68,8 +68,4 @@ class DMProcessAnnihilation : public G4VDiscreteProcess
     G4double GetOneRandomEleEnergy(G4double B);
     std::vector<G4double> SimulateElectronEnergies(const G4Element *elm,G4int is);
 
-
-
-    std::ofstream *fout;
-
 };

@@ -66,11 +66,9 @@ DMProcessAnnihilation::DMProcessAnnihilation(DarkMatterAnnihilation *DarkMatterP
   maxShellElectronEnergy=0;
 
 
-  fout=new std::ofstream("out.dat");
-
 }
 DMProcessAnnihilation::~DMProcessAnnihilation(){
-  fout->close();
+  
 }
 G4bool DMProcessAnnihilation::IsApplicable(const G4ParticleDefinition &pDef) {
   return ("e+" == pDef.GetParticleName());
@@ -143,7 +141,6 @@ G4ForceCondition* /*condition*/) {
     G4double CrossSection =myDarkMatterAnnihilation->GetSigmaTot(etot); //keep this line here
 #endif
 
-    *fout<<etot<<" "<<CrossSection<<std::endl;
 
     G4double Emax=(myDarkMatterAnnihilation->GetMA()*myDarkMatterAnnihilation->GetMA()-2*Mel*Mel)/(2*Mel); //this is in GeV
 
