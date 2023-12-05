@@ -450,7 +450,7 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
 
 
 
-G4Element* DMProcessAnnihilation::GetRandomElement(const G4ElementVector *elms){
+const G4Element* DMProcessAnnihilation::GetRandomElement(const G4ElementVector *elms){
   G4int idx=0;
   if (elms->size()==1){
     idx=0;

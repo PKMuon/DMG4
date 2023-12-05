@@ -35,7 +35,7 @@ class DMProcessAnnihilation : public G4VDiscreteProcess
 
   private:
 
-    G4Element *GetRandomElement(const G4ElementVector *elms);
+    const G4Element *GetRandomElement(const G4ElementVector *elms);
 
     DarkMatterAnnihilation* myDarkMatterAnnihilation;
     G4ParticleDefinition* theDMParticlePtr;
