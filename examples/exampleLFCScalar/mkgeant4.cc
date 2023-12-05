@@ -20,15 +20,21 @@ int main() {
 
   G4double MA = Mtau;// - 0.7*Mmu; // GeV, for mu N -> tau N + phi
   std::cout << "Mphi: " << MA*1000 << " MeV" << std::endl;
-  //  G4double MA = Mmu - Mel; // GeV, for mu N -> e N + phi
-  G4double SigmaNorm = 1.;
 
   //G4double EThresh = 2.*MA; // for full shape
   //G4double EThresh = 35.; // for sensitivity calculations
   G4double EThresh = 1.; // for shape studies
   //G4double EThresh = 2000.; // to turn off A emissions
 
-  DarkLFCScalars* myDarkMatter = new DarkLFCScalars(MA, EThresh, SigmaNorm); // Initialize by default for Pb with eps=0.0001
+  // Parameters
+  G4double coupling = 3e-3;
+  G4double SigmaNorm = 1.;
+  G4double ANuclPb = 207.;
+  G4double ZNuclPb = 82.;
+  G4double DensityPb = 11.35;
+  G4int IDecayIn = 1;
+
+  DarkLFCScalars* myDarkMatter = new DarkLFCScalars(MA, EThresh, SigmaNorm, ANuclPb, ZNuclPb, DensityPb, coupling, IDecayIn); // Initialize with user-defined pars.
   myDarkMatter->PrepareTable();
 
   double ekin = 160;// GeV
