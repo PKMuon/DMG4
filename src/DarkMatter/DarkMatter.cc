@@ -29,10 +29,11 @@
 DarkMatter::DarkMatter(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
                        double epsilIn, int IDecayIn)
 :MA(MAIn), EThresh(EThreshIn), SigmaNorm(SigmaNormIn),
-ANucl(ANuclIn), ZNucl(ZNuclIn), Density(DensityIn), epsilBench(0.0001), epsil(epsilIn), IDecay(IDecayIn),ISampler(0),
+ANucl(ANuclIn), ZNucl(ZNuclIn), Density(DensityIn), epsilBench(0.0001), epsil(epsilIn), IDecay(IDecayIn), ISampler(0),
 AccumulatedProbability(0.), NEmissions(0)
 {
-  if(MA > 3.) {std::cout << "Maximal allowed mass is 3 GeV, exiting" << std::endl; exit(1);}
+  if(MA > 3.) {std::cout << "DMG4: Maximal allowed mass is 3 GeV, exiting" << std::endl; exit(1);}
+  if(EThresh < 2.*MA) {std::cout << "DMG4: EThresh must be at least 2 times higher than MA, exiting" << std::endl; exit(1);}
   nptable = NPTAB;
   double epi[NPTAB]={0.008, 0.02, 0.05, 0.1, 0.2, 0.5, 1., 2., 5., 10., 15., 25., 50., 80., 150., 200.};
   for(int ip=0; ip < nptable; ip++) {ep[ip] = epi[ip];}
@@ -72,8 +73,10 @@ void DarkMatter::PrepareTable()
 
 double DarkMatter::GetSigmaTot0(double E0)
 {
-  //return parinv(E0, ep, sigmap, nptable);
-  return gsl_spline_eval(spline_steffen, E0, acc);
+  //double csmy = parinv(E0, ep, sigmap, nptable);
+  double csmy = gsl_spline_eval(spline_steffen, E0, acc);
+  if(csmy < 0.) {std::cout << "DMG4: Interpolated cross section is negative, exiting" << std::endl; exit(1);}
+  return csmy;
 }
 
 
