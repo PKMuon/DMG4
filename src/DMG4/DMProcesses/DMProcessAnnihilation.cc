@@ -111,9 +111,9 @@ G4ForceCondition* /*condition*/) {
           auto v=this->SimulateElectronEnergies(elm,is);
           shellElectronZ[Z][is]=elm->GetNbOfShellElectrons(is);
           shellElectronEnergies[Z][is]=v;
-          auto m=*max_element(v.begin(),v.end());
-          if (m>maxShellElectronEnergy){
-            maxShellElectronEnergy=m;
+          auto eMaxLoop=*max_element(v.begin(),v.end());
+          if (eMaxLoop>maxShellElectronEnergy){
+            maxShellElectronEnergy=eMaxLoop;
           }
         }
     }
