@@ -120,19 +120,19 @@ G4ForceCondition* /*condition*/) {
 
     /*3- Now check if the positron energy is above threshold for e+e- --> A+B (where A,B are the particles in the final state)*/
     double smin=myDarkMatterAnnihilation->sMin();
-    double sMaldestam=2*Mel*Mel+2*Mel*etot; //GeV^2
+    double sMandelstam=2*Mel*Mel+2*Mel*etot; //GeV^2
 
 #ifdef ATOMIC_EFFECTS
-    /*If atomic effects are included, we should write sMaldestam=2Mel*Mel+2*Mel(E_-zP_-).
-      Largest sMaldestam value: z=-1, sMaldestam=2Mel*Mel+2*E+*(E_- + P_-).
+    /*If atomic effects are included, we should write sMandelstam=2Mel*Mel+2*Mel(E_-zP_-).
+      Largest sMandelstam value: z=-1, sMandelstam=2Mel*Mel+2*E+*(E_- + P_-).
       Take the largest positron energy for the most energetic shell*/
     double EeleMAX=maxShellElectronEnergy+Mel;
     double PeleMAX=sqrt(EeleMAX*EeleMAX-Mel*Mel);
-    sMaldestam=2*Mel*Mel+2*etot*(EeleMAX+PeleMAX);
+    sMandelstam=2*Mel*Mel+2*etot*(EeleMAX+PeleMAX);
 #endif
 
 
-    if (sMaldestam<smin) return DBL_MAX;
+    if (sMandelstam<smin) return DBL_MAX;
 
     /*Finally compute the cross section*/
 #ifdef ATOMIC_EFFECTS
@@ -460,7 +460,7 @@ const G4Element* DMProcessAnnihilation::GetRandomElement(const G4ElementVector *
     G4cerr<<"ERROR! DMProcessAnnihilation::GetRandomElement called for a multi-element material, not yet implemented"<<G4endl;
     exit(1);
 
-    /*If there'sMaldestam more than one element in the material,
+    /*If there'sMandelstam more than one element in the material,
       consider a probability proportional to Z^2
     */
     std::vector<G4double> cumulativeProd;
