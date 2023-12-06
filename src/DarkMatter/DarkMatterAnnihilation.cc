@@ -197,11 +197,11 @@ double DarkMatterAnnihilation::GetSigmaTotAtomicEffectsOneShellFull(double E0,in
     //middle value of z in the allowed z-integral region (if all values are allowed, z=0)
     //    double zmid=(zmax+zmin)/2;
     //     double s_zmid=2*Mel*Mel+2*Ep*(Em-zmid*Pm);
-    const int nz=10;
+    const int nz=20;
     const double dz=(zmax-zmin)/nz;
     double pre=0;
-    for (int iz=0;iz<=nz;iz++){
-      double zThis=zmin+dz*iz;
+    for (int iz=0;iz<nz;iz++){
+      double zThis=zmin+dz*iz+dz/2;
       double sThis=2*Mel*Mel+2*Ep*(Em-zThis*Pm);
       double preThis=this->PreFactor(sThis)/this->q(sThis);
       if ((preThis<0)||(preThis!=preThis)){
@@ -209,7 +209,7 @@ double DarkMatterAnnihilation::GetSigmaTotAtomicEffectsOneShellFull(double E0,in
       }
       pre=pre+preThis;
     }
-    pre=pre/(nz+1);
+    pre=pre/(nz);
     pre=pre/(8*Ep*Pm); //jacobian
 
 
