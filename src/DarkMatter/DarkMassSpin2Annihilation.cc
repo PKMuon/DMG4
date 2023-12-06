@@ -1,4 +1,3 @@
-#include "DarkMatter.hh"
 #include "DarkMatterAnnihilation.hh"
 #include "DarkMassSpin2Annihilation.hh"
 #include "Utils.hh"

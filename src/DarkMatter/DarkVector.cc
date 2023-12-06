@@ -3,12 +3,8 @@
 // To be used in a Geant4 application.
 //
 //
-#include "DarkMatter.hh"
 #include "DarkVector.hh"
 #include "Utils.hh"
-
-
-
 
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_multimin.h>

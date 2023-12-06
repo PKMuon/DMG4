@@ -16,7 +16,6 @@
  *
  */
 
-#include "DarkMatter.hh"
 #include "DarkMatterAnnihilation.hh"
 #include "DarkZAnnihilation.hh"
 #include "Utils.hh"

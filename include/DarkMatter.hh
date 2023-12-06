@@ -1,3 +1,5 @@
+#pragma once
+
 #define Mel 5.109989461E-04 // electron mass in GeV
 #define Mmu 0.1056583745 // muon mass in GeV
 #define Mtau 1.77686     // tau mass in GeV
@@ -20,6 +22,7 @@ struct ParamsForMuonTotCS {double AA; double ZZ; double MMA; double EE0;};
 
 class DarkMatter
 {
+  #if 0
   friend class DarkPhotons;
   friend class DarkScalars;
   friend class DarkPseudoScalars;
@@ -37,6 +40,7 @@ class DarkMatter
   friend class DarkPseudoScalarsAnnihilation;
   friend class DarkAxialsAnnihilation;
   friend class DarkZAnnihilation;
+  #endif
   public:
 
     DarkMatter(double MAIn, double EThreshIn, double SigmaNormIn=1., double ANuclIn=207., double ZNuclIn=82., double DensityIn=11.35,
@@ -99,7 +103,7 @@ class DarkMatter
 
     double GetAccumulatedProbability() {return AccumulatedProbability;}
 
-  private:
+  protected:
 
     double MA;
     double EThresh;

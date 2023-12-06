@@ -6,7 +6,6 @@
  *  Fixed: Nov 2, 2020
  */
 
-#include "DarkMatter.hh"
 #include "DarkMatterAnnihilation.hh"
 #include "DarkAxialsAnnihilation.hh"
 #include "Utils.hh"

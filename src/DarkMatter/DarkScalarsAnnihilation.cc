@@ -5,7 +5,6 @@
  *      Author: celentan
  */
 
-#include "DarkMatter.hh"
 #include "DarkMatterAnnihilation.hh"
 #include "DarkScalarsAnnihilation.hh"
 #include "Utils.hh"

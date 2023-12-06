@@ -1,3 +1,7 @@
+#pragma once
+
+#include "DarkMatter.hh"
+
 class DarkAxials : public DarkMatter
 {
 

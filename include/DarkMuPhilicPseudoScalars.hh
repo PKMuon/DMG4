@@ -1,3 +1,7 @@
+#pragma once
+
+#include "DarkMatter.hh"
+
 class DarkMuPhilicPseudoScalars : public DarkMatter
 {
 

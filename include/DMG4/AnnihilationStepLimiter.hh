@@ -1,5 +1,4 @@
-#ifndef AnnihilationStepLimiter_h
-#define AnnihilationStepLimiter_h 1
+#pragma once
 
 #include "G4ios.hh"
 #include "globals.hh"
@@ -62,4 +61,3 @@ class AnnihilationStepLimiter : public G4VDiscreteProcess
 
 };
 
-#endif

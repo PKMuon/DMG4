@@ -1,6 +1,5 @@
 #include <iostream>
 
-#include "DarkMatter.hh"
 #include "DarkMassSpin2.hh"
 #include "Utils.hh"
 
