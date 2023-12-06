@@ -1,4 +1,4 @@
-05.12.2023   Version 2.4      Implemented Z' annihilation resonant production for the models Lmu-Ltau, B-L
+06.12.2023   Version 2.4      Implemented Z' annihilation resonant production for the models Lmu-Ltau, B-L
                               Implement atomic effects in annihilation resonant production
                               Improvements in annihilation resonant production simulation (step limitation)
                               Add possibility of invisible ALP production

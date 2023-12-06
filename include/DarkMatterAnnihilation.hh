@@ -12,14 +12,8 @@
  *      Author: bbantoob
  */
 
-class DarkMatterAnnihilation : public DarkMatter {
-  friend class DarkMassSpin2Annihilation;
-  friend class DarkPhotonsAnnihilation;
-  friend class DarkScalarsAnnihilation;
-  friend class DarkPseudoScalarsAnnihilation;
-  friend class DarkAxialsAnnihilation;
-  friend class DarkZAnnihilation;
-
+class DarkMatterAnnihilation : public DarkMatter
+{
   public:
 
 
@@ -50,7 +44,7 @@ class DarkMatterAnnihilation : public DarkMatter {
     double GetSigmaTotAtomicEffectsOneShell(double E0,int Zshell,const std::vector<double>& eneShell);
     double GetSigmaTotAtomicEffectsOneShellFull(double E0,int Zshell,const std::vector<double>& eneShell);
 
-  private:
+  protected:
 
     int iBranchingType;
     double r,f;

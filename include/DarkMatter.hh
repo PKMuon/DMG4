@@ -22,25 +22,6 @@ struct ParamsForMuonTotCS {double AA; double ZZ; double MMA; double EE0;};
 
 class DarkMatter
 {
-  #if 0
-  friend class DarkPhotons;
-  friend class DarkScalars;
-  friend class DarkPseudoScalars;
-  friend class DarkAxials;
-  friend class DarkZ;
-  friend class DarkMuPhilicScalars;
-  friend class DarkMuPhilicPseudoScalars;
-  friend class DarkMatterAnnihilation;
-  friend class DarkMassSpin2;
-  friend class DarkMassSpin2Annihilation;
-  friend class DarkVector;
-  friend class ALP;
-  friend class DarkPhotonsAnnihilation;
-  friend class DarkScalarsAnnihilation;
-  friend class DarkPseudoScalarsAnnihilation;
-  friend class DarkAxialsAnnihilation;
-  friend class DarkZAnnihilation;
-  #endif
   public:
 
     DarkMatter(double MAIn, double EThreshIn, double SigmaNormIn=1., double ANuclIn=207., double ZNuclIn=82., double DensityIn=11.35,
