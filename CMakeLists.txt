@@ -12,7 +12,7 @@ if (BUILD_GOA)
    SET(CMAKE_CXX_STANDARD 17)
    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 else(BUILD_GOA)
-   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif(BUILD_GOA)
 
 #----------------------------------------------------------------------------
