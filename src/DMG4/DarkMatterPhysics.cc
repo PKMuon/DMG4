@@ -381,10 +381,16 @@ void DarkMatterPhysics::ConstructProcess()
   //     as follows
   
   if(myDarkMatter->GetParentPDGID() == 11) {
-    phLHelper->RegisterProcess( new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
-                                G4Electron::ElectronDefinition() );
-    phLHelper->RegisterProcess( new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
-                                G4Positron::PositronDefinition() );
+    DMProcessDMBrem* DMBremPointer = new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
+
+    // Instead of using ordtable:
+    G4ProcessManager* processManager = (G4Electron::ElectronDefinition())->GetProcessManager();
+    processManager->AddDiscreteProcess(DMBremPointer);
+    processManager = (G4Positron::PositronDefinition())->GetProcessManager();
+    processManager->AddDiscreteProcess(DMBremPointer);
+
+//    phLHelper->RegisterProcess( DMBremPointer, G4Electron::ElectronDefinition() );
+//    phLHelper->RegisterProcess( DMBremPointer, G4Positron::PositronDefinition() );
   }
   if(myDarkMatter->GetParentPDGID() == -11) {
     DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
@@ -393,7 +399,7 @@ void DarkMatterPhysics::ConstructProcess()
     AnnihilationStepLimiter *dmLimiterProc=new AnnihilationStepLimiter(dmAnnihil,"StepLimiterAnnihilation");
     dmLimiterProc->SetFactor(annihilationStepLimiterFactor);
 
-    DMProcessAnnihilation *dmAnnihilProc=new DMProcessAnnihilation(dmAnnihil, theDMParticlePtr, BiasSigmaFactor,dmLimiterProc);
+    DMProcessAnnihilation* dmAnnihilProc = new DMProcessAnnihilation(dmAnnihil, theDMParticlePtr, BiasSigmaFactor, dmLimiterProc);
 
     /* Add the step limiter to the list of discrete processes for the e+
      * before adding the annihilation process
@@ -405,19 +411,29 @@ void DarkMatterPhysics::ConstructProcess()
     processManager->AddDiscreteProcess(dmLimiterProc);
 
     //Now add the annihilation process
-    phLHelper->RegisterProcess(dmAnnihilProc,G4Positron::PositronDefinition());
-
-
+    //phLHelper->RegisterProcess(dmAnnihilProc, G4Positron::PositronDefinition()); // old way, required ordtable
+    processManager->AddDiscreteProcess(dmAnnihilProc);
 
   }
   if(myDarkMatter->GetParentPDGID() == 13) {
-    phLHelper->RegisterProcess( new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
-                                G4MuonMinus::MuonMinusDefinition() );
-    phLHelper->RegisterProcess( new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
-                                G4MuonPlus::MuonPlusDefinition() );
+    DMProcessDMBrem* DMBremPointer = new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
+
+    // Instead of using ordtable:
+    G4ProcessManager* processManager = (G4MuonMinus::MuonMinusDefinition())->GetProcessManager();
+    processManager->AddDiscreteProcess(DMBremPointer);
+    processManager = (G4MuonPlus::MuonPlusDefinition())->GetProcessManager();
+    processManager->AddDiscreteProcess(DMBremPointer);
+
+    //phLHelper->RegisterProcess( DMBremPointer, G4MuonMinus::MuonMinusDefinition() );
+    //phLHelper->RegisterProcess( DMBremPointer, G4MuonPlus::MuonPlusDefinition() );
   }
   if(myDarkMatter->GetParentPDGID() == 22) {
-    phLHelper->RegisterProcess( new DMProcessPrimakoffALP(myDarkMatter, theDMParticlePtr, BiasSigmaFactor),
-                                G4Gamma::GammaDefinition() );
+    DMProcessPrimakoffALP* DMPrimakoffALPPointer = new DMProcessPrimakoffALP(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
+
+    // Instead of using ordtable:
+    G4ProcessManager* processManager = (G4Gamma::GammaDefinition())->GetProcessManager();
+    processManager->AddDiscreteProcess(DMPrimakoffALPPointer);
+
+    //phLHelper->RegisterProcess( DMPrimakoffALPPointer, G4Gamma::GammaDefinition() );
   }
 }
