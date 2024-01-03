@@ -1,3 +1,5 @@
+03.01.2023   Version 2.5      Urgent update connected with the usage of the latest Geant4 version 11.02, where reading user's ordtable is absent
+                              README is updated according to migration of lxplus to el9 and the above change
 06.12.2023   Version 2.4      Implemented Z' annihilation resonant production for the models Lmu-Ltau, B-L
                               Implement atomic effects in annihilation resonant production
                               Improvements in annihilation resonant production simulation (step limitation)
