@@ -245,7 +245,7 @@ DMParticleZPrime* DMParticleZPrime::Definition()
         delete [] mode;
       }
       anInstance->SetDecayTable(table);
-      //anInstance->DumpTable();
+      anInstance->DumpTable();
     }
 
   }
