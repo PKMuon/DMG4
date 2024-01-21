@@ -1,6 +1,9 @@
 #include "globals.hh"
 
 #include "G4ios.hh"
+#include "G4Element.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4NistManager.hh"
 
 #include "DarkMatter.hh"
 #include "DarkMatterAnnihilation.hh"
@@ -14,6 +17,28 @@
 #include "TH1.h"
 #include "TGraph.h"
 #include "TCanvas.h"
+
+
+//An exponential model
+G4double GetOneRandomEleEnergy(G4double B){
+  G4double u=G4UniformRand();
+  G4double x=-B*log(u);
+  return x;
+}
+
+std::vector<G4double> SimulateElectronEnergies(const G4Element *elm,G4int is){
+
+  std::vector<G4double> v;
+  G4double B=elm->GetAtomicShell(is); //binding energy, positive, in g4 units
+
+  const G4int nEne=100;
+  for (G4int ii=0;ii<nEne;ii++){
+    G4double x=GetOneRandomEleEnergy(B); //in G4 units
+    v.push_back(x/GeV); //convert it in GeV
+  }
+  return v;
+}
+
 
 int main() {
 
@@ -49,10 +74,10 @@ int main() {
   // Define output ROOT files with plots
   TFile* hOutputFile = new TFile("result.root", "RECREATE");
   TGraph *gSigma = new TGraph(nSteps);
+  TGraph *gSigmaAE = new TGraph(nSteps);
   TGraph *gPreFactor = new TGraph(nSteps);
   TGraph *gBW = new TGraph(nSteps);
   TH1D *hAngle = new TH1D("hAngle","Angular distribution; #eta; nevts [-]", 100,-1,1);
-  //TH1D *gSigmaAE = new TH1D("gSigmaAE","gSigma Atomic Effects", nSteps+1,Emin,Emax);
 
   G4double width = myDarkMatter->Width();
 
@@ -64,18 +89,50 @@ int main() {
   G4cout << "Test of the DarkMatter package: Resonant Annihilation production simulation, coupling = " << coupling << ", mass = " << MA << " GeV" << G4endl;
   G4cout << G4endl;
 
+  G4NistManager* nistManager = G4NistManager::Instance();
+
+  // Retrieve the lead element from the NIST database
+  const G4Element* elm = nistManager->FindOrBuildElement("Pb");
+  G4int Z=(G4int)(elm->GetZ());
+
+  // Set up maps for atomic effects calculations
+  std::map<G4int, std::map<G4int,std::vector<G4double> > > shellElectronEnergies;
+  std::map<G4int, std::map<G4int,G4int> > shellElectronZ;
+  /* Compute the electron energies for this material*/
+  if (shellElectronEnergies.find(Z)==shellElectronEnergies.end()){
+    for (G4int is=0;is<elm->GetNbOfAtomicShells();is++){
+      auto v=SimulateElectronEnergies(elm,is);
+      shellElectronZ[Z][is]=elm->GetNbOfShellElectrons(is);
+      shellElectronEnergies[Z][is]=v;
+    }
+  }
+
   for(unsigned int i=0; i<nSteps; i++) {
     ekin = Emin + Ediff * i;
     if (myDarkMatter->EmissionAllowed(ekin, DensityPb)) {
-      double totalCS = myDarkMatter->GetSigmaTot(ekin);
       double preF = myDarkMatter->PreFactor(ekin);
       double BW = myDarkMatter->BreitWignerDenominator(ekin);
-      //std::cout << Form("%3.2f GeV:   Prefactor = %5.2e [pb]  --  1/BW = %3.2e [GeV^4]  --  total CS = %5.2e [pb]\n", ekin, preF, 1./BW, totalCS);
-      //double totalCS_AE = myDarkMatter->GetSigmaTotAtomicEffectsOneShell(ekin);
+      double totalCS = myDarkMatter->GetSigmaTot(ekin);
+
+      // Calculate CS with atomic effects
+      double totalCSAtomicEffects = 0.;
+      for (int is = 0; is < shellElectronZ[Z].size(); is++) {
+        int ZeleShell = shellElectronZ[Z].at(is);
+        const std::vector<double>& eneShell = shellElectronEnergies[Z].at(is);
+
+        //double sigmaShell = myDarkMatter->GetSigmaTotAtomicEffectsOneShell(ekin, ZeleShell, eneShell);
+        double sigmaShell = myDarkMatter->GetSigmaTotAtomicEffectsOneShellFull(ekin, ZeleShell, eneShell);
+
+        totalCSAtomicEffects += sigmaShell;
+      }
+
+      //G4cout << Form("%3.2f GeV:   Prefactor = %5.2e [pb]  --  1/BW = %3.2e [GeV^4]  --  total CS = %5.2e [pb]", ekin, preF, 1./BW, totalCS) << G4endl;
+
+      // Save info in TGraph
       gSigma->SetPoint(i, ekin, totalCS);
       gPreFactor->SetPoint(i, ekin, preF);
       gBW->SetPoint(i, ekin, BW);
-      //gSigmaAE->Fill(totalCS_AE);
+      gSigmaAE->SetPoint(i, ekin, totalCSAtomicEffects);
     }
   }
 
@@ -97,7 +154,6 @@ int main() {
     hAngle->Fill(angle);
 
     G4cout << "Emission simulated, Theta = " << angle << G4endl;
-    G4cout << angle << G4endl;
 
   }
   (void)ITry; // to avoid warning
@@ -121,6 +177,11 @@ int main() {
   gSigma->Draw("ACP");
   gSigma->GetXaxis()->SetTitle("E_{primary} [GeV]");
   gSigma->GetYaxis()->SetTitle("Cross-section [pb]");
+  gSigmaAE->SetTitle(Form("Total CS (with atomic effects for MA = %3.2e MeV and coupling = %3.2e with #Gamma = %3.2e MeV", MA*1.e3, coupling, width*1.e3));
+  gSigmaAE->SetMarkerStyle(21);
+  gSigmaAE->SetMarkerColor(kRed);
+  gSigmaAE->Draw("SAME CP");
+  c->Update();
   c->SetLogy();
   c->Write();
 
