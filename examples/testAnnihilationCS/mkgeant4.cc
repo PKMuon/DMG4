@@ -17,6 +17,7 @@
 #include "TH1.h"
 #include "TGraph.h"
 #include "TCanvas.h"
+#include "TLegend.h"
 
 
 //An exponential model
@@ -75,6 +76,7 @@ int main() {
   TFile* hOutputFile = new TFile("result.root", "RECREATE");
   TGraph *gSigma = new TGraph(nSteps);
   TGraph *gSigmaAE = new TGraph(nSteps);
+  TGraph *gSigmaAEFull = new TGraph(nSteps);
   TGraph *gPreFactor = new TGraph(nSteps);
   TGraph *gBW = new TGraph(nSteps);
   TH1D *hAngle = new TH1D("hAngle","Angular distribution; #eta; nevts [-]", 100,-1,1);
@@ -116,14 +118,16 @@ int main() {
 
       // Calculate CS with atomic effects
       double totalCSAtomicEffects = 0.;
+      double totalCSAtomicEffectsFull = 0.;
       for (int is = 0; is < shellElectronZ[Z].size(); is++) {
         int ZeleShell = shellElectronZ[Z].at(is);
         const std::vector<double>& eneShell = shellElectronEnergies[Z].at(is);
 
-        //double sigmaShell = myDarkMatter->GetSigmaTotAtomicEffectsOneShell(ekin, ZeleShell, eneShell);
-        double sigmaShell = myDarkMatter->GetSigmaTotAtomicEffectsOneShellFull(ekin, ZeleShell, eneShell);
+        double sigmaShell = myDarkMatter->GetSigmaTotAtomicEffectsOneShell(ekin, ZeleShell, eneShell);
+        double sigmaShellFull = myDarkMatter->GetSigmaTotAtomicEffectsOneShellFull(ekin, ZeleShell, eneShell);
 
         totalCSAtomicEffects += sigmaShell;
+        totalCSAtomicEffectsFull += sigmaShellFull;
       }
 
       //G4cout << Form("%3.2f GeV:   Prefactor = %5.2e [pb]  --  1/BW = %3.2e [GeV^4]  --  total CS = %5.2e [pb]", ekin, preF, 1./BW, totalCS) << G4endl;
@@ -133,6 +137,7 @@ int main() {
       gPreFactor->SetPoint(i, ekin, preF);
       gBW->SetPoint(i, ekin, BW);
       gSigmaAE->SetPoint(i, ekin, totalCSAtomicEffects);
+      gSigmaAEFull->SetPoint(i, ekin, totalCSAtomicEffectsFull);
     }
   }
 
@@ -171,16 +176,24 @@ int main() {
   // Save CS graph
   c->SetName("totalCS");
   c->SetGrid();
+  TLegend* legend = new TLegend();
   gSigma->SetTitle(Form("Total CS for MA = %3.2e MeV and coupling = %3.2e with #Gamma = %3.2e MeV", MA*1.e3, coupling, width*1.e3));
   gSigma->SetMarkerStyle(21);
-  gSigma->SetMarkerColor(kBlue);
+  gSigma->SetMarkerColor(kBlack);
+  legend->AddEntry(gSigma, "CS without atomic effects", "lp");
   gSigma->Draw("ACP");
   gSigma->GetXaxis()->SetTitle("E_{primary} [GeV]");
   gSigma->GetYaxis()->SetTitle("Cross-section [pb]");
   gSigmaAE->SetTitle(Form("Total CS (with atomic effects for MA = %3.2e MeV and coupling = %3.2e with #Gamma = %3.2e MeV", MA*1.e3, coupling, width*1.e3));
+  legend->AddEntry(gSigmaAE, "CS with atomic effects in BW denominator", "lp");
   gSigmaAE->SetMarkerStyle(21);
-  gSigmaAE->SetMarkerColor(kRed);
+  gSigmaAE->SetMarkerColor(kBlue);
   gSigmaAE->Draw("SAME CP");
+  legend->AddEntry(gSigmaAEFull, "CS with atomic effects in full expression", "lp");
+  gSigmaAEFull->SetMarkerStyle(21);
+  gSigmaAEFull->SetMarkerColor(kGreen);
+  gSigmaAEFull->Draw("SAME CP");
+  legend->Draw();
   c->Update();
   c->SetLogy();
   c->Write();
