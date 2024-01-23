@@ -27,7 +27,7 @@
 
 #include "AnnihilationStepLimiter.hh"
 
-//#define EDEP_ALONG_STEP
+#define EDEP_ALONG_STEP
 #define ATOMIC_EFFECTS
 
 

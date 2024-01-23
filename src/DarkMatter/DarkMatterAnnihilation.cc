@@ -278,8 +278,9 @@ double DarkMatterAnnihilation::GetTotalCrossSectionMaxAtomicEffects(const std::m
 double DarkMatterAnnihilation::funIntegral(double x,double delta2,double eta2){
 
 
+  double W = this->Width();
   double p1=1/(2*sqrt(2*eta2+2*delta2)) * log((x*x-sqrt(2*eta2+2*delta2)*x+eta2)/(x*x+sqrt(2*eta2+2*delta2)*x+eta2));
-  double p2=1/sqrt(2*eta2-2*delta2)*(atan((2*x-sqrt(2*eta2+2*delta2))/(sqrt(2*eta2-2*delta2)))+atan((2*x+sqrt(2*eta2+2*delta2))/(sqrt(2*eta2-2*delta2))));
+  double p2=sqrt(eta2+delta2)/(sqrt(2)*MA*W)*(atan((2*x*(sqrt(2*eta2+2*delta2))-2*eta2-2*delta2)/(2*MA*W))+atan((2*x*(sqrt(2*eta2+2*delta2))+2*eta2+2*delta2)/(2*MA*W)));
 
   double ret=p1+p2;
 
