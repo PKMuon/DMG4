@@ -90,7 +90,7 @@ echo "source geant4.csh" >> config.csh
 echo "cd -" >> config.csh
 echo "setenv G4ORDPARAMTABLE `pwd`/../../DATA/ordTable_FTFP_BERT.txt" >> config.csh
 
-ARGLIST="-DCMAKE_INSTALL_PREFIX=${PREFIX}"
+ARGLIST="-DCMAKE_INSTALL_PREFIX=${PREFIX} -DGeant4_DIR=${GEANT4LOCATION}/lib64/cmake/Geant4"
 if [ "x${DMG4LOCATION}" != "x" ] ; then
   ARGLIST="${ARGLIST} -DDMG4_ROOT_DIR=${DMG4LOCATION}"
 fi
