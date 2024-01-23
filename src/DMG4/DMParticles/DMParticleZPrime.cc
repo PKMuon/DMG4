@@ -138,7 +138,7 @@ DMParticleZPrime* DMParticleZPrime::Definition()
       }
       if (MassIn > 2.*mChi) chiWidth= MassIn/12*alphaD*pow((1-4*mChi*mChi/(MassIn*MassIn)),3./2); //Z->DM DM
       // Define total width and branching ratios
-      WidthIn = nuWidth + eWidth + muWidth + hWidth;
+      WidthIn = nuWidth + eWidth + muWidth + hWidth + chiWidth;
       nuBrRatio = nuWidth/WidthIn;
       eBrRatio = eWidth/WidthIn;
       muBrRatio = muWidth/WidthIn;
