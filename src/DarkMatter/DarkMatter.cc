@@ -32,7 +32,7 @@ ANucl(ANuclIn), ZNucl(ZNuclIn), Density(DensityIn), epsilBench(0.0001), epsil(ep
 AccumulatedProbability(0.), NEmissions(0)
 {
   if(MA > 3.) {std::cout << "DMG4: Maximal allowed mass is 3 GeV, exiting" << std::endl; exit(1);}
-  if(EThresh < 2.*MA) {std::cout << "DMG4: EThresh must be at least 2 times higher than MA, exiting" << std::endl; exit(1);}
+  
   nptable = NPTAB;
   double epi[NPTAB]={0.008, 0.02, 0.05, 0.1, 0.2, 0.5, 1., 2., 5., 10., 15., 25., 50., 80., 150., 200.};
   for(int ip=0; ip < nptable; ip++) {ep[ip] = epi[ip];}
@@ -54,6 +54,13 @@ void DarkMatter::PrepareTable()
   MParent = 0.;
   if(fabs(ParentPDGID) == 11) MParent = Mel;
   if(fabs(ParentPDGID) == 13) MParent = Mmu;
+  
+  //Check here the threshold energy, since in the constructor parentPDGID is not available, being set by daughter classes at their creator
+  double Mnucleus=ANucl; //we assume here that Mnucleus = ANucl, not a big change in the formula
+  double EkinMin = MA * (1+MParent/Mnucleus+2*MA/Mnucleus);
+  if(EThresh < EkinMin) {std::cout << "DMG4: EThresh must be at least 2 times higher than MA, exiting" << std::endl; exit(1);}
+
+
   //if(fabs(ParentPDGID) == 11 && MA < 0.001) return;
   for(int ip=0; ip < nptable; ip++) {
     sigmap[ip] = TotalCrossSectionCalc(ep[ip]);
