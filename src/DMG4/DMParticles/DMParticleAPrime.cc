@@ -46,6 +46,7 @@ DMParticleAPrime* DMParticleAPrime::Definition()
   G4ParticleDefinition * anInstance = pTable->FindParticle(name);
   const G4double muMass = G4MuonMinus::MuonMinusDefinition()->GetPDGMass();
   const G4double pi0Mass = G4PionZero::PionZeroDefinition()->GetPDGMass();
+  const G4double omegaMass = 782.66*MeV; // omega meson mass from pdg:  https://pdglive.lbl.gov/Particle.action?init=0&node=M001&home=MXXX005
   G4bool isStable = true;
   G4double WidthIn = 0.;
   G4double nuWidth = 0.;
@@ -74,16 +75,16 @@ DMParticleAPrime* DMParticleAPrime::Definition()
         name = "DMParticleXBoson";
       }
     } else if (BranchingType == 1) { // B-L Z' boson with coupling to all SM particles
-      if(MassIn > 600.) {G4cout << "Branching ratios for this BranchingType and this mass are not yet implemented, exiting" << G4endl; exit(1);}
-      nuWidth = epsilIn*epsilIn*CLHEP::fine_structure_const*MassIn;
-      if(MassIn > 2.*electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(electron_mass_c2, electron_mass_c2, MassIn);
+      if(MassIn > 600.*MeV) {G4cout << "Branching ratios for this BranchingType and this mass are not yet implemented, exiting" << G4endl; exit(1);}
+      nuWidth = CLHEP::fine_structure_const * epsilIn*epsilIn*MassIn;
+      if(MassIn > 2.*CLHEP::electron_mass_c2) eWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(CLHEP::electron_mass_c2, CLHEP::electron_mass_c2, MassIn);
       if(MassIn > 2.*muMass) muWidth = CLHEP::fine_structure_const * epsilIn * epsilIn * APrimeWidth(muMass, muMass, MassIn);
       if(MassIn > pi0Mass) {
         hWidth = (CLHEP::fine_structure_const*CLHEP::fine_structure_const*epsilIn*epsilIn*MassIn*MassIn*MassIn) /
-                 (96.*3.141*3.141*3.141*0.93*0.93*pi0Mass*pi0Mass);
-        hWidth *= (1. - pi0Mass*pi0Mass/(MassIn*MassIn));
-        G4double a = 1. - (MassIn*MassIn)/(782.66*782.66);
-        G4double b = 12.3/782.66;
+                 (96.*M_PI*M_PI*M_PI*0.93*0.93*pi0Mass*pi0Mass);
+        hWidth *= pow((1. - pi0Mass*pi0Mass/(MassIn*MassIn)),3);
+        G4double a = 1. - (MassIn*MassIn)/(omegaMass*omegaMass);
+        G4double b = 12.3/omegaMass;
         G4double mod2 = 1./(a*a + b*b);
         hWidth *= mod2;
       }

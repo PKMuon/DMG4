@@ -48,6 +48,7 @@ DMParticleZPrime* DMParticleZPrime::Definition()
   // determine decay rates
   const G4double muMass = G4MuonMinus::MuonMinusDefinition()->GetPDGMass();
   const G4double pi0Mass = G4PionZero::PionZeroDefinition()->GetPDGMass();
+  const G4double omegaMass = 782.66*MeV; // omega meson mass from pdg:  https://pdglive.lbl.gov/Particle.action?init=0&node=M001&home=MXXX005
   G4bool isStable = true;
   G4double massRatio2 = muMass*muMass/(MassIn*MassIn);
   G4double WidthIn = 0.; // in MeV
@@ -97,16 +98,16 @@ DMParticleZPrime* DMParticleZPrime::Definition()
       IDPDG = 5500222;
       name = "DMParticleB-LBoson";
       // Calculate widths
-      if(MassIn > 600.) {G4cout << "Branching ratios for this BranchingType and this mass are not yet implemented, exiting" << G4endl; exit(1);}
+      if(MassIn > 600.*MeV) {G4cout << "Branching ratios for this BranchingType and this mass are not yet implemented, exiting" << G4endl; exit(1);}
       nuWidth = epsilIn*epsilIn*MassIn/(4*M_PI);
       if(MassIn > 2.*CLHEP::electron_mass_c2) eWidth = epsilIn * epsilIn / (4*M_PI) * ZPrimeWidth(CLHEP::electron_mass_c2, CLHEP::electron_mass_c2, MassIn);
       if(MassIn > 2.*muMass) muWidth = epsilIn * epsilIn / (4*M_PI) * ZPrimeWidth(muMass, muMass, MassIn);
       if(MassIn > pi0Mass) {
         hWidth = (CLHEP::fine_structure_const*epsilIn*epsilIn/(4*M_PI)*MassIn*MassIn*MassIn) /
                  (96.*M_PI*M_PI*M_PI*0.93*0.93*pi0Mass*pi0Mass);
-        hWidth *= (1. - pi0Mass*pi0Mass/(MassIn*MassIn));
-        G4double a = 1. - (MassIn*MassIn)/(782.66*782.66); // 782.66 MeV is the mass of omega meson
-        G4double b = 12.3/782.66;
+        hWidth *= pow((1. - pi0Mass*pi0Mass/(MassIn*MassIn)),3);
+        G4double a = 1. - (MassIn*MassIn)/(omegaMass*omegaMass);
+        G4double b = 12.3/omegaMass;
         G4double mod2 = 1./(a*a + b*b);
         hWidth *= mod2;
       }
@@ -122,14 +123,14 @@ DMParticleZPrime* DMParticleZPrime::Definition()
       IDPDG = 5500222;
       name = "DMParticleB-LBoson";
       // Calculate widths
-      if(MassIn > 600.) {G4cout << "Branching ratios for this BranchingType and this mass are not yet implemented, exiting" << G4endl; exit(1);}
+      if(MassIn > 600.*MeV) {G4cout << "Branching ratios for this BranchingType and this mass are not yet implemented, exiting" << G4endl; exit(1);}
       nuWidth = epsilIn*epsilIn*MassIn/(4*M_PI);
       if(MassIn > 2.*CLHEP::electron_mass_c2) eWidth = epsilIn * epsilIn / (4*M_PI) * ZPrimeWidth(CLHEP::electron_mass_c2, CLHEP::electron_mass_c2, MassIn);
       if(MassIn > 2.*muMass) muWidth = epsilIn * epsilIn / (4*M_PI) * ZPrimeWidth(muMass, muMass, MassIn);
       if(MassIn > pi0Mass) {
         hWidth = (CLHEP::fine_structure_const*epsilIn*epsilIn/(4*M_PI)*MassIn*MassIn*MassIn) /
                  (96.*M_PI*M_PI*M_PI*0.93*0.93*pi0Mass*pi0Mass);
-        hWidth *= (1. - pi0Mass*pi0Mass/(MassIn*MassIn));
+        hWidth *= pow((1. - pi0Mass*pi0Mass/(MassIn*MassIn)),3);
         G4double a = 1. - (MassIn*MassIn)/(782.66*782.66); // 782.66 MeV is the mass of omega meson
         G4double b = 12.3/782.66;
         G4double mod2 = 1./(a*a + b*b);
@@ -137,7 +138,7 @@ DMParticleZPrime* DMParticleZPrime::Definition()
       }
       if (MassIn > 2.*mChi) chiWidth= MassIn/12*alphaD*pow((1-4*mChi*mChi/(MassIn*MassIn)),3./2); //Z->DM DM
       // Define total width and branching ratios
-      WidthIn = nuWidth + eWidth + muWidth + hWidth;
+      WidthIn = nuWidth + eWidth + muWidth + hWidth + chiWidth;
       nuBrRatio = nuWidth/WidthIn;
       eBrRatio = eWidth/WidthIn;
       muBrRatio = muWidth/WidthIn;
