@@ -104,7 +104,7 @@ DMParticleZPrime* DMParticleZPrime::Definition()
       if(MassIn > pi0Mass) {
         hWidth = (CLHEP::fine_structure_const*epsilIn*epsilIn/(4*M_PI)*MassIn*MassIn*MassIn) /
                  (96.*M_PI*M_PI*M_PI*0.93*0.93*pi0Mass*pi0Mass);
-        hWidth *= (1. - pi0Mass*pi0Mass/(MassIn*MassIn));
+        hWidth *= pow((1. - pi0Mass*pi0Mass/(MassIn*MassIn)),3);
         G4double a = 1. - (MassIn*MassIn)/(782.66*782.66); // 782.66 MeV is the mass of omega meson
         G4double b = 12.3/782.66;
         G4double mod2 = 1./(a*a + b*b);
@@ -129,7 +129,7 @@ DMParticleZPrime* DMParticleZPrime::Definition()
       if(MassIn > pi0Mass) {
         hWidth = (CLHEP::fine_structure_const*epsilIn*epsilIn/(4*M_PI)*MassIn*MassIn*MassIn) /
                  (96.*M_PI*M_PI*M_PI*0.93*0.93*pi0Mass*pi0Mass);
-        hWidth *= (1. - pi0Mass*pi0Mass/(MassIn*MassIn));
+        hWidth *= pow((1. - pi0Mass*pi0Mass/(MassIn*MassIn)),3);
         G4double a = 1. - (MassIn*MassIn)/(782.66*782.66); // 782.66 MeV is the mass of omega meson
         G4double b = 12.3/782.66;
         G4double mod2 = 1./(a*a + b*b);
