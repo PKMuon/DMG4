@@ -154,7 +154,7 @@ G4ForceCondition* /*condition*/) {
      * This is obtained from the step limiter if it is available
      */
     if (m_limiter){
-      G4double dEmax=m_limiter->GetMaxEloss(etot)/GeV;
+      G4double dEmax=m_limiter->GetMaxEloss(etot*GeV)/GeV;
       xi=Emax/(Emax+dEmax);
       if (xi<.8) //G4 suggestion
         xi=.8;
