@@ -52,6 +52,6 @@ class DarkMatterAnnihilation : public DarkMatter
     double mChi;
     double mChi1,mChi2,deltaMchi;
 
-    double funIntegral(double x,double eta2,double delta2);
+    double funIntegral(long double x,long double eta2,long double delta2);
 };
 

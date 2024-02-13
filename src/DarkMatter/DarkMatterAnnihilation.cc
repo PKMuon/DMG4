@@ -178,12 +178,12 @@ double DarkMatterAnnihilation::GetSigmaTotAtomicEffectsOneShellFull(double E0,in
     }
 
     //integration limits
-    double s_zmax = 2 * Mel * Mel + 2 * Ep * (Em - zmax * Pm);
-    double s_zmin = 2 * Mel * Mel + 2 * Ep * (Em - zmin * Pm);
-    double x_zmax = s_zmax - 4 * mChi * mChi;
+    long double s_zmax = 2 * Mel * Mel + 2 * Ep * (Em - zmax * Pm);
+    long double s_zmin = 2 * Mel * Mel + 2 * Ep * (Em - zmin * Pm);
+    long double x_zmax = s_zmax - 4 * mChi * mChi;
     if (x_zmax < 0)
       x_zmax = 0; //numerical precision
-    double x_zmin = s_zmin - 4 * mChi * mChi;
+    long double x_zmin = s_zmin - 4 * mChi * mChi;
     if (x_zmin < 0)
       x_zmin = 0;  //numerical precision
 
@@ -213,8 +213,8 @@ double DarkMatterAnnihilation::GetSigmaTotAtomicEffectsOneShellFull(double E0,in
 
 
 
-    double delta2=MA*MA-4*mChi*mChi;
-    double eta2=sqrt(delta2*delta2+MA*MA*W*W);
+    long double delta2=MA*MA-4*mChi*mChi;
+    long double eta2=sqrt(delta2*delta2+MA*MA*W*W);
 
     double arg1=this->funIntegral(x_zmin,delta2,eta2);
     double arg2=this->funIntegral(x_zmax,delta2,eta2);
@@ -275,14 +275,14 @@ double DarkMatterAnnihilation::GetTotalCrossSectionMaxAtomicEffects(const std::m
 
 
 //See: https://gitlab.cern.ch/P348/DMG4/-/issues/27 -> this is "P(x)" without B(x)/(8*Ep*Pm)
-double DarkMatterAnnihilation::funIntegral(double x,double delta2,double eta2){
+double DarkMatterAnnihilation::funIntegral(long double x, long double delta2, long double eta2){
 
 
-  double W = this->Width();
-  double p1=1/(2*sqrt(2*eta2+2*delta2)) * log((x*x-sqrt(2*eta2+2*delta2)*x+eta2)/(x*x+sqrt(2*eta2+2*delta2)*x+eta2));
-  double p2=sqrt(eta2+delta2)/(sqrt(2)*MA*W)*(atan((2*x*(sqrt(2*eta2+2*delta2))-2*eta2-2*delta2)/(2*MA*W))+atan((2*x*(sqrt(2*eta2+2*delta2))+2*eta2+2*delta2)/(2*MA*W)));
+  long double W = this->Width();
+  long double p1=1/(2*sqrt(2*eta2+2*delta2)) * log((x*x-sqrt(2*eta2+2*delta2)*x+eta2)/(x*x+sqrt(2*eta2+2*delta2)*x+eta2));
+  long double p2=sqrt(eta2+delta2)/(sqrt(2)*MA*W)*(atan((2*x*(sqrt(2*eta2+2*delta2))-2*eta2-2*delta2)/(2*MA*W))+atan((2*x*(sqrt(2*eta2+2*delta2))+2*eta2+2*delta2)/(2*MA*W)));
 
-  double ret=p1+p2;
+  double ret=(double)(p1+p2);
 
 
   return ret;
