@@ -54,16 +54,14 @@ double DarkPhotons::TotalCrossSectionCalc(double E0)
   //double ThetaMaxA;
   //double ThetaMaxEl;
   double sigmaTot;
-
  
   if(fabs(ParentPDGID) == 11) MParent = Mel;
   if(fabs(ParentPDGID) == 13) MParent = Mmu;
   double Mnucleus=ANucl; //we assume here that Mnucleus = ANucl, not a big change in the formula
-  double EkinMin = MA * (1+MParent/Mnucleus+2*MA/Mnucleus);
+  double EkinMin = MA * (1. + MParent/Mnucleus + 2.*MA/Mnucleus);
 
   if(E0 < EkinMin ) return 0.;
  
-
   if(MA > 0.001) { // analytical IWW calculation above 1 MeV, result in pb
 
     double tmin = MA*MA*MA*MA/(4.*E0*E0);

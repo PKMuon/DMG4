@@ -57,8 +57,8 @@ double DarkScalars::TotalCrossSectionCalc(double E0)
 
   if(fabs(ParentPDGID) == 11) MParent = Mel;
   if(fabs(ParentPDGID) == 13) MParent = Mmu;
-  double Mnucleus=ANucl; //we assume here that Mnucleus = ANucl, not a big change in the formula
-  double EkinMin = MA * (1+MParent/Mnucleus+2*MA/Mnucleus);
+  double Mnucleus = ANucl; //we assume here that Mnucleus = ANucl, not a big change in the formula
+  double EkinMin = MA * (1. + MParent/Mnucleus + 2.*MA/Mnucleus);
 
   if(E0 < EkinMin ) return 0.;
 
