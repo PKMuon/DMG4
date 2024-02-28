@@ -33,6 +33,7 @@ class DarkMatter
     void ResetNEmissions() {NEmissions = 0;} // For G4 DM classes
     void EmissionSimulated() {NEmissions++;} // For G4 DM classes; in future do it automatically in SimulateEmission
     virtual double TotalCrossSectionCalc(double E0) = 0;
+    void PrepareVariables();
     void PrepareTable();
     double GetMA() {return MA;}
     virtual void SetMA(double MAIn) {MA = MAIn;}
@@ -88,6 +89,7 @@ class DarkMatter
 
     double MA;
     double EThresh;
+    double EKinThresh;
     double SigmaNorm;
     double ANucl;
     double ZNucl;

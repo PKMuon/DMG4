@@ -46,21 +46,24 @@ DarkMatter::~DarkMatter()
 }
 
 
+void DarkMatter::PrepareVariables()
+{
+  MParent = 0.;
+  if(fabs(ParentPDGID) == 11) MParent = Mel;
+  if(fabs(ParentPDGID) == 13) MParent = Mmu;
+  double MNucleus=ANucl; //we assume here that Mnucleus = ANucl, not a big change in the formula
+  EKinThresh = MA * (1. + MParent/MNucleus + 2.*MA/MNucleus);
+  if(EThresh < EKinThresh)
+    {std::cout << "DMG4: EThresh must be higher than kinematical threshold MA*(1+MParent/Mnucleus+2*MA/Mnucleus), exiting" << std::endl; exit(1);}
+}
+
+
 void DarkMatter::PrepareTable()
 {
   ISampler = 0;
   if(DMType == 1) ISampler = 1; // available only for vector; not yet fully tested
   //ISampler = 0; // Force work without sampler 
-  MParent = 0.;
-  if(fabs(ParentPDGID) == 11) MParent = Mel;
-  if(fabs(ParentPDGID) == 13) MParent = Mmu;
   
-  //Check here the threshold energy, since in the constructor parentPDGID is not available, being set by daughter classes at their creator
-  double Mnucleus = ANucl; //we assume here that Mnucleus = ANucl, not a big change in the formula
-  double EkinMin = MA * (1. + MParent/Mnucleus + 2.*MA/Mnucleus);
-  if(EThresh < EkinMin) {std::cout << "DMG4: EThresh must be higher than kinematical threshold MA*(1+MParent/Mnucleus+2*MA/Mnucleus), exiting" << std::endl; exit(1);}
-
-  //if(fabs(ParentPDGID) == 11 && MA < 0.001) return;
   for(int ip=0; ip < nptable; ip++) {
     sigmap[ip] = TotalCrossSectionCalc(ep[ip]);
     sigmax[ip] = MaxCrossSectionCalc(ep[ip]);

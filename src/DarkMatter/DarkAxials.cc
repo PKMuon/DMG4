@@ -39,6 +39,7 @@ DarkAxials::DarkAxials(double MAIn, double EThreshIn, double SigmaNormIn, double
   DMType = 3;
   ParentPDGID = 11;
   DaughterPDGID = 11;
+  PrepareVariables();
   std::cout << "Initialized DarkAxials off electrons and positrons for material density = " << DensityIn << std::endl;
   std::cout << std::endl;
 }
@@ -53,12 +54,8 @@ double DarkAxials::TotalCrossSectionCalc(double E0)
   //double ThetaMaxA;
   //double ThetaMaxEl;
   double sigmaTot;
-  if(fabs(ParentPDGID) == 11) MParent = Mel;
-  if(fabs(ParentPDGID) == 13) MParent = Mmu;
-  double Mnucleus = ANucl; //we assume here that Mnucleus = ANucl, not a big change in the formula
-  double EkinMin = MA * (1. + MParent/Mnucleus + 2.*MA/Mnucleus);
 
-  if(E0 < EkinMin ) return 0.;
+  if(E0 < EKinThresh) return 0.;
 
   if(MA > 0.001) { // analytical calculation above 1 MeV
 
