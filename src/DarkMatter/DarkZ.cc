@@ -75,6 +75,8 @@ DarkZ::DarkZ(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, 
   ParentPDGID = 13;
   DaughterPDGID = 0;
 
+  PrepareVariables();
+
   IApprox =        2;   // Approximation: 1 - IWW; 2 - WW (default is 2)
   IMethodTotalCS = 1;   // Method for total CS: 1 - ds/dxdTheta; 2 - ds/dxdPsi; 3 - ds/dx (default is 1)
   tMax =       10000.;  // tmax initial; Value 10000. means that tmax = E0*E0 will be taken
