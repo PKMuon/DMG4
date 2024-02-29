@@ -53,7 +53,7 @@ void DarkMatter::PrepareVariables()
   if(fabs(ParentPDGID) == 13) MParent = Mmu;
   double MNucleus=ANucl; //we assume here that Mnucleus = ANucl, not a big change in the formula
   EKinThresh = MA * (1. + MParent/MNucleus + 2.*MA/MNucleus);
-  if(EThresh < EKinThresh)
+  if(EThresh < 1.005*EKinThresh)
     {std::cout << "DMG4: EThresh must be higher than kinematical threshold MA*(1+MParent/Mnucleus+2*MA/Mnucleus), exiting" << std::endl; exit(1);}
 }
 
