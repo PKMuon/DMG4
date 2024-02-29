@@ -34,17 +34,18 @@ DarkZAnnihilation::DarkZAnnihilation(double MAIn, double EThreshIn, double Sigma
   std::cout << "Initialized DarkZAnnihilation (e+ e- -> Z' -> DM DM) for material density = " << DensityIn << std::endl;
   std::cout << "mA: " << MA * 1E3 << " MeV " << std::endl;
   std::cout << "IBranchingType: " << iBranchingType << std::endl;
-  if (iBranchingType == 0 || iBranchingType == 10) {
+  if (iBranchingType == 0 || iBranchingType == 10) { //neutrino
     mChi=0;
     mChi1=0;
     mChi2=0;
     std::cout << "decay to neutrinos, mass is negligible m_nu << mA" << std::endl;
   }
-  else if (iBranchingType == 1 || iBranchingType == 11) {
-    std::cout << "mChi1: " << mChi1 * 1E3 << " MeV " << std::endl;
-    std::cout << "mChi2: " << mChi2 * 1E3 << " MeV " << std::endl;
-  } else {
+  else if (iBranchingType == 1 || iBranchingType == 11) { //DM
     std::cout << "mChi: " << mChi * 1E3 << " MeV " << std::endl;
+  } 
+  else {
+    std::cout <<"Zprime branchingType not supported: "<<iBranchingType<<std::endl;
+    exit(1);
   }
   std::cout << "Width: " << this->Width() * 1E3 << " MeV " << std::endl;
 
