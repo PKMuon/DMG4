@@ -154,7 +154,7 @@ G4ForceCondition* /*condition*/) {
      * This is obtained from the step limiter if it is available
      */
     if (m_limiter){
-      G4double dEmax=m_limiter->GetMaxEloss(etot)/GeV;
+      G4double dEmax=m_limiter->GetMaxEloss(etot*GeV)/GeV;
       xi=Emax/(Emax+dEmax);
       if (xi<.8) //G4 suggestion
         xi=.8;
@@ -165,7 +165,7 @@ G4ForceCondition* /*condition*/) {
     if (etot < Emax){
       this->CrossSectionStepE=etot;
 #ifdef ATOMIC_EFFECTS
-      this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(etot, shellElectronZ[Z], shellElectronEnergies[Z]);
+      this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(this->CrossSectionStepE, shellElectronZ[Z], shellElectronEnergies[Z]);
 #else
       this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTot(this->CrossSectionStepE);
 #endif
@@ -176,7 +176,7 @@ G4ForceCondition* /*condition*/) {
     else if (ekin > (Emax/xi)){
       this->CrossSectionStepE=xi*ekin;
 #ifdef ATOMIC_EFFECTS
-      this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(etot, shellElectronZ[Z], shellElectronEnergies[Z]);
+      this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(this->CrossSectionStepE, shellElectronZ[Z], shellElectronEnergies[Z]);
 #else
       this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTot(this->CrossSectionStepE);
 #endif
@@ -185,7 +185,7 @@ G4ForceCondition* /*condition*/) {
     else{
       this->CrossSectionStepE=Emax;
 #ifdef ATOMIC_EFFECTS
-      this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(etot, shellElectronZ[Z], shellElectronEnergies[Z]);
+      this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(this->CrossSectionStepE, shellElectronZ[Z], shellElectronEnergies[Z]);
 #else
       this->CrossSectionStepVal=myDarkMatterAnnihilation->GetTotalCrossSectionMax();
 #endif
@@ -262,6 +262,16 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
   G4cout << "PostStepDoIt: Final CS = " << finalCrossSection << std::endl;
   */
   const G4double prob=finalCrossSection/this->CrossSectionStepVal;
+
+  if (std::isinf(this->CrossSectionStepVal) || std::isinf(finalCrossSection)) {
+    G4cout<<"ERROR, DMProcessAnnihilation with inf CS! Skipping event!"<<G4endl;
+    aStep.GetTrack()->SetKineticEnergy(0.);
+    aStep.GetTrack()->SetTrackStatus(fStopAndKill);
+    aStep.GetPostStepPoint()->SetProcessDefinedStep(0); //important for the G4SteppingAction
+    aParticleChange.Initialize(aTrack);
+    return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
+  }
+
 
 #ifdef EDEP_ALONG_STEP
  // G4cout<<"PostStepDoIt1 "<<aStep.GetPreStepPoint()->GetKineticEnergy()/GeV<<" "<<aStep.GetPostStepPoint()->GetKineticEnergy()/GeV<<G4endl;
