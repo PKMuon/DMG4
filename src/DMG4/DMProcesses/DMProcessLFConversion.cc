@@ -9,6 +9,7 @@
 #include "G4EmProcessSubType.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4Material.hh"
+#include "G4Electron.hh"
 #include "G4TauMinus.hh"
 #include "G4TauPlus.hh"
 #include "G4MuonMinus.hh"
