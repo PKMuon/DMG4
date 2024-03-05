@@ -926,9 +926,9 @@ double DarkMatter::MaxCrossSectionPsiCalcLFC(double E0)
     auxpsi = 0.5 * psii*psii;
     csi = CrossSectionDSDXDPSI(xi, auxpsi, E0);
     if(csi > csmax) {
-	csmax = csi;
-	xMAX = xi;
-	psiMAX = psii;
+        csmax = csi;
+        xMAX = xi;
+        psiMAX = psii;
     }
   }
   std::cout << "ymax/psimax/csmax " << 1. - xMAX << " " << psiMAX << " " << csmax << std::endl;
@@ -965,9 +965,9 @@ double DarkMatter::MaxCrossSectionPsiCalcLFCLog10(double E0)
     auxpsi = 0.5 * PsiEv*PsiEv;
     csi = CrossSectionDSDXDPSI(xi, auxpsi, E0);
     if(csi > csmax) {
-	csmax = csi;
-	xMAX = xi;
-	psiMAX = PsiEv;
+        csmax = csi;
+        xMAX = xi;
+        psiMAX = PsiEv;
     }
   }
   std::cout << "ymax/psimax/csmax " << 1. - xMAX << " " << psiMAX << " " << csmax << std::endl;

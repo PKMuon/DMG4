@@ -3,7 +3,7 @@
 #define Mel 5.109989461E-04 // electron mass in GeV
 #define Mmu 0.1056583745 // muon mass in GeV
 #define Mtau 1.77686     // tau mass in GeV
-#define alphaEW CLHEP::fine_structure_const
+#define alphaEW 1./137.
 
 #define MUp 2.79 // protonMu
 #define Mpr 0.938 // proton mass
