@@ -1,5 +1,4 @@
-#ifndef DarkMatterParametersFactory_hh
-#define DarkMatterParametersFactory_hh 1
+#pragma once
 
 // STD Library
 #include <string>
@@ -32,4 +31,3 @@ class DarkMatterParametersFactory
     std::map<std::string, double> fFactoryParams;
 };
 
-#endif // DarkMatterParametersFactory_hh

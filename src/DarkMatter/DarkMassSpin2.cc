@@ -1,6 +1,5 @@
 #include <iostream>
 
-#include "DarkMatter.hh"
 #include "DarkMassSpin2.hh"
 #include "Utils.hh"
 
@@ -67,6 +66,8 @@ DarkMassSpin2::DarkMassSpin2( double MAIn, double EThreshIn
   DMType = 5;
   ParentPDGID = 11;
   DaughterPDGID = 11;
+
+  PrepareVariables();
 
   mInit = Mel;          // mass of initial particle
   tMax =         100.;  // tmax initial; tmax = E0*E0 will be taken

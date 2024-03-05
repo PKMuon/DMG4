@@ -3,7 +3,6 @@
 // To be used in a Geant4 application.
 //
 //
-#include "DarkMatter.hh"
 #include "DarkPseudoScalars.hh"
 #include "Utils.hh"
 
@@ -40,6 +39,7 @@ DarkPseudoScalars::DarkPseudoScalars(double MAIn, double EThreshIn, double Sigma
   DMType = 4;
   ParentPDGID = 11;
   DaughterPDGID = 11;
+  PrepareVariables();
   std::cout << "Initialized DarkPseudoScalars off electrons and positrons for material density = " << DensityIn << std::endl;
   std::cout << std::endl;
 }
@@ -55,7 +55,7 @@ double DarkPseudoScalars::TotalCrossSectionCalc(double E0)
   //double ThetaMaxEl;
   double sigmaTot;
 
-  if(E0 < 2.*MA) return 0.;
+  if(E0 < EKinThresh) return 0.;
 
   if(MA > 0.001) { // analytical calculation above 1 MeV
 
@@ -115,11 +115,7 @@ double DarkPseudoScalars::TotalCrossSectionCalc(double E0)
 
 double DarkPseudoScalars::GetSigmaTot(double E0)
 {
-  if(MA > 0.001) {
-    return GetSigmaTot0(E0);
-  } else {
-    return TotCSPseudoScalarParticle(MA);
-  }
+  return GetSigmaTot0(E0);
 }
 
 

@@ -1,7 +1,9 @@
+#pragma once
+
 #define Mel 5.109989461E-04 // electron mass in GeV
 #define Mmu 0.1056583745 // muon mass in GeV
 #define Mtau 1.77686     // tau mass in GeV
-#define alphaEW 1./137.
+#define alphaEW CLHEP::fine_structure_const
 
 #define MUp 2.79 // protonMu
 #define Mpr 0.938 // proton mass
@@ -10,6 +12,9 @@
 
 #include <stdlib.h>
 
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_spline.h>
+
 struct ParamsForChi {double AA; double ZZ; double MMA; double EE0;};
 
 struct ParamsForMuonTotCS {double AA; double ZZ; double MMA; double EE0;};
@@ -17,22 +22,6 @@ struct ParamsForMuonTotCS {double AA; double ZZ; double MMA; double EE0;};
 
 class DarkMatter
 {
-  friend class DarkPhotons;
-  friend class DarkScalars;
-  friend class DarkLFCScalars;
-  friend class DarkPseudoScalars;
-  friend class DarkAxials;
-  friend class DarkZ;
-  friend class DarkMuPhilicScalars;
-  friend class DarkMuPhilicPseudoScalars;
-  friend class DarkMassSpin2;
-  friend class DarkMassSpin2Annihilation;
-  friend class DarkVector;
-  friend class ALP;
-  friend class DarkPhotonsAnnihilation;
-  friend class DarkScalarsAnnihilation;
-  friend class DarkPseudoScalarsAnnihilation;
-  friend class DarkAxialsAnnihilation;
   public:
 
     DarkMatter(double MAIn, double EThreshIn, double SigmaNormIn=1., double ANuclIn=207., double ZNuclIn=82., double DensityIn=11.35,
@@ -44,6 +33,7 @@ class DarkMatter
     void ResetNEmissions() {NEmissions = 0;} // For G4 DM classes
     void EmissionSimulated() {NEmissions++;} // For G4 DM classes; in future do it automatically in SimulateEmission
     virtual double TotalCrossSectionCalc(double E0) = 0;
+    void PrepareVariables();
     void PrepareTable();
     double GetMA() {return MA;}
     virtual void SetMA(double MAIn) {MA = MAIn;}
@@ -93,24 +83,37 @@ class DarkMatter
     double SimulateEmissionByMuon(double E0, double* angles);
     double SimulateEmissionVector(double E0, double* angles);
 
-    //for resonant production e+ e- --> R --> f f, this function returns the cosine of the angle of the f in the CM frame.
-    double SimulateEmissionResonant(double E0); //E0 in GeV
-    virtual double AngularDistributionResonant(double eta,double E0); //E0 in GeV
-
-
     double GetAccumulatedProbability() {return AccumulatedProbability;}
+    // TODO CHECK THIS
+    // for emission with different final and inital state lepton
+    /*
+    void PrepareTableLFC();
+    double MaxCrossSectionCalcLFC(double E0);
+    double MaxCrossSectionAngleCalcLFC(double E0);
+    double MaxCrossSectionPsiCalcLFC(double E0);
+    double MaxCrossSectionPsiCalcLFCLog10(double E0); // log-uniform random sampling
+    double MaxCrossSectionThetaCalcLFC(double E0);
+    double SimulateEmissionLFC(double E0, double* angles);
+    double SimulateEmissionWithAngleLFC(double E0, double* angles);
+    double SimulateEmissionWithAngle2LFC(double E0, double* angles);
+    double SimulateEmissionByMuon2LFC(double E0, double* angles);
+    double SimulateEmissionByMuonLFClog10(double E0, double* angles); // log-uniform random sampling
+    */
 
-  private:
+
+
+  protected:
 
     double MA;
     double EThresh;
+    double EKinThresh;
     double SigmaNorm;
     double ANucl;
     double ZNucl;
     double Density;
     double epsilBench;
     double epsil;
-    int DMType; // 1 - Dark Photon; 2 - Dark Scalar; 3 - Dark Axials; 4 - Dark Pseudoscalars; 11 - Z'; 21 - ALP.; 32 - LFC Scalar
+    int DMType; // 1 - Dark Photon; 2 - Dark Scalar; 3 - Dark Axials; 4 - Dark Pseudoscalars; 11 - Z' (muon); 12 - Z' (electron) ; 21 - ALP; 32 - LFC Scalar
                 // For annihilation, this is the "resonance R" in e+e- --> R --> final-state
     int ParentPDGID;
     double MParent;
@@ -130,4 +133,7 @@ class DarkMatter
     double AccumulatedProbability;
 
     int NEmissions;
+
+    gsl_interp_accel *acc;
+    gsl_spline *spline_steffen;
 };

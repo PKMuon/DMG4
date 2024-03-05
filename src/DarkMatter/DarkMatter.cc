@@ -5,7 +5,6 @@
 //
 // Concrete implementations: DarkPhotons, DarkScalars, ...
 //
-#include "DarkMatter.hh"
 #include "Utils.hh"
 
 #include "Randomize.hh"
@@ -29,10 +28,11 @@
 DarkMatter::DarkMatter(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
                        double epsilIn, int IDecayIn)
 :MA(MAIn), EThresh(EThreshIn), SigmaNorm(SigmaNormIn),
-ANucl(ANuclIn), ZNucl(ZNuclIn), Density(DensityIn), epsilBench(0.0001), epsil(epsilIn), IDecay(IDecayIn),ISampler(0),
+ANucl(ANuclIn), ZNucl(ZNuclIn), Density(DensityIn), epsilBench(0.0001), epsil(epsilIn), IDecay(IDecayIn), ISampler(0),
 AccumulatedProbability(0.), NEmissions(0)
 {
-  if(MA > 3.) {std::cout << "Maximal allowed mass is 3 GeV, exiting" << std::endl; exit(1);}
+  if(MA > 3.) {std::cout << "DMG4: Maximal allowed mass is 3 GeV, exiting" << std::endl; exit(1);}
+  
   nptable = NPTAB;
   double epi[NPTAB]={0.008, 0.02, 0.05, 0.1, 0.2, 0.5, 1., 2., 5., 10., 15., 25., 50., 80., 150., 200.};
   for(int ip=0; ip < nptable; ip++) {ep[ip] = epi[ip];}
@@ -40,7 +40,22 @@ AccumulatedProbability(0.), NEmissions(0)
 
 
 DarkMatter::~DarkMatter()
-{;}
+{
+  gsl_spline_free(spline_steffen);
+  gsl_interp_accel_free(acc);
+}
+
+
+void DarkMatter::PrepareVariables()
+{
+  MParent = 0.;
+  if(fabs(ParentPDGID) == 11) MParent = Mel;
+  if(fabs(ParentPDGID) == 13) MParent = Mmu;
+  double MNucleus=ANucl; //we assume here that Mnucleus = ANucl, not a big change in the formula
+  EKinThresh = MA * (1. + MParent/MNucleus + 2.*MA/MNucleus);
+  if(EThresh < 1.005*EKinThresh)
+    {std::cout << "DMG4: EThresh must be higher than kinematical threshold MA*(1+MParent/Mnucleus+2*MA/Mnucleus), exiting" << std::endl; exit(1);}
+}
 
 
 void DarkMatter::PrepareTable()
@@ -48,10 +63,7 @@ void DarkMatter::PrepareTable()
   ISampler = 0;
   if(DMType == 1) ISampler = 1; // available only for vector; not yet fully tested
   //ISampler = 0; // Force work without sampler 
-  MParent = 0.;
-  if(fabs(ParentPDGID) == 11) MParent = Mel;
-  if(fabs(ParentPDGID) == 13) MParent = Mmu;
-  //if(fabs(ParentPDGID) == 11 && MA < 0.001) return;
+  
   for(int ip=0; ip < nptable; ip++) {
     sigmap[ip] = TotalCrossSectionCalc(ep[ip]);
     sigmax[ip] = MaxCrossSectionCalc(ep[ip]);
@@ -59,12 +71,20 @@ void DarkMatter::PrepareTable()
     if(fabs(ParentPDGID) == 13) sigmaxpsi[ip] = MaxCrossSectionPsiCalc(ep[ip]);
     if(fabs(ParentPDGID) == 13) sigmaxtheta[ip] = MaxCrossSectionThetaCalc(ep[ip]);
   }
+  //initializing Steffen interpolation with GSL
+  const size_t N = NPTAB;
+  acc = gsl_interp_accel_alloc();
+  spline_steffen = gsl_spline_alloc(gsl_interp_steffen, N);
+  gsl_spline_init(spline_steffen, ep, sigmap, N);
 }
 
 
 double DarkMatter::GetSigmaTot0(double E0)
 {
-  return parinv(E0, ep, sigmap, nptable);
+  //double csmy = parinv(E0, ep, sigmap, nptable);
+  double csmy = gsl_spline_eval(spline_steffen, E0, acc);
+  if(csmy < 0.) {std::cout << "DMG4: Interpolated cross section is negative, exiting" << std::endl; exit(1);}
+  return csmy;
 }
 
 
@@ -176,6 +196,8 @@ double DarkMatter::MaxCrossSectionPsiCalc(double E0)
 {
   double Xmin = MA/E0;
   double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MParent/E0;
+  if(EThresh/E0 > Xmin) Xmin = EThresh/E0;
+  if(Xmax < Xmin) return 0.;
   double psimax = 160.*MA/E0;
   if(psimax > 1.) psimax = 1.;
 
@@ -199,6 +221,8 @@ double DarkMatter::MaxCrossSectionThetaCalc(double E0)
   double Xmin = MA/E0;
   double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MParent/E0;
   if (DMType == 32) Xmax = 1. - Mtau/E0;
+  if(EThresh/E0 > Xmin) Xmin = EThresh/E0;
+  if(Xmax < Xmin) return 0.;
   double thetamax = 0.1;
 
   double csmax = 0.;
@@ -519,7 +543,7 @@ double DarkMatter::SimulateEmissionWithAngle2(double E0, double* angles)
 }
 
 
-double DarkMatter::SimulateEmissionWithAngle3(double E0, double* angles)
+double DarkMatter::SimulateEmissionWithAngle3(double E0, double* angles) // For ALP simulation (Primakoff process)
 {
   double Xmin = MA/E0;
 
@@ -549,7 +573,7 @@ double DarkMatter::SimulateEmissionWithAngle3(double E0, double* angles)
   XAcc = ThetaAcc = PhiAcc = sigma = ThetaEv = Log10ThetaEv = 0.;
 
   // Set range of uniform sampling between 0 and 1
-  double ThetaMaxA = 1.;
+  double ThetaMaxA = 0.3;
 
   int maxiterA = 2000000;
   for(int iii = 1; iii < maxiterA; iii++) { // Angle simulation loop
@@ -766,6 +790,7 @@ double DarkMatter::SimulateEmissionByMuon(double E0, double* angles)
 double DarkMatter::SimulateEmissionVector(double E0, double* angles)
 {
   double Xmin = MA/E0;
+  //TODO CHECK THIS
   //double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MParent/E0;
   double Xmax = 1. - Mtau/E0;
   double ThetaMax = 0.1;
@@ -807,32 +832,638 @@ double DarkMatter::SimulateEmissionVector(double E0, double* angles)
 }
 
 
-/*This method returns a random cosine for e+e- --> A' --> ff in the CM frame
- * E0: positron energy in LAB frame (GeV units)
- */
-double DarkMatter::SimulateEmissionResonant(double E0){
 
-    int maxiter = 25000000;
-    double eta;
-    double fcomp,frand;
+/* CHECK THIS TODO
+
+
+// BEGIN LFC version of max cross section calculation and sampling
+double DarkMatter::MaxCrossSectionCalcLFC(double E0)
+{
+  // mass for final state lepton, needed for xmax bound
+  double MChild;
+  if(ParentPDGID == 13) MChild = Mel;
+  if(ParentPDGID == 11) MChild = Mmu;
+
+  if(E0 < 2.*MA) return 0.;
+  if(ParentPDGID == 13 && E0 < EThresh) return 0.;
+
+  double Xmin = MA/E0;
+  double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MChild/E0;
+
+  double csmax = 0.;
+
+  if(ParentPDGID == 22 || ParentPDGID == -11) Xmax = 0.99999;
+
+  if(MA >= 0.001) csmax = CrossSectionDSDX(Xmax, E0); // preliminary
+  for(int i=0; i<10000; i++) {
+    double xi = 0.00005 + 0.0001*((double)i);
+    if(xi >= Xmin && xi <= Xmax) {
+      double csi = CrossSectionDSDX(xi, E0);
+      if(MA < 0.001 && xi < EThresh/E0) csi = 0.;        // we cut DM at EThresh for these masses
+      if(ParentPDGID == 13 && xi < EThresh/E0) csi = 0.; // we cut DM at EThresh for the muon beam
+      if(csi > csmax) csmax = csi;
+    }
+  }
+  std::cout << " E0 = " << E0 << "  Max cross section = " << csmax << std::endl;
+  return 1.1*csmax;
+}
+
+
+double DarkMatter::MaxCrossSectionAngleCalcLFC(double E0)
+{
+  // mass for final state lepton, needed for xmax bound
+  double MChild;
+  if(ParentPDGID == 13) MChild = Mel;
+  if(ParentPDGID == 11) MChild = Mmu;
+
+  double Xmin = MA/E0;
+  double Xmax;
+
+  double csmax = 0.;
+
+  if(E0 < 2.*MA) return 0.;
+
+  Xmax = 1.0-Xmin; // Incorrect limit, but for MA > 100 MeV works only like this without sampler
+  if(MA <= 0.02 || ISampler) Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MChild/E0;
+  if(ParentPDGID == 22) Xmax = 0.99999;
+
+  csmax = CrossSectionDSDXDU(Xmax, 0., E0);
+  double csmax1 = CrossSectionDSDXDU(Xmax, 0.000005 , E0);
+  if(csmax1 > csmax) csmax = csmax1;
+
+  for(int i=0; i<1000; i++) {
+    double xi = 0.0005 + 0.001*((double)i);
+    if(xi >= Xmin && xi <= Xmax) {
+      double csi = CrossSectionDSDXDU(xi, 0., E0);
+      if(csi > csmax) csmax = csi;
+      csi = CrossSectionDSDXDU(xi, 0.000005, E0);
+      if(csi > csmax) csmax = csi;
+    }
+  }
+  return 1.1*csmax;
+}
+
+
+double DarkMatter::MaxCrossSectionPsiCalcLFC(double E0)
+{
+  // mass for final state lepton, needed for xmax bound
+  double MChild;
+  if(ParentPDGID == 13) MChild = Mel;
+  if(ParentPDGID == 11) MChild = Mmu;
+
+  double Xmin = MA/E0;
+  double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MChild/E0;
+  double psimax = M_PI;
+  double csmax = 0.;
+
+  if(E0 < 2.*MA) return 0.;
+
+  double xi, psii, auxpsi, csi;
+  double xMAX, psiMAX;
+  for(int i=0; i < 5000000; i++) {
+    xi = G4UniformRand() * (Xmax-Xmin) + Xmin;
+    psii = G4UniformRand() * psimax;
+    auxpsi = 0.5 * psii*psii;
+    csi = CrossSectionDSDXDPSI(xi, auxpsi, E0);
+    if(csi > csmax) {
+	csmax = csi;
+	xMAX = xi;
+	psiMAX = psii;
+    }
+  }
+  std::cout << "ymax/psimax/csmax " << 1. - xMAX << " " << psiMAX << " " << csmax << std::endl;
+  return 1.1*csmax;
+}
+
+// log-uniform sampling of points
+double DarkMatter::MaxCrossSectionPsiCalcLFCLog10(double E0)
+{
+  // mass for final state lepton, needed for xmax bound
+  double MChild;
+  if(ParentPDGID == 13) MChild = Mel;
+  if(ParentPDGID == 11) MChild = Mmu;
+
+  double Xmin = MA/E0;
+  double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MChild/E0;
+  double Log10YMin = log10(1. - Xmax);
+  double Log10YMax = 0;
+  double csmax = 0.;
+
+  double PsiMax = M_PI;
+  double Log10PsiMax = log10(PsiMax);
+  double Log10PsiMin = -5;
+ 
+  if(E0 < 2.*MA) return 0.;
+
+  double xi, auxpsi, csi, Log10PsiEv, PsiEv, yexponent;
+  double xMAX, psiMAX;
+  for(int i=0; i < 5000000; i++) {
+    yexponent = G4UniformRand() * (Log10YMax-Log10YMin) + Log10YMin;
+    xi = 1.0 - TMath::Power(10,yexponent);
+    Log10PsiEv = G4UniformRand() * (Log10PsiMax - Log10PsiMin) + Log10PsiMin;
+    PsiEv = TMath::Power(10, Log10PsiEv);
+    auxpsi = 0.5 * PsiEv*PsiEv;
+    csi = CrossSectionDSDXDPSI(xi, auxpsi, E0);
+    if(csi > csmax) {
+	csmax = csi;
+	xMAX = xi;
+	psiMAX = PsiEv;
+    }
+  }
+  std::cout << "ymax/psimax/csmax " << 1. - xMAX << " " << psiMAX << " " << csmax << std::endl;
+  return 1.1*csmax;
+}
+
+double DarkMatter::MaxCrossSectionThetaCalcLFC(double E0)
+{
+  // mass for final state lepton, needed for xmax bound
+  double MChild;
+  if(ParentPDGID == 13) MChild = Mel;
+  if(ParentPDGID == 11) MChild = Mmu;
+
+  double Xmin = MA/E0;
+  double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MChild/E0;
+  double thetamax = 0.1;
+
+  double csmax = 0.;
+
+  if(E0 < 2.*MA) return 0.;
+
+  double xi, thetai, csi;
+  for(int i=0; i < 5000000; i++) {
+    xi = G4UniformRand() * (Xmax-Xmin) + Xmin;
+    thetai = G4UniformRand() * thetamax;
+    csi = CrossSectionDSDXDTheta(xi, thetai, E0);
+    if(csi > csmax) csmax = csi;
+  }
+  return 1.1*csmax;
+}
+
+
+double DarkMatter::SimulateEmissionLFC(double E0, double* angles)
+{
+  // mass for final state lepton, needed for xmax bound
+  double MChild;
+  if(ParentPDGID == 13) MChild = Mel;
+  if(ParentPDGID == 11) MChild = Mmu;
+
+  double Xmin = MA/E0;
+  if(MA < 0.001 && EThresh/E0 > Xmin) Xmin = EThresh/E0;
+  double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MChild/E0;
+
+  if(ParentPDGID == 22 || ParentPDGID == -11) {
+    Xmin = 0.999;
+    Xmax = 0.99999;
+  }
+
+  double sigmaMax = GetSigmaMax(E0);
+  if(MA < 0.001 && sigmaMax > 1.2) { // diff. cross section normalized to 1.
+    std::cout << "Strange too big sigma max for the mass below 0.001, exiting" << std::endl; exit(1);
+  }
+
+  int maxiter = 1000000;
+
+  double XAcc, ThetaAcc, PhiAcc;
+
+  for( int iii = 1; iii < maxiter; iii++) {
+
+    double XEv  =  G4UniformRand() * (Xmax-Xmin) + Xmin;
+    double UThetaEv = 0.; // we set angles to zero, generate only x
+
+    //Now we sample only Diff. c.s. for X below 
+
+    if(XEv*E0 < MA) return 0.;
+
+    double sigma = CrossSectionDSDX(XEv, E0);
+
+    double UU = G4UniformRand() * sigmaMax;
+
+    if(sigma > sigmaMax) printf ("Maximum violated: ratio = % .18f\n", sigma/sigmaMax);
+
+    if(sigma >= UU) {
+      XAcc = XEv;
+      ThetaAcc = sqrt(2.0*UThetaEv);
+      //PhiAcc = G4UniformRand() * 2. * 3.1415926;
+      PhiAcc = 0.;
+
+      printf ("Accepted at iteration %d\n", iii);
+      printf( "EParent = %e XAcc = %e ThetaAcc = %e\n ", E0, XAcc, ThetaAcc);
+
+      angles[0] = ThetaAcc;
+      angles[1] = PhiAcc;
+      return XAcc;
+    }
+  }
+  printf ("Simulation of emission failed after N iterations = %d\n", maxiter);
+  return 0.;
+}
+
+
+double DarkMatter::SimulateEmissionWithAngleLFC(double E0, double* angles)
+{
+  // mass for final state lepton, needed for xmax bound
+  double MChild;
+  if(ParentPDGID == 13) MChild = Mel;
+  if(ParentPDGID == 11) MChild = Mmu;
+
+  double Xmin = MA/E0;
+  if(MA < 0.001 && EThresh/E0 > Xmin) Xmin = EThresh/E0;
+
+  if(ParentPDGID == 22) {
+    std::cout << "ALP: Error: double differential cross section DSDXDU is not implemented, exiting" << std::endl;
+    exit(1);
+  }
+  if(ParentPDGID == 13) {
+    std::cout << "DarkZ: Error: procedure of simulation Z with angle not implemented, exiting" << std::endl;
+    exit(1);
+  }
+  if(ParentPDGID == -11) {
+    std::cout << "DarkPhotonsAnnihilation: Error: annihilation simulation with angle not implemented, exiting" << std::endl;
+    exit(1);
+  }
+
+  if(MA < 0.001) {
+    std::cout << "Error: mass < 0.001, don't use SimulateEmissionWithAngle" << std::endl;
+    exit(1);
+  }
+
+  if(!ISampler) { // Don't use external sampler DarkMatterSampler
+
+    double Xmax = 1. - Xmin; // Incorrect limit, but for MA > 100 MeV works only like this without sampler
+    if(MA <= 0.02) Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MChild/E0;
+
+    //double ThetaMaxA = 0.0001*sqrt((MA/E0)/(0.001/100.));
+    double ThetaMaxA = 0.0001*sqrt(MA/0.001)*(100./E0);
+    double UThetaMaxA = 0.5*ThetaMaxA*ThetaMaxA; // Nota Bene !!! this is maximum of u= 0.5*theta^2 variable!!
+    if(MA < 0.001) UThetaMaxA = 0.; // Angle is simulated only for MA > 0.001 GeV
+    double sigmaMax = GetSigmaAngleMax(E0);
+    int maxiter = 3000000;
+
+    double XAcc, ThetaAcc, PhiAcc;
+
     for( int iii = 1; iii < maxiter; iii++) {
-        eta = G4UniformRand()*2 -1; //between -1 and 1;
-        fcomp=this->AngularDistributionResonant(eta,E0);
-        frand=G4UniformRand();
-        if (frand<fcomp) return eta;
-     }
-    return 1;
+
+      double XEv, FactorSigma=1.;
+      if(MA >= 0.001) {
+        double XFactor = 1.5*sqrt(0.001/MA);
+        double AlphaX = exp(-(1. - Xmax)/XFactor);
+        double BetaX = exp(-(1. - Xmin)/XFactor);
+        double DeltaX = - XFactor * log(BetaX+G4UniformRand()*(AlphaX-BetaX));
+        XEv = 1. - DeltaX;
+        FactorSigma = exp(DeltaX/XFactor);
+      } else {
+        XEv  =  G4UniformRand() * (Xmax-Xmin) + Xmin;
+      }
+
+      double UThetaEv, FactorSigmaU=1.;
+      if(MA >= 0.001) {
+        double UFactor = 0.3*UThetaMaxA;
+        double BetaU = exp(-UThetaMaxA/UFactor);
+        UThetaEv = - UFactor * log(BetaU+G4UniformRand()*(1.-BetaU));
+        FactorSigmaU = exp(UThetaEv/UFactor);
+      } else {
+        UThetaEv = G4UniformRand() * UThetaMaxA; // this is a u = 0.5*theta^2 variable!!!
+      }
+
+      if(XEv*E0 < MA) return 0.;
+
+      double sigma = FactorSigma * FactorSigmaU * CrossSectionDSDXDU(XEv, UThetaEv, E0);
+
+      double UU = G4UniformRand() * sigmaMax;
+
+      if(sigma > sigmaMax) {
+        printf ("Maximum violated: ratio = % .18f\n", sigma/sigmaMax);
+        sigmaMax = 1.05*sigma;
+      }
+
+      if(sigma >= UU) {
+        XAcc = XEv;
+        ThetaAcc =sqrt(2.0*UThetaEv); // this is just a theta accepted!!!
+        PhiAcc = G4UniformRand() * 2. * 3.1415926;
+
+        printf ("Accepted at iteration %d\n", iii);
+        printf( "EParent = %e XAcc = %e ThetaAcc = %e\n ", E0, XAcc, ThetaAcc);
+
+        angles[0] = ThetaAcc;
+        angles[1] = PhiAcc;
+        return XAcc;
+      }
+    }
+    printf ("Simulation of emission failed after N iterations = %d\n", maxiter);
+    return 0.;
+
+  } else { // Use external sampler
+
+    // NOTE: the engine later must be supplied by the G4-physics instance
+    dphmc_URandomState state = {CLHEP::HepRandom::getTheEngine()};
+
+    double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MChild/E0;
+
+    Sampler s(E0, MA);
+    double x, theta;
+    double accProb = s.sample_x_theta(&state, x, theta, Xmin, Xmax);
+    (void)accProb; // to avoid warning
+    if(x < Xmin || x > Xmax) {
+      std::cout << "SimulateEmissionWithAngle: error, X from sampler beyond limits, exiting" << std::endl;
+      exit(1);
+    } else {
+      angles[0] = theta;
+      angles[1] = G4UniformRand() * 2. * 3.1415926;
+      return x;
+    }
+    std::cout << "SimulateEmissionWithAngle: simulation of emission with a sampler failed" << std::endl;
+    return 0.;
+  }
 }
 
-/*This method returns the angular distribution for e+e- --> A' --> ff in the CM frame
- * It has to be implemented in the derived classes (the default method is a dummy implementation)
- * eta: cosine of the f in the CM frame
- * E0: positron beam energy in LAB frame (GeV units)
- * IMPORTANT: it has to be normalized so that the maximum is one.
- */
-double DarkMatter::AngularDistributionResonant(double eta,double E0){
-    return (1+eta*eta)/2.;
+
+double DarkMatter::SimulateEmissionWithAngle2LFC(double E0, double* angles)
+{
+  // mass for final state lepton, needed for xmax bound
+  double MChild;
+  if(ParentPDGID == 13) MChild = Mel;
+  if(ParentPDGID == 11) MChild = Mmu;
+
+  double Xmin = MA/E0;
+  if(MA < 0.001 && EThresh/E0 > Xmin) Xmin = EThresh/E0;
+
+  if(ParentPDGID == 22) {
+    std::cout << "ALP: Error: double differential cross section DSDXDU is not implemented, exiting" << std::endl;
+    exit(1);
+  }
+  if(ParentPDGID == 13) {
+    std::cout << "DarkZ: Error: procedure of simulation Z with angle not implemented, exiting" << std::endl;
+    exit(1);
+  }
+  if(ParentPDGID == -11) {
+    std::cout << "DarkPhotonsAnnihilation: Error: annihilation simulation with angle not implemented, exiting" << std::endl;
+    exit(1);
+  }
+
+  angles[0] = 0.;
+  angles[1] = 0.;
+
+  if(!ISampler || MA < 0.001) { // Don't use external sampler DarkMatterSampler
+
+    double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MChild/E0;
+    if(Xmin > Xmax) return 0.;
+
+    if(ParentPDGID == 22 || ParentPDGID == -11) {
+      Xmin = 0.999;
+      Xmax = 0.99999;
+    }
+    double sigmaMax = GetSigmaMax(E0);
+    if(MA < 0.001 && sigmaMax > 1.2) { // diff. cross section normalized to 1.
+      std::cout << "Strange too big sigma max for the mass below 0.001, exiting" << std::endl; exit(1);
+    }
+    int maxiterX = 1000000;
+
+    double XAcc = 0., ThetaAcc = 0., PhiAcc = 0.;
+    int NIterX = 0;
+
+    for(int iii = 1; iii < maxiterX; iii++) { // X simulation loop
+
+      double XEv  =  G4UniformRand() * (Xmax-Xmin) + Xmin;
+      if(XEv*E0 < MA) return 0.;
+
+      double sigma = CrossSectionDSDX(XEv, E0);
+      if(sigma > sigmaMax) printf ("Maximum of single diff. CS violated: ratio = % .18f\n", sigma/sigmaMax);
+
+      double UU = G4UniformRand() * sigmaMax;
+
+      if(sigma >= UU) {
+        XAcc = XEv;
+        NIterX = iii;
+        break;
+      }
+    }
+    if(XAcc < 0.5*Xmin) {
+      printf ("Simulation of X failed after N iterations = %d\n", maxiterX);
+      return 0.;
+    }
+    if(MA < 0.001) { // No angle sampling for these masses
+      std::cout << "Accepted after " << NIterX << " iterations for X " << std::endl;
+      return XAcc;
+    }
+
+    double ThetaMaxA = 0.0002*pow((MA/0.001), 0.7)*(100./E0);
+    if(XAcc > 0.999) ThetaMaxA *= 0.5;
+    if(XAcc > 0.9999) ThetaMaxA *= 0.5;
+    if(ThetaMaxA > 1.) ThetaMaxA = 1.;
+    double UThetaMaxA = 0.5*ThetaMaxA*ThetaMaxA; // Nota Bene !!! this is maximum of u= 0.5*theta^2 variable!!
+    double UThetaEv, sigma;
+
+    int NIterMax = 100000.;
+    sigmaMax = 0.;
+    for(int iii = 0; iii < NIterMax; iii++) {
+      UThetaEv = ((double)iii) * (0.1 * UThetaMaxA / (double)NIterMax);
+      sigma = CrossSectionDSDXDU(XAcc, UThetaEv, E0);
+      if(sigma > sigmaMax) sigmaMax = sigma;
+    }
+    sigmaMax *= 1.5;
+
+    int maxiterA = 2000000;
+    for(int iii = 1; iii < maxiterA; iii++) { // Angle simulation loop
+
+      UThetaEv = UThetaMaxA * G4UniformRand();
+      sigma = CrossSectionDSDXDU(XAcc, UThetaEv, E0);
+
+      if(sigma > sigmaMax) {
+        printf ("Maximum violated: ratio = % .18f\n", sigma/sigmaMax);
+        sigmaMax = 1.05*sigma;
+      }
+
+      double UU = G4UniformRand() * sigmaMax;
+
+      if(sigma >= UU) {
+        ThetaAcc =sqrt(2.0*UThetaEv); // this is just a theta accepted!!!
+        PhiAcc = G4UniformRand() * 2. * 3.1415926;
+
+        std::cout << "Accepted after " << NIterX << " iterations for X and " << iii << " iterations for Angle" << std::endl;
+        printf( "EParent = %e XAcc = %e ThetaAcc = %e\n ", E0, XAcc, ThetaAcc);
+
+        angles[0] = ThetaAcc;
+        angles[1] = PhiAcc;
+        return XAcc;
+      }
+    }
+    std::cout << "Simulation of Angle failed after N iterations = " << maxiterA << " ,X = " << XAcc << std::endl;
+    return 0.;
+
+  } else { // Use external sampler
+
+    // NOTE: the engine later must be supplied by the G4-physics instance
+    dphmc_URandomState state = {CLHEP::HepRandom::getTheEngine()};
+
+    double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MChild/E0;
+
+    Sampler s(E0, MA);
+    double x, theta;
+    double accProb = s.sample_x_theta(&state, x, theta, Xmin, Xmax);
+    (void)accProb; // to avoid warning
+    if(x < Xmin || x > Xmax) {
+      std::cout << "SimulateEmissionWithAngle: error, X from sampler beyond limits, exiting" << std::endl;
+      exit(1);
+    } else {
+      angles[0] = theta;
+      angles[1] = G4UniformRand() * 2. * 3.1415926;
+      return x;
+    }
+    std::cout << "SimulateEmissionWithAngle: simulation of emission with a sampler failed" << std::endl;
+    return 0.;
+  }
 }
 
 
+// Z' sampling in 2 steps using DSDX and DSDXDPSI
+double DarkMatter::SimulateEmissionByMuon2LFC(double E0, double* angles)
+{
+  // mass for final state lepton, needed for xmax bound
+  double MChild;
+  if(ParentPDGID == 13) MChild = Mel;
+  if(ParentPDGID == 11) MChild = Mmu;
 
+  double Xmin = MA/E0;
+  if(EThresh/E0 > Xmin) Xmin = EThresh/E0;
+
+  if(abs(ParentPDGID) != 13) {
+    std::cout << "Error: SimulateEmissionByMuon2: this is only for muons, exiting" << std::endl;
+    exit(1);
+  }
+
+  double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MChild/E0;
+  double sigmaMax = GetSigmaMax(E0);
+  int maxiterX = 1000000;
+
+  double XAcc = 0., PsiAcc, PhiAcc;
+  int NIterX = 0;
+
+  for(int iii = 1; iii < maxiterX; iii++) { // X simulation loop
+
+    double XEv  =  G4UniformRand() * (Xmax-Xmin) + Xmin;
+    if(XEv*E0 < MA) return 0.;
+
+    double sigma = CrossSectionDSDX(XEv, E0);
+    if(sigma < -0.5) {std::cout << "Error: CrossSectionDSDX is not properly defined, exiting" << std::endl; exit(1);}
+    if(sigma > sigmaMax) printf ("Maximum of single diff. CS violated: ratio = % .18f\n", sigma/sigmaMax);
+
+    double UU = G4UniformRand() * sigmaMax;
+
+    if(sigma >= UU) {
+      XAcc = XEv;
+      NIterX = iii;
+      break;
+    }
+  }
+  if(XAcc < 0.5*Xmin) {
+    printf ("Simulation of X failed after N iterations = %d\n", maxiterX);
+    return 0.;
+  }
+
+  double PsiMaxA = 700.*MA/E0;
+  double XFact = 1.;
+  if(XAcc > 0.5) XFact = 1. + 20.*(XAcc - 0.5)*(XAcc - 0.5);
+  PsiMaxA *= XFact;
+  if(PsiMaxA < XFact*0.007*100./E0) PsiMaxA = XFact*0.007*100./E0;
+  if(PsiMaxA > 1.) PsiMaxA = 1.;
+  double UPsiMaxA = 0.5*PsiMaxA*PsiMaxA; // Nota Bene !!! this is maximum of u= 0.5*Psi^2 variable!!
+  double UPsiEv, sigma;
+
+  int NIterMax = 20000.;
+  sigmaMax = 0.;
+  for(int iii = 0; iii < NIterMax; iii++) {
+    UPsiEv = ((double)iii) * (0.1 * UPsiMaxA / (double)NIterMax);
+    sigma = CrossSectionDSDXDPSI(XAcc, UPsiEv, E0);
+    if(sigma > sigmaMax) sigmaMax = sigma;
+  }
+  sigmaMax *= 1.5;
+
+  int maxiterA = 20000000;
+  for(int iii = 1; iii < maxiterA; iii++) { // Angle simulation loop
+
+    UPsiEv = UPsiMaxA * G4UniformRand();
+    sigma = CrossSectionDSDXDPSI(XAcc, UPsiEv, E0);
+
+    if(sigma > sigmaMax) {
+      printf ("Maximum violated: ratio = % .18f\n", sigma/sigmaMax);
+      sigmaMax = 1.05*sigma;
+    }
+
+    double UU = G4UniformRand() * sigmaMax;
+
+    if(sigma >= UU) {
+      PsiAcc =sqrt(2.0*UPsiEv);
+      PhiAcc = G4UniformRand() * 2. * 3.1415926;
+
+      std::cout << "Accepted after " << NIterX << " iterations for X and " << iii << " iterations for Angle" << std::endl;
+      printf( "EParent = %e XAcc = %e PsiAcc = %e\n ", E0, XAcc, PsiAcc);
+
+      angles[0] = PsiAcc;
+      angles[1] = PhiAcc;
+      return XAcc;
+
+    }
+  }
+  std::cout << "Simulation of Angle failed after N iterations = " << maxiterA << " ,X = " << XAcc << std::endl;
+  return 0.;
+}
+
+
+// Z' sampling using DSDXDPSI
+// log-uniform sampling
+double DarkMatter::SimulateEmissionByMuonLFClog10(double E0, double* angles){
+  // mass for final state lepton, needed for xmax bound
+  double MChild;
+  if(ParentPDGID == 13) MChild = Mel;
+  if(ParentPDGID == 11) MChild = Mmu;
+
+  double Xmin = MA/E0;
+  // if(EThresh/E0 > Xmin) Xmin = EThresh/E0;
+  double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MChild/E0;
+
+  double PsiMax = M_PI;
+  double Log10PsiMax = log10(PsiMax);
+  double Log10PsiMin = -5;
+  double Log10YMin = log10(1.0-Xmax);
+  double Log10YMax = 0;
+  double sigmaMax = GetSigmaPsiMax(E0);
+
+  int maxiter = 25000000;
+  double XEv, UPsiEv, PsiEv, Log10PsiEv, sigma, XAcc, PsiAcc, PhiAcc, exponent;
+
+  for( int iii = 1; iii < maxiter; iii++) {
+
+    // log-uniform sampling
+    exponent = G4UniformRand() * (Log10YMax-Log10YMin) + Log10YMin;
+    XEv = 1.0 - TMath::Power(10,exponent);
+    Log10PsiEv = G4UniformRand() * (Log10PsiMax - Log10PsiMin) + Log10PsiMin;
+    PsiEv = TMath::Power(10, Log10PsiEv);
+    UPsiEv = 0.5*PsiEv*PsiEv;    
+
+    sigma = CrossSectionDSDXDPSI(XEv, UPsiEv, E0);
+
+
+    if(sigma > sigmaMax) {
+      printf ("Maximum violated: ratio = % .18f\n", sigma/sigmaMax);
+      sigmaMax = 1.05*sigma; // actually will not not work, the values in the table to be scaled 
+    }
+
+    double UU = G4UniformRand() * sigmaMax; 
+
+    if(sigma >= UU) {
+      XAcc = XEv;
+      PsiAcc = sqrt(2.0*UPsiEv);
+      PhiAcc = G4UniformRand() * 2. * 3.1415926;
+
+      std::cout << "Accepted after " << iii << " iterations" << std::endl;
+      printf( "EParent = %e XAcc = %e PsiAcc = %e\n ", E0, XAcc, PsiAcc);
+
+      angles[0] = PsiAcc;
+      angles[1] = PhiAcc;
+      return XAcc;
+    }
+  }
+  printf ("Simulation of emission failed after N iterations = %d\n", maxiter);
+  return 0.;
+}
+*/

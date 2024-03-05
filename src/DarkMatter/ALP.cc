@@ -3,7 +3,6 @@
 // To be used in a Geant4 application.
 //
 //
-#include "DarkMatter.hh"
 #include "ALP.hh"
 #include "Utils.hh"
 
@@ -18,6 +17,7 @@ ALP::ALP(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, doub
   DMType = 21;
   ParentPDGID = 22;
   DaughterPDGID = 22;
+  PrepareVariables();
   std::cout << "Initialized ALP (gamma conversion to ALP) for material density = " << DensityIn << std::endl;
   std::cout << std::endl;
 }

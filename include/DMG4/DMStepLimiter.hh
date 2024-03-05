@@ -1,5 +1,4 @@
-#ifndef DMStepLimiter_h
-#define DMStepLimiter_h 1
+#pragma once
 
 #include "G4ios.hh"
 #include "globals.hh"
@@ -37,4 +36,3 @@ class DMStepLimiter : public G4StepLimiter
 
 };
 
-#endif

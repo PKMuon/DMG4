@@ -12,7 +12,7 @@ if (BUILD_GOA)
    SET(CMAKE_CXX_STANDARD 17)
    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 else(BUILD_GOA)
-   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif(BUILD_GOA)
 
 #----------------------------------------------------------------------------
@@ -60,6 +60,12 @@ set_target_properties(DarkMatter PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_S
 add_library(DMG4 SHARED ${sources_DMG4} ${sources_DMParticles} ${sources_DMProcesses})
 target_link_libraries(DMG4 ${Geant4_LIBRARIES} ${GSL_LIBRARIES} UtilsDM DarkMatter)
 set_target_properties(DMG4 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
+
+if(APPLE)
+  target_link_options(DarkMatter PRIVATE "LINKER:-flat_namespace")
+  target_link_options(UtilsDM PRIVATE "LINKER:-flat_namespace")
+  target_link_options(DMG4 PRIVATE "LINKER:-flat_namespace")
+endif(APPLE)
 
 #---Install build products---------------------------------------------------
 install(TARGETS DMG4 DarkMatter UtilsDM DESTINATION lib)

@@ -6,7 +6,7 @@
  *  Fixed: Nov 2, 2020
  */
 
-#include "DarkMatter.hh"
+#include "DarkMatterAnnihilation.hh"
 #include "DarkPhotonsAnnihilation.hh"
 #include "Utils.hh"
 
@@ -17,44 +17,22 @@
 
 DarkPhotonsAnnihilation::DarkPhotonsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
                                                  double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
-DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn),
-iBranchingType(IBranchingIn), r(rIn), f(fIn), alphaD(alphaDIn)
+                                                 DarkMatterAnnihilation(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn, rIn,alphaDIn, IBranchingIn,fIn)
 {
   DMType = 1; //A.C.
-  ParentPDGID = -11;
-  DaughterPDGID = 11;
-
-  //default values
-  mChi = MAIn/3;
-  mChi1=mChi;
-  mChi2=mChi;
-
-
-  if (iBranchingType==2){
-      mChi1 = MA * r;
-      mChi2 = (1. + f) * mChi1;
-  }else{
-      mChi = MA * r;
-      mChi1=mChi;
-      mChi2=mChi;
-
-  }
-
-
-  deltaMchi=mChi2-mChi1;
-
-
 
   std::cout << "Initialized DarkPhotonsAnnihilation (e+ e- -> A' -> DM DM) for material density = " << DensityIn << std::endl;
-  std::cout << "mA: "<<MA<<std::endl;
+  std::cout << "mA: "<<MA*1000<<" MeV "<<std::endl;
   std::cout << "IbranchingType: "<<iBranchingType<<std::endl;
   if (iBranchingType==2){
-    std::cout<<"mChi1: "<<mChi1<<std::endl;
-    std::cout<<"mChi2: "<<mChi2<<std::endl;
+    std::cout<<"mChi1: "<<mChi1*1000<<" MeV "<<std::endl;
+    std::cout<<"mChi2: "<<mChi2*1000<<" MeV "<<std::endl;
   }else{
-    std::cout<<"mChi: "<<mChi<<std::endl;
+    std::cout<<"mChi: "<<mChi*1000<<" MeV "<<std::endl;
   }
-  std::cout<<"Width: "<<this->Width()<<std::endl;
+  std::cout<<"Width: "<<this->Width()*1E3<<" MeV "<<std::endl;
+
+
 
 
   std::cout << std::endl;
@@ -65,34 +43,29 @@ DarkPhotonsAnnihilation::~DarkPhotonsAnnihilation()
 {;}
 
 
-//Input: E0, positron energy in GeV
-//output: total annihilation cross-section in pbarn.
-//Since the framework assumes this method is returning the total cross section per nucleous, for the moment I scale this by Z.
-double DarkPhotonsAnnihilation::TotalCrossSectionCalc(double E0)
-{
-  double ss = 2. * Mel * E0;
-  double qq=0.,E1=0.,E2=0.;
-  switch (iBranchingType) {
+//Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
+//This is the total cross section without the BW denominator
+//s: e+e- invariant mass squared
+double DarkPhotonsAnnihilation::PreFactor(double ss){
 
-  case 0:
-  case 1:
-      if (sqrt(ss) < 2.*mChi) return 0.;   // A.C. e+e- -> A' -> chi chi can happen also for an A' and chi with large mass,
-                                           // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
-      qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
-      break;
+  double qq=0.,E1=0.,E2=0.;
+
+  if (ss<this->sMin()){
+    return 0;
+  }
+
+  qq = this->q(ss);
+
+  switch (iBranchingType) {
   case 2:
-      if (sqrt(ss) < (mChi1+mChi2)) return 0.;
       E1=(ss-mChi2*mChi2+mChi1*mChi1)/(2*sqrt(ss));
       E2=(ss+mChi2*mChi2-mChi1*mChi1)/(2*sqrt(ss));
-      qq = sqrt(E1*E1-mChi1*mChi1);
       break;
   }
 
-  double gg = this->Width();
 
   double sigma = 4 * M_PI * alphaEW * epsilBench * epsilBench * alphaD;
   sigma = sigma * qq / sqrt(ss);
-  sigma = sigma / ((ss - MA * MA) * (ss - MA * MA) + MA * MA * gg * gg);
 
 
 
@@ -113,26 +86,14 @@ double DarkPhotonsAnnihilation::TotalCrossSectionCalc(double E0)
   //here sigma is in G4 internal units, 1 /Energy^2. Move to pBarn;
   sigma *= GeVtoPb;
 
-
-  //A.C. correct here for atomic effects
-  sigma = sigma * ZNucl;
   return sigma;
 }
 
-
+//E0: positron TOTAL energy in lab frame
 double DarkPhotonsAnnihilation::GetSigmaTot(double E0) {
   return TotalCrossSectionCalc(E0);
 }
 
-
-bool DarkPhotonsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
-{
-  if (sqrt(2.*Mel*E0) < 2.*mChi) return false;
-  if(E0 < EThresh) return false;
-  if(NEmissions) return false; // For G4 DM classes
-  if(fabs(DensityMat - Density) > 0.1) return false;
-  return true;
-}
 
 
 double DarkPhotonsAnnihilation::CrossSectionDSDX(double XEv, double E0) {
@@ -173,8 +134,6 @@ double DarkPhotonsAnnihilation::Width() {
       break;
   }
 
-
-
   return ret;
 }
 
@@ -198,22 +157,23 @@ void DarkPhotonsAnnihilation::SetMA(double MAIn) {
 
 }
 
-
+//E0: positron TOTAL energy in lab frame
 double DarkPhotonsAnnihilation::AngularDistributionResonant(double eta,double E0){
 
 
-    double ss = 2. * Mel * E0;
-    double qq;
+    double ss = 2. * Mel * E0+2*Mel*Mel;
+
+    //TODO for atomic effects
+    if (ss<this->sMin()){
+      printf("DarkPhotonsAnnihilation::AngularDistribution error with threshold, E0=%f, m=%f\n",E0,mChi);
+      exit(1);
+    }
+
+    double qq=this->q(ss);
     double val=0;
     switch (iBranchingType){
      case 0:
          //Fermionic LDM. Angular distribution f(eta) ~ s+4*qq*qq*eta*eta+4*m*m. Max for eta=+-1
-         if (sqrt(ss) < 2.*mChi){
-             printf("DarkPhotonsAnnihilation::AngularDistribution error with threshold, E0=%f, m=%f\n",E0,mChi);
-             exit(1);
-         }
-         qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
-
          val=ss+4*qq*qq*eta*eta+4*mChi*mChi;
          val/=(ss+4*qq*qq+4*mChi*mChi);
          break;
@@ -223,14 +183,9 @@ double DarkPhotonsAnnihilation::AngularDistributionResonant(double eta,double E0
          break;
      case 2:
          //Asymmetric LDM. Angular distribution f(eta)=(m1*m2+E1*E2+qq*qq*eta*eta). Max for eta=+-1
-         if (sqrt(ss) < (mChi1+mChi2)){
-             printf("DarkPhotonsAnnihilation::AngularDistribution error with threshold, E0=%f, m1=%f m2=%f\n",E0,mChi1,mChi2);
-             exit(1);
-         }
          double E1=(ss+mChi1*mChi1-mChi2*mChi2)/(2*sqrt(ss));
          double E2=(ss-mChi1*mChi1+mChi2*mChi2)/(2*sqrt(ss));
 
-         qq=sqrt(E1*E1-mChi1*mChi1);
 
          val=(mChi1*mChi2+E1*E2+qq*qq*eta*eta);
          val/=(mChi1*mChi2+E1*E2+qq*qq);
@@ -238,7 +193,5 @@ double DarkPhotonsAnnihilation::AngularDistributionResonant(double eta,double E0
     }
 
     return val;
-
-
 }
 

@@ -74,21 +74,39 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure(void *ptr)
       * Optional to make different decay table; 0 : invisible decays or SM lepton decays, depending on DecayType; 1 : B - L model; 2 : Semivisible: Inelastic DM; 3 : Semivisible: Dirac Inelastic DM    
       * For annihilation e+e- --> R --> ff the meaning is DIFFERENT!
 
-        0: default: fermionic ff final state
-        1: scalar ff final state
-        2: asymmetric fermionic DM final state produced (iDM)
-        3: Dirac DM final state produced (i2DM)
+       CASE Dark Photon, Dark Scalar, Dark Axial Vector, Dark Pseudo Scalar
+
+       0: default: fermionic ff final state
+       1: scalar ff final state
+       2: asymmetric fermionic DM final state produced (iDM)
+       3: Dirac DM final state produced (i2DM)
+
+       CASE Dark Z'
+
+       0: Lmu-Ltau vanilla model,  nu-nu final state - sum nuMu + nuTau (default)
+       1: Lmu-Ltau DM model,       scalar DM final state
+       10: B-L vanilla model,      nu-nu final state
+       11: B-L DM model,           scalar DM final state
       */
      //DMpar->RegisterNewParam("BranchingType", 0.);
 
-     // additional parameters for annihilation (if absent the default ones will be used)
+     /* additional parameters for annihilation (if absent the default ones will be used)
+      * RDM -> mChi/mA ratio
+      * AlphaD -> value of alphaDark
+      * */
      //DMpar->RegisterNewParam("RDM", 1./3.);
      //DMpar->RegisterNewParam("AlphaD", 0.5);
 
-     // additional parameters for semivisible DM, in addition to above parameters for annihilation (if absent the default ones will be used)
+     /* additional parameters for semivisible DM, in addition to above parameters for annihilation (if absent the default ones will be used)*/
      //DMpar->RegisterNewParam("Ffactor", 0.4);
-     // additional parameter for Dirac DM, describing the dark fermion mixing (if absent the default ones will be used)
+
+     /* additional parameter for Dirac DM, describing the dark fermion mixing (if absent the default ones will be used)*/
      //DMpar->RegisterNewParam("IDMTheta", 1.e-3);
+
+     /* Additional parameters to handle narrow width resonances in annihilation
+      * dEmaxPerStep -> the maximum energy loss per step in the material(s) where the annihilation is allowed
+      */
+     //DMpar->RegisterNewParam("dEmaxPerStep",5*MeV)
 
   return true;
 }

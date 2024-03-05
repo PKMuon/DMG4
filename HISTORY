@@ -1,3 +1,22 @@
+                              Declare some variables long double to solve precision issues in annihilation classes
+                              Add variable EKinThresh (kinematic threshold) and use it instead of big margin value 2*MA
+                              Add option to build and use library on MacOS : flat_namespace
+                              
+03.01.2023   Version 2.5      Urgent update connected with the usage of the latest Geant4 version 11.02, where reading user's ordtable is absent
+                              README is updated according to migration of lxplus to el9 and the above change
+
+06.12.2023   Version 2.4      Implemented Z' annihilation resonant production for the models Lmu-Ltau, B-L
+                              Implement atomic effects in annihilation resonant production
+                              Improvements in annihilation resonant production simulation (step limitation)
+                              Add possibility of invisible ALP production
+                              Change method of total cross section interpolation from the prepared table, this fixes a rare bug of negative cross section
+                              near the threshold
+                              Add protection against too low threshold EThresh and diagnostics of negative cross section
+
+20.10.2023   Version 2.3      Reorganized classes of annihilation processes, the list of such processes revised, added missing pieces
+                              Improved simulation of ALP production in Primakoff effect (proper angle sampling)
+                              Bug fixed in the usage of Bremsstrahlung cross sections for the masses below 1 MeV for S, P, A mediators
+
 24.10.2022   Version 2.2      Add possibility of more complicated semivisible DM models, with asymmetric decays
                               In addition to Z', a possibility to emit muophilic scalar and pseudoscalar DM particle is added, for the moment only fully invisible
                               Extend some K-factor tables to 3 GeV

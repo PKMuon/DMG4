@@ -1,0 +1,9 @@
+#!/bin/bash
+#source /cvmfs/sft.cern.ch/lcg/views/setupViews.csh LCG_104 ${SCRAM_ARCH_LCG}
+#
+GEANT4VERSION=4.11.02
+GEANT4LOCATION=/moscow71/mkirsano/GEANT4/geant${GEANT4VERSION}.multithread/geant4_install
+#
+echo "GEANT4LOCATION=${GEANT4LOCATION}" > config.txt
+#
+./configure --with-geant4=${GEANT4LOCATION}

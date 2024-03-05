@@ -51,12 +51,12 @@ link_directories (${PROJECT_SOURCE_DIR}/../lib)
 # Add the executable, and link it to the Geant4 and other libraries
 #
 add_executable(mkgeant4 ${sources})
+
+target_link_libraries(mkgeant4 DarkMatter DMG4 UtilsDM ${Geant4_LIBRARIES} ${GSL_LIBRARIES})
+set_property(TARGET mkgeant4 PROPERTY CXX_STANDARD 14)
+
 if(ROOTSYS)
-  target_link_libraries(mkgeant4 DarkMatter DMG4 UtilsDM ${Geant4_LIBRARIES} ${GSL_LIBRARIES} ${ROOT_LIBARIES})
-  #set_target_properties(mkgeant4 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
-  set_property(TARGET mkgeant4 PROPERTY CXX_STANDARD 14)
-else(ROOTSYS)
-  target_link_libraries(mkgeant4 DarkMatter DMG4 UtilsDM ${Geant4_LIBRARIES} ${GSL_LIBRARIES})
+  target_link_libraries(mkgeant4 ${ROOT_LIBRARIES})
 endif(ROOTSYS)
 
 if(ROOTSYS)

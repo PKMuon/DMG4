@@ -3,7 +3,6 @@
 // To be used in a Geant4 application.
 //
 //
-#include "DarkMatter.hh"
 #include "DarkMuPhilicPseudoScalars.hh"
 #include "Utils.hh"
 
@@ -75,6 +74,8 @@ DarkMuPhilicPseudoScalars::DarkMuPhilicPseudoScalars(double MAIn, double EThresh
   DMType = 14;
   ParentPDGID = 13;
   DaughterPDGID = 0;
+
+  PrepareVariables();
 
   IApprox =        2;   // Approximation: 1 - IWW; 2 - WW (default is 2)
   IMethodTotalCS = 1;   // Method for total CS: 1 - ds/dxdTheta; 2 - ds/dxdPsi; 3 - ds/dx (default is 1)

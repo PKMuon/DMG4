@@ -5,7 +5,7 @@
  *      Author: celentan
  */
 
-#include "DarkMatter.hh"
+#include "DarkMatterAnnihilation.hh"
 #include "DarkPseudoScalarsAnnihilation.hh"
 #include "Utils.hh"
 
@@ -14,35 +14,10 @@
 
 DarkPseudoScalarsAnnihilation::DarkPseudoScalarsAnnihilation(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
                                                              double epsilIn, int IDecayIn, double rIn, double alphaDIn, int IBranchingIn, double fIn) :
-DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn),
-iBranchingType(IBranchingIn), r(rIn), f(fIn), alphaD(alphaDIn)
+                                                             DarkMatterAnnihilation(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn, rIn,alphaDIn, IBranchingIn,fIn)
 {
     DMType = 4; //A.C.
-    ParentPDGID = -11;
-    DaughterPDGID = 11;
 
-    //default values
-    mChi = MAIn / 3;
-    mChi1 = mChi;
-    mChi2 = mChi;
-
-    if (iBranchingType != 0) {
-        std::cerr << " DarkPseudoScalarAnnihilation iBranchingType!=0 not yet supported" << std::endl;
-        exit(1);
-    }
-
-    if (iBranchingType == 2) {
-
-        mChi1 = MA * r;
-        mChi2 = (1. + f) * mChi1;
-    } else {
-
-        mChi = MA * r;
-        mChi2 = mChi;
-        mChi1 = mChi;
-    }
-
-    deltaMchi = mChi2 - mChi1;
     std::cout << "Initialized DarkPseudoScalarsAnnihilation (e+ e- -> A' -> DM DM) for material density = " << DensityIn << std::endl;
     std::cout << std::endl;
 }
@@ -51,48 +26,40 @@ DarkPseudoScalarsAnnihilation::~DarkPseudoScalarsAnnihilation() {
     ;
 }
 
-//Input: E0, positron energy in GeV
-//output: total annihilation cross-section in pbarn.
-//Since the framework assumes this method is returning the total cross section per nucleous, for the moment I scale this by Z.
-double DarkPseudoScalarsAnnihilation::TotalCrossSectionCalc(double E0) {
-    double ss = 2. * Mel * E0;
-    if (sqrt(ss) < 2. * mChi)
+
+//Convenience private method to be shared among TotalCrossSectionCalc and GetSigmaMax.
+//This is the total cross section without the BW denominator
+//s: e+e- invariant mass squared
+double DarkPseudoScalarsAnnihilation::PreFactor(double ss){
+
+    if (ss < this->sMin())
         return 0.;   // A.C. e+e- -> S -> chi chi can happen also for an S and chi with large mass,
-                     // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
-    double qq = sqrt(ss) / 2. * sqrt(1 - 4 * mChi * mChi / (ss));
-    double gg = this->Width();
+                   // i.e. through the off-shell tail of the resonance, but this still needs to be kinematically allowed
+    double qq = this->q(ss);
 
     double sigma = 4 * M_PI * alphaEW * epsilBench * epsilBench * alphaD;
     sigma = sigma * qq / sqrt(ss);
-    sigma = sigma / ((ss - MA * MA) * (ss - MA * MA) + MA * MA * gg * gg);
 
-    sigma = sigma * (ss / 2);   // A.C. this is for final state fermions (default)
-
+    switch (iBranchingType) {
+      case 0:
+        sigma = sigma * (ss / 2);   // A.C. this is for final state fermions (default)
+        break;
+      case 1:
+        sigma = sigma * (MA * MA) / 4;   // A.C. this is for final state scalars
+        break;
+    }
     //here sigma is in G4 internal units, 1 /Energy^2. Move to pBarn;
-    sigma = sigma * GeVtoPb;
+    sigma *= GeVtoPb;
 
-    //A.C. correct here for atomic effects
-    sigma = sigma * ZNucl;
+
     return sigma;
 }
 
+//E0: positron TOTAL energy in lab frame
 double DarkPseudoScalarsAnnihilation::GetSigmaTot(double E0) {
     return TotalCrossSectionCalc(E0);
 }
 
-bool DarkPseudoScalarsAnnihilation::EmissionAllowed(double E0, double DensityMat) // Different kinematic limit here
-        {
-
-    if (sqrt(2. * Mel * E0) < 2. * mChi)
-        return false;
-    if (E0 < EThresh)
-        return false;
-    if (NEmissions)
-        return false; // For G4 DM classes
-    if (fabs(DensityMat - Density) > 0.1)
-        return false;
-    return true;
-}
 
 double DarkPseudoScalarsAnnihilation::CrossSectionDSDX(double XEv, double E0) {
     (void)(E0);
@@ -113,7 +80,12 @@ double DarkPseudoScalarsAnnihilation::Width() {
     double ret;
     ret = MA * epsil * epsil * alphaEW * 1. / 2;
     if (MA / 2. > mChi) {
+      if (iBranchingType==0){
         ret += MA * alphaD * sqrt(1 - 4 * mChi * mChi / (MA * MA)) / 2.;
+      }
+      if (iBranchingType==1){
+             ret += MA * alphaD * sqrt(1 - 4 * mChi * mChi / (MA * MA)) / 4.;
+      }
     }
     return ret;
 }
@@ -129,3 +101,27 @@ void DarkPseudoScalarsAnnihilation::SetMA(double MAIn) {
         mChi2 = mChi;
     }
 }
+
+//E0: positron TOTAL energy in lab frame
+double DarkPseudoScalarsAnnihilation::AngularDistributionResonant(double eta,double E0){
+   double val=1;
+   double ss = 2. * Mel * E0+2*Mel*Mel;
+
+   //TODO annihilation
+   if (ss < this->sMin()){
+     printf("DarkScalarsAnnihilation::AngularDistribution error with threshold, E0=%f, m=%f\n",E0,mChi);
+     exit(1);
+   }
+   switch (iBranchingType){
+       case 0:
+       case 1:
+           //Fermionic and scalar LDM. Angular distribution f(eta) ~ 1
+           val=1; //Must be maximum == 1
+           break;
+       default:
+           break;
+   }
+   return val;
+}
+
+

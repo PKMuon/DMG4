@@ -1,0 +1,8 @@
+GEANT4VERSION=4.11.02
+GEANT4LOCATION=/moscow71/mkirsano/GEANT4/geant${GEANT4VERSION}.multithread/geant4_install
+GSLLOCATION=/cvmfs/sft.cern.ch/lcg/views/LCG_104/x86_64-centos7-gcc12-opt
+#
+echo "GEANT4LOCATION=${GEANT4LOCATION}" > config.txt
+echo "GSLLOCATION=${GSLLOCATION}" >> config.txt
+#
+./configure --with-geant4=${GEANT4LOCATION} --with-gsl=${GSLLOCATION}
