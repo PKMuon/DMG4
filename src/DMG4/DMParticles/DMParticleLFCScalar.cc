@@ -22,6 +22,7 @@ DMParticleLFCScalar* DMParticleLFCScalar::Definition()
   G4double MassIn    = DMpar->GetRegisteredParam("DMMass");
   G4double epsilIn   = DMpar->GetRegisteredParam("Epsilon");
   G4double DecayType = DMpar->GetRegisteredParam("DecayType");
+  G4double BranchingType = DMpar->GetRegisteredParam("BranchingType", 0);
 
   G4String name = "DMParticleLFCScalar";
   const G4String nameSubType = "DMParticleLFCScalar";

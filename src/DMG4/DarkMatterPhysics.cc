@@ -378,7 +378,7 @@ void DarkMatterPhysics::ConstructProcess()
     }
   }
   if(myDarkMatter->GetParentPDGID() == 13) {
-    if(myDarkMatter->GetDMType() >= 32 || myDarkMatter->GetDMType < 35) { // LFC scalar
+    if(myDarkMatter->GetDMType() >= 32 && myDarkMatter->GetDMType() < 35) { // LFC scalar
       theDMParticlePtr = DMParticleLFCScalar::Definition();
     }
     else
