@@ -40,7 +40,7 @@ find_package(GSL REQUIRED)
 # Setup include directory for this project
 #
 include(${Geant4_USE_FILE})
-include_directories(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/include/DMG4 ${GSL_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/include/DMG4/DMParticles ${PROJECT_SOURCE_DIR}/include/DMG4/DMProcesses)
+include_directories(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/include/DMG4 ${PROJECT_SOURCE_DIR}/include/UtilsDM ${GSL_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/include/DMG4/DMParticles ${PROJECT_SOURCE_DIR}/include/DMG4/DMProcesses)
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
