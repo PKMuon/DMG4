@@ -59,6 +59,9 @@ if(ROOTSYS)
   target_link_libraries(mkgeant4 ${ROOT_LIBRARIES})
 endif(ROOTSYS)
 
+if(ROOTSYS)
+  target_link_libraries(mkgeant4 ${ROOT_LIBRARIES})
+endif(ROOTSYS)
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
 install(TARGETS mkgeant4 DESTINATION bin)

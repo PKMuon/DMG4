@@ -84,6 +84,23 @@ class DarkMatter
     double SimulateEmissionVector(double E0, double* angles);
 
     double GetAccumulatedProbability() {return AccumulatedProbability;}
+    // TODO CHECK THIS
+    // for emission with different final and inital state lepton
+    /*
+    void PrepareTableLFC();
+    double MaxCrossSectionCalcLFC(double E0);
+    double MaxCrossSectionAngleCalcLFC(double E0);
+    double MaxCrossSectionPsiCalcLFC(double E0);
+    double MaxCrossSectionPsiCalcLFCLog10(double E0); // log-uniform random sampling
+    double MaxCrossSectionThetaCalcLFC(double E0);
+    double SimulateEmissionLFC(double E0, double* angles);
+    double SimulateEmissionWithAngleLFC(double E0, double* angles);
+    double SimulateEmissionWithAngle2LFC(double E0, double* angles);
+    double SimulateEmissionByMuon2LFC(double E0, double* angles);
+    double SimulateEmissionByMuonLFClog10(double E0, double* angles); // log-uniform random sampling
+    */
+
+
 
   protected:
 
@@ -96,7 +113,7 @@ class DarkMatter
     double Density;
     double epsilBench;
     double epsil;
-    int DMType; // 1 - Dark Photon; 2 - Dark Scalar; 3 - Dark Axials; 4 - Dark Pseudoscalars; 11 - Z' (muon); 12 - Z' (electron) ; 21 - ALP.
+    int DMType; // 1 - Dark Photon; 2 - Dark Scalar; 3 - Dark Axials; 4 - Dark Pseudoscalars; 11 - Z' (muon); 12 - Z' (electron) ; 21 - ALP; 32 - LFC Scalar
                 // For annihilation, this is the "resonance R" in e+e- --> R --> final-state
     int ParentPDGID;
     double MParent;

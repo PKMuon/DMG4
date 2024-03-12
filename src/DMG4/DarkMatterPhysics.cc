@@ -18,10 +18,12 @@
 #include "DarkMassSpin2.hh"
 #include "DarkMassSpin2Annihilation.hh"
 #include "DarkAxials.hh"
+#include "DarkLFCScalars.hh"
 
 #include "DMProcessDMBrem.hh"
 #include "DMProcessPrimakoffALP.hh"
 #include "DMProcessAnnihilation.hh"
+#include "DMProcessLFConversion.hh"
 #include "AnnihilationStepLimiter.hh"
 
 #include "DMParticleAPrime.hh"
@@ -30,6 +32,9 @@
 #include "DMParticleScalar.hh"
 #include "DMParticlePseudoScalar.hh"
 #include "DMParticleAxial.hh"
+#include "DMParticleLFCScalar.hh"
+#include "DMParticleChi1.hh"
+#include "DMParticleChi2.hh"
 
 #include "DMParticleChi.hh"
 #include "DMParticleChiScalar.hh"
@@ -167,6 +172,14 @@ void DarkMatterPhysics::Init(){
       }
       myDarkMatter = new DarkMuPhilicPseudoScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
       break;
+    case 35:
+      G4cout << "Initialize DarkLFCScalars\n";
+      if(DecayType) { // Temporary plug
+        G4cout << G4endl << "DarkLFCScalars with decays is not yet implemented, exiting" << G4endl << G4endl;
+        exit(1);
+      }
+      myDarkMatter = new DarkLFCScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+      break;
     case 11:
       G4cout << "Initialize DarkPhotonsAnnihilation\n";
       myDarkMatter = new DarkPhotonsAnnihilation(DMMass, EThresh, 1., ANucl, ZNucl, Density, Epsilon, DecayType, RDM,
@@ -213,6 +226,16 @@ void DarkMatterPhysics::Init(){
 
 void DarkMatterPhysics::ConstructParticle()
 {
+  // This call to particle definition must be first or at least go before
+  // Physics::ConstructProcess()
+  DMParticleAPrime::Definition();
+  DMParticleZPrime::Definition();
+  DMParticleALP::Definition();
+  DMParticleScalar::Definition();
+  DMParticleLFCScalar::Definition();
+  DMParticlePseudoScalar::Definition();
+  DMParticleAxial::Definition();
+
   /*A.C.
    * The following lines are necessary to construct the particles that will be propagated for annihilation
    *
@@ -330,6 +353,9 @@ void DarkMatterPhysics::ConstructProcess()
     if(myDarkMatter->GetDMType() == 5) {
       theDMParticlePtr = DMParticleAPrime::Definition(); // A' for the moment, the spin 2 particle not yet implemented
     }
+    if(myDarkMatter->GetDMType() == 33) {
+      theDMParticlePtr = DMParticleLFCScalar::Definition();
+    }
   }
   if(myDarkMatter->GetParentPDGID() == -11) { // Annihilation
     if(myDarkMatter->GetDMType() == 1) {
@@ -352,7 +378,11 @@ void DarkMatterPhysics::ConstructProcess()
     }
   }
   if(myDarkMatter->GetParentPDGID() == 13) {
-    theDMParticlePtr = DMParticleZPrime::Definition(); // Always Z' for the moment, scalar etc. particles from muons not yet implemented
+    if(myDarkMatter->GetDMType() >= 32 && myDarkMatter->GetDMType() < 35) { // LFC scalar
+      theDMParticlePtr = DMParticleLFCScalar::Definition();
+    }
+    else
+      theDMParticlePtr = DMParticleZPrime::Definition(); // Always Z' for the moment, scalar etc. particles from muons not yet implemented
   }
   if(myDarkMatter->GetParentPDGID() == 22) {
     theDMParticlePtr = DMParticleALP::Definition();
@@ -362,7 +392,14 @@ void DarkMatterPhysics::ConstructProcess()
 
   myDarkMatter->SetMA(theDMParticlePtr->GetPDGMass()/GeV);
   myDarkMatter->SetDMPDGID(theDMParticlePtr->GetPDGEncoding());
-  myDarkMatter->PrepareTable();
+
+  /* TODO CHECK THIS
+  // prepare maximum cross sections for sampling, different if LFC
+  if(myDarkMatter->GetDMType() == 99) {
+    myDarkMatter->PrepareTableLFC();
+  }
+  else myDarkMatter->PrepareTable();
+  */
 
   G4PhysicsListHelper * phLHelper = G4PhysicsListHelper::GetPhysicsListHelper();
 
@@ -381,16 +418,26 @@ void DarkMatterPhysics::ConstructProcess()
   //     as follows
   
   if(myDarkMatter->GetParentPDGID() == 11) {
-    DMProcessDMBrem* DMBremPointer = new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
+    if (myDarkMatter->GetDMType() != 32) {
+      DMProcessDMBrem* DMBremPointer = new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
 
-    // Instead of using ordtable:
-    G4ProcessManager* processManager = (G4Electron::ElectronDefinition())->GetProcessManager();
-    processManager->AddDiscreteProcess(DMBremPointer);
-    processManager = (G4Positron::PositronDefinition())->GetProcessManager();
-    processManager->AddDiscreteProcess(DMBremPointer);
+      // Instead of using ordtable:
+      G4ProcessManager* processManager = (G4Electron::ElectronDefinition())->GetProcessManager();
+      processManager->AddDiscreteProcess(DMBremPointer);
+      processManager = (G4Positron::PositronDefinition())->GetProcessManager();
+      processManager->AddDiscreteProcess(DMBremPointer);
 
-//    phLHelper->RegisterProcess( DMBremPointer, G4Electron::ElectronDefinition() );
-//    phLHelper->RegisterProcess( DMBremPointer, G4Positron::PositronDefinition() );
+      //    phLHelper->RegisterProcess( DMBremPointer, G4Electron::ElectronDefinition() );
+      //    phLHelper->RegisterProcess( DMBremPointer, G4Positron::PositronDefinition() );
+    } else {
+      DMProcessLFConversion* DMLFCPointer = new DMProcessLFConversion(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
+
+      // Instead of using ordtable:
+      G4ProcessManager* processManager = (G4Electron::ElectronDefinition())->GetProcessManager();
+      processManager->AddDiscreteProcess(DMLFCPointer);
+      processManager = (G4Positron::PositronDefinition())->GetProcessManager();
+      processManager->AddDiscreteProcess(DMLFCPointer);
+    }
   }
   if(myDarkMatter->GetParentPDGID() == -11) {
     DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
@@ -416,16 +463,27 @@ void DarkMatterPhysics::ConstructProcess()
 
   }
   if(myDarkMatter->GetParentPDGID() == 13) {
-    DMProcessDMBrem* DMBremPointer = new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
+    if(myDarkMatter->GetDMType() == 32) { // LFC scalar
+      DMProcessLFConversion* DMLFCPointer = new DMProcessLFConversion(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
 
-    // Instead of using ordtable:
-    G4ProcessManager* processManager = (G4MuonMinus::MuonMinusDefinition())->GetProcessManager();
-    processManager->AddDiscreteProcess(DMBremPointer);
-    processManager = (G4MuonPlus::MuonPlusDefinition())->GetProcessManager();
-    processManager->AddDiscreteProcess(DMBremPointer);
+      // Instead of using ordtable:
+      G4ProcessManager* processManager = (G4MuonMinus::MuonMinusDefinition())->GetProcessManager();
+      processManager->AddDiscreteProcess(DMLFCPointer);
+      processManager = (G4MuonPlus::MuonPlusDefinition())->GetProcessManager();
+      processManager->AddDiscreteProcess(DMLFCPointer);
 
-    //phLHelper->RegisterProcess( DMBremPointer, G4MuonMinus::MuonMinusDefinition() );
-    //phLHelper->RegisterProcess( DMBremPointer, G4MuonPlus::MuonPlusDefinition() );
+    } else {
+      DMProcessDMBrem* DMBremPointer = new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
+
+      // Instead of using ordtable:
+      G4ProcessManager* processManager = (G4MuonMinus::MuonMinusDefinition())->GetProcessManager();
+      processManager->AddDiscreteProcess(DMBremPointer);
+      processManager = (G4MuonPlus::MuonPlusDefinition())->GetProcessManager();
+      processManager->AddDiscreteProcess(DMBremPointer);
+
+      //phLHelper->RegisterProcess( DMBremPointer, G4MuonMinus::MuonMinusDefinition() );
+      //phLHelper->RegisterProcess( DMBremPointer, G4MuonPlus::MuonPlusDefinition() );
+    }
   }
   if(myDarkMatter->GetParentPDGID() == 22) {
     DMProcessPrimakoffALP* DMPrimakoffALPPointer = new DMProcessPrimakoffALP(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);

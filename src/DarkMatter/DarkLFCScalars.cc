@@ -1,0 +1,426 @@
+ // This is a class to simulate flavour-changing dark Long-lived Phi boson production by muons in matter mu N -> tau N phi
+// Description is in the base class DarkMatter code
+// To be used in a Geant4 application.
+//
+//
+#include "DarkMatter.hh"
+#include "DarkLFCScalars.hh"
+#include "Utils.hh"
+
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_multimin.h>
+#include <gsl/gsl_monte.h>
+#include <gsl/gsl_monte_plain.h>
+#include <gsl/gsl_monte_miser.h>
+#include <gsl/gsl_monte_vegas.h>
+#include <gsl/gsl_integration.h>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_sf_dilog.h>
+
+#include <iostream>
+#include <cmath>
+
+// Auxiliary structures and functions:
+
+
+// Additional structure holding E0 value to be passed into GSL callbacks.
+struct BoundParms {
+    DarkLFCScalars * this_;
+    double E0;
+};
+
+
+// A callback wrapping function for DarkLFCScalars::CrossSectionDSDX_WW()
+static double _DarkLFCScalarsDsDxMuon_WW(double x1, void * parms_) {
+    //BoundParms * parms = (BoundParms*) parms_;  // or, equivalently, in C++ style
+    BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
+    // Forward invocation to target method
+    return parms->this_->CrossSectionDSDX_WW( x1, parms->E0 );
+}
+
+
+// A callback wrapping function for DarkLFCScalars::CrossSectionDSDXDTheta()
+static double _DarkLFCScalarsDsDxDThetaMuon(double x[], size_t dim, void * parms_) {
+    (void)dim; // to avoid warning
+    BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
+    // Forward invocation to target method
+    return parms->this_->CrossSectionDSDXDTheta( x[0], x[1], parms->E0 );
+}
+
+// A callback wrapping function for DarkLFCScalars::CrossSectionDSDXDpsi()
+static double _DarkLFCScalarsDsDxDPsiMuon(double x[], size_t dim, void * parms_) {
+    (void)dim; // to avoid warning
+    BoundParms * parms = reinterpret_cast<BoundParms*>(parms_);
+    // Forward invocation to target method
+    return parms->this_->CrossSectionDSDXDPSI_WW( x[0], x[1], parms->E0 );
+}
+
+
+// Class methods:  ---------------
+DarkLFCScalars::DarkLFCScalars(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
+                         double epsilIn, int IDecayIn)
+: DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn)
+{
+  DMType = 32; // scalar
+  ParentPDGID = 13;
+  DaughterPDGID = 0;
+  epsilBench = 0.003; // From https://doi.org/10.1140/epjc/s10052-023-11891-3
+
+  tMax =       10000.;  // tmax initial; Value 10000. means that tmax = E0*E0 will be taken
+  ThetaMax =     0.3;   // Max. angle of Z
+
+  std::cout << "Initialized Dark Z boson for material density = " << DensityIn << std::endl;
+  std::cout << "Energy cutoff = " << EThresh << " GeV" << std::endl;
+  std::cout << std::endl;
+}
+
+
+DarkLFCScalars::~DarkLFCScalars()
+{;}
+
+
+double DarkLFCScalars::TotalCrossSectionCalc(double E0)
+{
+  return TotalCrossSectionCalc_WW2(E0); // Integral of ds/dxdTheta
+}
+
+
+// Below is the 2 - dimensional integration of WW ds/dxdTheta
+//
+double DarkLFCScalars::TotalCrossSectionCalc_WW2(double E0)
+{
+  if(E0 < 2.*MA) return 0.;
+
+  double Xmin1 = MA/E0;
+  if(EThresh/E0 > Xmin1) Xmin1 = EThresh/E0;
+  double Xmax1 = 1. - Mtau/E0;
+  if(Xmax1 < Xmin1) return 0.;
+
+  double PrefactorAlphaEW = alphaEW*alphaEW;
+
+  double xl[2] = { Xmin1, 0.};
+  double xu[2] = { Xmax1, ThetaMax};
+
+  const gsl_rng_type *T;
+  gsl_rng *r;
+
+  gsl_monte_function G;
+  BoundParms parms = {this, E0};
+  G.f = _DarkLFCScalarsDsDxDThetaMuon;
+  G.dim = 2;
+  G.params = &parms;
+
+  gsl_rng_env_setup();
+
+  T = gsl_rng_default;
+  r = gsl_rng_alloc (T);
+
+  double res, err, sigmaTot;
+
+  // monte_miser: adaptive MC integration
+
+  size_t calls = 5000000;
+  gsl_monte_miser_state* stat = gsl_monte_miser_alloc(2);
+  gsl_monte_miser_integrate(&G, xl, xu, 2, calls, r, stat, &res, &err);
+  gsl_monte_miser_free(stat);
+  sigmaTot = GeVtoPb*res*PrefactorAlphaEW;
+
+  // Other vegas integration methods:
+  // gsl_monte_plain : plain MC
+  // gsl_monte_vegas
+
+#if 0
+  gsl_monte_vegas_state* stat = gsl_monte_vegas_alloc(2);
+  gsl_monte_vegas_integrate(&G, xl, xu, 2, 10000, r, s, &res, &err);
+  do {
+    gsl_monte_vegas_integrate (&G, xl, xu, 2, calls/5, r, s, &res, &err);
+  } while (fabs (gsl_monte_vegas_chisq(stat) - 1.0) > 0.5);
+  double sigmaTot = GeVtoPb*res*PrefactorAlphaEW;
+  gsl_monte_vegas_free(stat);
+#endif
+
+  gsl_rng_free (r);
+  std::cout << "Total CS calc, E = " << E0 << "  M = " << MA << " CS = " << sigmaTot << std::endl;
+  return sigmaTot;
+}
+
+
+
+double DarkLFCScalars::GetSigmaTot(double E0)
+{
+  return GetSigmaTot0(E0);
+}
+
+
+double DarkLFCScalars::CrossSectionDSDX(double XEv, double E0)
+{
+  return CrossSectionDSDX_WW(XEv, E0);
+}
+
+// Below is cross section obtained by integration of ds/dxdTheta
+//
+double DarkLFCScalars::CrossSectionDSDX_WW(double XEv, double E0)
+{
+  // return ds/sx = 0 if energy Z' less mass rest
+  if( XEv*E0 <= MA ){ return 0.0; }
+
+  // Get sq for varible and constant
+  double XEv2 = XEv*XEv, Mmu2 = Mmu*Mmu, MA2 = MA*MA, E02 = E0*E0;
+
+  // Limits on u(x)
+  double uMax   = - MA2 * (1.0 - XEv) / XEv - Mmu2*XEv
+       , uMin   = -  XEv*E02*ThetaMax*ThetaMax -  MA2*(1.0 - XEv)/XEv - Mmu2*XEv
+       , uMax2  = uMax*uMax, uMin2 = uMin*uMin;
+
+  // Properties nucleus
+  double aa     = 111.*pow(ZNucl,-1./3.)/Mel;
+  double d      = 0.164*pow(ANucl,-2./3.);
+  // Transmitted momentum, GeV^2
+  double t_scr  = pow(1./aa,2.) // nuclear shielding
+       , t_size = d;            // nuclear size
+
+  double tmax = tMax;
+  if(fabs(tMax - 10000.) < 0.001) tmax = E0*E0;
+
+  // Conversion coefficient from tmin to u varible
+  double gZ   = 1.0 / ( 2.0*E0*(1.0 - XEv) ), gZ2 = gZ*gZ;
+  // Coefficients in amplitude
+  double JZ   = 2.0 * ( (2.0 - 2.0*XEv + XEv2) / (1.0 - XEv) )
+       , K    = 4.0 * (MA2 + 2.0*Mmu2) * XEv
+       , LZ   = 4.0 * (MA2 + 2.0*Mmu2) * (MA2*(1.0 - XEv) + Mmu2*XEv2 );
+
+  // Coefficients in photon flux
+  double
+  genCoef   = t_size*t_size / ( pow( t_scr - t_size, 3.0 ) ),
+        D   =  genCoef * ( (t_scr - t_size) * t_scr / (tmax + t_scr)
+                         + (t_scr - t_size) * t_size / (tmax + t_size)
+                         - 2.0 * ( t_scr - t_size )
+                         + ( t_scr + t_size )
+                           * std::log( (tmax + t_size)/(tmax + t_scr) )
+                         ),
+        F   = genCoef *gZ2 * (
+                               (t_scr - t_size) / (tmax + t_scr)
+                             + (t_scr - t_size) / (tmax + t_size)
+                             + 2.0 * std::log( (tmax + t_size)/(tmax + t_scr) )
+                             ),
+        H   = - genCoef*(t_size + t_scr),
+        I   = - 2.0*genCoef*gZ2;
+
+  // Helper functions
+  double lnuMax       = std::log( (gZ2*uMax2 + t_scr) / (gZ2*uMax2 + t_size) )
+       , lnuMin       = std::log( (gZ2*uMin2 + t_scr) / (gZ2*uMin2 + t_size) )
+       , aTantSizeMax = std::atan( gZ*uMax / sqrt(t_size) )
+       , aTantSizeMin = std::atan( gZ*uMin / sqrt(t_size) )
+       , aTantScrMax  = std::atan( gZ*uMax / sqrt(t_scr) )
+       , aTantScrMin  = std::atan( gZ*uMin / sqrt(t_scr) );
+
+  // Result integration on u
+  double
+  Ing1 =   JZ*F * (uMax - uMin) + K*F  * ( log(uMax / uMin) )
+         - ( JZ*D + LZ*F ) / uMax
+         - K*D / ( 2.0*uMax2 )
+         - LZ*D / ( 3.0*pow(uMax, 3.0) )
+         + ( JZ*D + LZ*F ) / uMin
+         + K*D / ( 2.0*uMin2 )
+         + LZ*D / ( 3.0*pow(uMin, 3.0) ),
+
+  Ing2 = LZ * H
+           * ( lnuMax / ( 3.0*pow( uMax, 3.0 ) )
+             - 2.0*gZ2 / ( 3.0*t_size*uMax )
+             + 2.0*gZ2 / ( 3.0*t_scr*uMax )
+             -  ( 2.0*pow( gZ, 3.0 ) / 3.0 )
+                * ( pow(t_size, -3.0/2.0)*aTantSizeMax
+                  - pow(t_scr, -3.0/2.0)*aTantScrMax
+                  )
+             - lnuMin / ( 3.0*pow( uMin, 3.0 ) )
+             + 2.0*gZ2 / ( 3.0*t_size*uMin )
+             - 2.0*gZ2 / ( 3.0*t_scr*uMin )
+             +  ( 2.0*pow( gZ, 3.0 ) / 3.0 )
+                * ( pow(t_size, -3.0/2.0)*aTantSizeMin
+                  - pow(t_scr, -3.0/2.0)*aTantScrMin
+                  )
+             ),
+
+  Ing3 = (K * H / 2.0)
+           * ( lnuMax / (uMax2)
+             + gZ2
+               * ( std::log( (uMax2) / (gZ2*uMax2 + t_size) ) / t_size
+                 - std::log( (uMax2) / (gZ2*uMax2 + t_scr) ) / t_scr
+                 )
+             - lnuMin / (uMin2)
+             - gZ2
+               * ( std::log( (uMin2) / (gZ2*uMin2 + t_size) ) / t_size
+                 - std::log( (uMin2) / (gZ2*uMin2 + t_scr) ) / t_scr
+                 )
+             ),
+
+  Ing4 = ( JZ*H + LZ*I )
+         * ( lnuMax / uMax
+           + 2.0* gZ * ( std::pow(t_size, -1.0/2.0) * aTantSizeMax
+                      - std::pow(t_scr, -1.0/2.0) * aTantScrMax )
+           - lnuMin / uMin
+           - 2.0* gZ * ( std::pow(t_size, -1.0/2.0) * aTantSizeMin
+                      - std::pow(t_scr, -1.0/2.0) * aTantScrMin )
+           ),
+
+  Ing5 = K * I
+           * ( std::log( std::abs(uMax) ) * std::log( t_size / t_scr )
+             + (1.0/2.0) * ( gsl_sf_dilog(- uMax2*gZ2/t_scr )
+                           - gsl_sf_dilog(- uMax2*gZ2/t_size ) )
+             - std::log( std::abs(uMin) ) * std::log( t_size / t_scr )
+             - (1.0/2.0) * ( gsl_sf_dilog(- uMin2*gZ2/t_scr )
+                           - gsl_sf_dilog(- uMin2*gZ2/t_size ) )
+             ),
+
+  Ing6 = JZ * I
+           * ( - ( lnuMax * uMax )
+             + (2/gZ)
+               * ( std::pow(t_size, 1./2) * aTantSizeMax
+                 - std::pow(t_scr, 1./2) * aTantScrMax )
+             + ( lnuMin * uMin )
+             - (2/gZ)
+               * ( std::pow(t_size, 1./2) * aTantSizeMin
+                 - std::pow(t_scr, 1./2) * aTantScrMin )
+             );
+
+  // Sum integrals
+  double sumIng = Ing1 + Ing2 + Ing3 + Ing4 + Ing5 + Ing6;
+  // Prefactor analytical integral
+  double coef = sqrt( XEv*XEv - (MA2) / (E02) )*( 1.0 - XEv ) / ( XEv );
+  return sumIng*coef;
+}
+
+
+
+// Below is the IWW formula for the double differential cross-section
+// from 1705.01633, see e.g. corresponding second line of Eq.(25)
+//
+double DarkLFCScalars::CrossSectionDSDXDU(double XEv, double UThetaEv, double E0)
+{
+  if(XEv*E0 <= MA) return 0.;
+  double Uxtheta = E0*E0*2.*UThetaEv*XEv + MA*MA*(1.0-XEv)/XEv + Mmu*Mmu*XEv;
+  double AA = (1. - XEv + XEv*XEv/2.) / (Uxtheta*Uxtheta);
+  double BB = (1. - XEv)*(1. - XEv)*(MA*MA + 2.0*Mmu*Mmu)/(Uxtheta*Uxtheta*Uxtheta*Uxtheta);
+  double CC = MA*MA - Uxtheta*XEv/(1. - XEv);
+  double sigma = sqrt(XEv*XEv - MA*MA/(E0*E0)) * (AA + BB*CC);
+  return sigma;
+}
+
+double DarkLFCScalars::CrossSectionDSDXDPSI(double XEv, double auxpsi, double E0)
+{
+  return CrossSectionDSDXDPSI_WW(XEv, auxpsi, E0);
+}
+
+
+double DarkLFCScalars::CrossSectionDSDXDPSI_WW(double XEv, double auxpsi, double E0)
+{
+  if(E0*XEv < EThresh) return 0.;
+  double Xmin = MA/E0;
+  double Xmax = 1. - MA*MA*MA*MA/(8.*E0*E0*E0*ANucl) - MParent/E0;
+  if(XEv < Xmin || XEv > Xmax) return 0.;
+  double y = 1. - XEv;
+  double aa = 111.*pow(ZNucl,-1./3)/Mel;
+  double d = 0.164*pow(ANucl,-2./3);
+  double ta = pow(1./aa,2.);
+  double td = d;
+  double t2 = -(y*E0*E0*2.*auxpsi + Mmu*Mmu*(1.-y)/y + Mmu*Mmu*y) + Mmu*Mmu;
+  double t  = MA*MA - t2;
+  double q = t/(2.*E0*(1.0-y));
+  double tmin = q*q;
+  double tmax = tMax;
+  if(fabs(tMax - 10000.) < 0.001) tmax = E0*E0;
+  if(tmax < tmin) return 0.;
+  //double flux = log(td/(tmin + ta)) - 2.0;
+  double flux = -((td*td*(((ta - td)*(ta + td + 2.0*tmax)*(tmax - tmin))/((ta + tmax)*(td + tmax)) + (ta + td + 2.0*tmin)*(log(ta + tmax)
+                  - log(td + tmax) - log(ta + tmin) + log(td + tmin))))/((ta-td)*(ta-td)*(ta-td)));
+  // MODIFIED
+  //flux = -ZNucl*ZNucl*((td*td*(((ta - td)*(ta + td + 2.0*tmax)*(tmax - tmin))/((ta + tmax)*(td + tmax)) + (ta + td + 2.0*tmin)*(log(ta + tmax)
+    //              - log(td + tmax) - log(ta + tmin) + log(td + tmin))))/((ta-td)*(ta-td)*(ta-td)));
+
+  //
+  if(flux < 0.) return 0.;
+  // ds/dpprime
+  double fac1 = (1.-y)/(t*t);
+  double fac2 = 1./(2.*y)+y/2.;
+  double fac3 = (MA*MA + 2.0*Mmu*Mmu)*(1.-y)*(1.-y)/(t*t*y);
+  double fac4 = Mmu*Mmu*(1.-y)*(1.-y)/y + MA*MA - t;
+  double part1 = fac1*(fac2 + fac3*fac4);
+
+  //beta factor
+  double beta = sqrt(y*y - Mmu*Mmu/(E0*E0));
+
+  double rescs = flux*part1*beta;
+  if(std::isnan(rescs) || rescs < 0.) {
+    std::cout << "DSDXDPSI: bad result = " << rescs << " XEv = " << XEv << " E0 = " << E0 << std::endl;
+    rescs = 0.;
+  }
+  return rescs;
+}
+
+
+// WW cross section for the total cross section
+//
+double DarkLFCScalars::CrossSectionDSDXDTheta(double XEv, double ThetaEv, double E0)
+{
+
+  if(E0*XEv < EThresh) return 0.;
+  double x2=XEv*XEv;
+  double theta2=ThetaEv*ThetaEv;
+  double d = 0.164*pow(ANucl,-2./3);
+  double MA2= MA*MA;
+  double Mmu2= Mmu*Mmu;
+  double Mtau2 = Mtau*Mtau;
+  double E02= E0*E0;
+  double u = -XEv*E02*theta2 - MA2*(1.0-XEv)/XEv + Mmu2*(1.0-XEv);
+  double s = Mmu2 - (u-Mtau2)/(1.0-XEv);
+  double gV = epsilBench;
+  double gA = 0.;
+  double tmax = MA2;
+  const double pi = 3.141592654;
+  double tmin= pow((u-Mtau2), 2.0)/(4.0*E02*(1.0-XEv)*(1.0-XEv));
+  // I've calculated ChiWWAnalytical by using mathematica's "Integrate[...]" function
+  // and converted the resulted expression to C-like form
+  double ChiWWAnalytical = ZNucl*ZNucl*( (d*tmin/tmax + d*(d+tmin)/(d+tmax) + (d+2*tmin)*log(tmax) - (d+2*tmin)*log(d+tmax))
+                                       - (2*d + (d+2*tmin)*log(tmin) - (d+2*tmin)*log(d+tmin)) )/d;
+
+  // Trace of the amplitude from Eq. A.36 in https://arxiv.org/abs/2211.00664
+  double Factor1= 4*Mmu*Mtau*(gA*gA - gV*gV)/(pow((Mmu2 - s),2.)*pow(Mtau2 - u,2));
+  double Factor2= Mmu2*Mmu2*(MA2 + u) + 2*Mmu2*Mmu*(Mtau2*Mtau - Mtau*u) + Mmu2*(Mtau2*Mtau2 - 2*MA2*s - 2*Mtau2*u + u*(u-2*s)) + 2*Mmu*Mtau*s*(u - Mtau2) + s*(MA2*s + Mtau2*Mtau2 - 2*Mtau2*u + u*(s+u));
+  double AmplZpr2WWVEGAS = Factor1*Factor2/(8*pi*s*s);
+  // one should multiply the prefactor written below by factor
+  // alphaEW^2 to get diff_CS_WW_phi in GeV^(-2)
+  // (see e.g. calling VEGAS MC  function)
+  double PrefactorWithoutAlphaEW=E0*XEv*sqrt(1.0-MA2/E02)/(1.0-XEv);
+  double DsDxDthetaWithoutAlphaEW=-E0*sin(ThetaEv)*ChiWWAnalytical*PrefactorWithoutAlphaEW*AmplZpr2WWVEGAS;
+
+  double ResTemporary;
+  if (DsDxDthetaWithoutAlphaEW < 0.0 ) {
+    ResTemporary = 0.0;
+  } else {
+    ResTemporary = DsDxDthetaWithoutAlphaEW;
+  }
+  return ResTemporary;
+}
+
+
+double DarkLFCScalars::Width()
+{
+  const double muMass = Mmu;
+  const double tauMass = Mtau;
+  const double massRatio2 = muMass*muMass/(MA*MA);
+  double width          = 0.;
+  double nuWidth        = 0.;
+  double muWidth        = 0.;
+  if (MA < 2.*tauMass) {
+    nuWidth = epsil*epsil*alphaEW*(1./3.)*MA;
+    if (MA > 2.*muMass) {
+      double factor = (1.+2.*massRatio2)*sqrt(1.-4.*massRatio2);
+      muWidth = nuWidth*factor;
+    }
+    width = nuWidth+muWidth; // in GeV
+  } else {
+    std::cout << "DarkLFCScalars: width for the mass above 2 Mtau is not implemented, exiting" << std::endl;
+    exit(1);
+  }
+  return width;
+}

@@ -44,7 +44,7 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
   //select particle type and details
   DMpar->RegisterNewParam("DMProcessType", 1.); // 1 - 4: Brem. process for Vector, Scalar, Axial, Pseudoscalar, 5 - spin 2, 21 - ALP
                                                 // 11 - 14: Annihilation, 15 - annihilation through spin 2 DM, 16 - Z' annihilation
-                                                // 31 - ZPrime (muon beams)
+                                                // 31 - ZPrime (muon beams), 35 - LFC Scalar
   DMpar->RegisterNewParam("DMMass", 0.0167*GeV);
   DMpar->RegisterNewParam("Epsilon", 0.0001);
 
