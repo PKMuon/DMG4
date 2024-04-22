@@ -29,8 +29,11 @@ G4bool DMProcessLFConversion::IsApplicable(const G4ParticleDefinition& pDef)
 {
   if(myDarkMatter->GetParentPDGID() == 15)
     return ("tau-" == pDef.GetParticleName() || "tau+" == pDef.GetParticleName());
-  if(myDarkMatter->GetParentPDGID() == 13)
+  else if(myDarkMatter->GetParentPDGID() == 13)
     return ("mu-" == pDef.GetParticleName() || "mu+" == pDef.GetParticleName());
+  else if(myDarkMatter->GetParentPDGID() == 11)
+    return ("e-" == pDef.GetParticleName() || "e+" == pDef.GetParticleName());
+
   return false;
 }
 
@@ -76,7 +79,10 @@ G4VParticleChange* DMProcessLFConversion::PostStepDoIt(const G4Track& aTrack,
   // compute process information (change in energy, momentum direction, ...)
   G4double XAcc=0., angles[2];
 
-  if(myDarkMatter->GetParentPDGID() == 15 || myDarkMatter->GetParentPDGID() == 13) {
+  // TODO: CHECK THIS
+  //if(myDarkMatter->GetParentPDGID() == 11 || myDarkMatter->GetParentPDGID() == 13) {
+    //XAcc = myDarkMatter->SimulateEmissionByMuonLFClog10(incidentE/GeV, angles); // 2-dim log-uniform sampling, angles are for the recoil lepton
+  if(myDarkMatter->GetParentPDGID() == 15 || myDarkMatter->GetParentPDGID() == 13 || myDarkMatter->GetParentPDGID() == 11) {
     XAcc = myDarkMatter->SimulateEmissionVector(incidentE/GeV, angles); // 2-dim log-uniform sampling, angles are for the recoil lepton
   }
 
@@ -85,11 +91,12 @@ G4VParticleChange* DMProcessLFConversion::PostStepDoIt(const G4Track& aTrack,
 
   G4double recoilE;
   // correct for MinitialLepton != MfinalLepton in LFC
-  if(myDarkMatter->GetDMType() == 32) {
+  if(myDarkMatter->GetDMType() == 41) {
     G4double MRecoilLepton = 0.;
     // mass of recoil lepton
-    if(myDarkMatter->GetParentPDGID() == 13) MRecoilLepton = Mtau; // muon mode
-    if(myDarkMatter->GetParentPDGID() == 15) MRecoilLepton = Mmu; // tau mode
+    if(myDarkMatter->GetDaughterPDGID() == 11) MRecoilLepton = Mel; // electron mode
+    if(myDarkMatter->GetDaughterPDGID() == 13) MRecoilLepton = Mmu; // muon mode
+    if(myDarkMatter->GetDaughterPDGID() == 15) MRecoilLepton = Mtau; // tau mode
     recoilE = incidentE * (1.0 - XAcc) - MRecoilLepton;           // KinE = TotE - Mass
   }
   else recoilE = incidentKinE - incidentE * XAcc;
@@ -97,7 +104,8 @@ G4VParticleChange* DMProcessLFConversion::PostStepDoIt(const G4Track& aTrack,
   G4double recoilTheta = 0.,
            recoilPhi = 0.;
   G4double DMTheta = angles[0], DMPhi = angles[1];
-  if(myDarkMatter->GetParentPDGID() == 15 || myDarkMatter->GetParentPDGID() == 13) {
+
+  if(myDarkMatter->GetParentPDGID() == 11 || myDarkMatter->GetParentPDGID() == 13) {
     recoilTheta = angles[0];
     recoilPhi = angles[1];
     // TODO: modify for visible study (not for now)
@@ -126,28 +134,59 @@ G4VParticleChange* DMProcessLFConversion::PostStepDoIt(const G4Track& aTrack,
 
   aParticleChange.SetNumberOfSecondaries(2);
   // create G4DynamicParticle object for the particle1
-  G4DynamicParticle* aParticle1;
-  // muon mode
-  if(aTrack.GetDefinition()->GetPDGEncoding() == 13) {
-    aParticle1 = new G4DynamicParticle(G4TauMinus::TauMinus(), 
-        projDirection,
-        recoilE);
-  } 
-  else if(aTrack.GetDefinition()->GetPDGEncoding() == -13) {
-    aParticle1 = new G4DynamicParticle(G4TauPlus::TauPlus(), 
-        projDirection,
-        recoilE);
-  } 
-  // tau mode
-  else if(myDarkMatter->GetParentPDGID() == 15) {
-    aParticle1 = new G4DynamicParticle(G4MuonMinus::MuonMinus(), 
-        projDirection,
-        recoilE);
+  G4DynamicParticle* aParticle1 = nullptr;
+
+  // Select final state lepton accordingly
+  auto charge = aTrack.GetDefinition()->GetPDGCharge();
+  switch (myDarkMatter->GetDaughterPDGID()) {
+    case 11:
+      // Conversion to LFC scalar and Electron particle
+      if(charge < 0) {
+        aParticle1 = new G4DynamicParticle(G4Electron::Electron(),
+            projDirection,
+            recoilE);
+      }
+      else if(charge > 0) {
+        aParticle1 = new G4DynamicParticle(G4Positron::Positron(),
+            projDirection,
+            recoilE);
+      }
+      break;
+    case 13:
+      // Conversion to LFC scalar and Muon particle
+      if(charge < 0) {
+        aParticle1 = new G4DynamicParticle(G4MuonMinus::MuonMinus(),
+            projDirection,
+            recoilE);
+      }
+      else if(charge > 0) {
+        aParticle1 = new G4DynamicParticle(G4MuonPlus::MuonPlus(),
+            projDirection,
+            recoilE);
+      }
+      break;
+    case 15:
+      // Conversion to LFC scalar and Tau particle
+      if(charge < 0) {
+        aParticle1 = new G4DynamicParticle(G4TauMinus::TauMinus(),
+            projDirection,
+            recoilE);
+      }
+      else if(charge > 0) {
+        aParticle1 = new G4DynamicParticle(G4TauPlus::TauPlus(),
+            projDirection,
+            recoilE);
+      }
+      break;
+    default:
+      break;
   }
-  else {
-    throw std::runtime_error("DMProcessLFConversion: ERROR: Parent particle in LFConversion process is neither a muon nor a tau particle, exiting");
+
+  if (!aParticle1) {
+    throw std::runtime_error("DMProcessLFConversion: ERROR: Daughter particle in LFConversion process is neither an electron, muon nor tau particle, exiting");
     exit(1);
   }
+
   aParticleChange.AddSecondary(aParticle1);
   // create G4DynamicParticle object for the particle2
   G4DynamicParticle* aParticle2 = new G4DynamicParticle(theDMParticlePtr,

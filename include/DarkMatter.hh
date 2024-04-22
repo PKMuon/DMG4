@@ -34,7 +34,7 @@ class DarkMatter
     void EmissionSimulated() {NEmissions++;} // For G4 DM classes; in future do it automatically in SimulateEmission
     virtual double TotalCrossSectionCalc(double E0) = 0;
     void PrepareVariables();
-    void PrepareTable();
+    virtual void PrepareTable();
     double GetMA() {return MA;}
     virtual void SetMA(double MAIn) {MA = MAIn;}
     double GetEThresh() {return EThresh;}
@@ -87,7 +87,6 @@ class DarkMatter
     // TODO CHECK THIS
     // for emission with different final and inital state lepton
     /*
-    void PrepareTableLFC();
     double MaxCrossSectionCalcLFC(double E0);
     double MaxCrossSectionAngleCalcLFC(double E0);
     double MaxCrossSectionPsiCalcLFC(double E0);

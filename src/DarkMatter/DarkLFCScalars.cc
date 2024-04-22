@@ -58,18 +58,20 @@ static double _DarkLFCScalarsDsDxDPsiMuon(double x[], size_t dim, void * parms_)
 
 // Class methods:  ---------------
 DarkLFCScalars::DarkLFCScalars(double MAIn, double EThreshIn, double SigmaNormIn, double ANuclIn, double ZNuclIn, double DensityIn,
-                         double epsilIn, int IDecayIn)
+                         double epsilIn, int IDecayIn, int ParentIn, int DaughterIn)
 : DarkMatter(MAIn, EThreshIn, SigmaNormIn, ANuclIn, ZNuclIn, DensityIn, epsilIn, IDecayIn)
 {
-  DMType = 32; // scalar
-  ParentPDGID = 13;
-  DaughterPDGID = 0;
+  ParentPDGID = ParentIn;
+  DaughterPDGID = DaughterIn;
+
+  DMType = 41; // LFC scalar
   epsilBench = 0.003; // From https://doi.org/10.1140/epjc/s10052-023-11891-3
 
   tMax =       10000.;  // tmax initial; Value 10000. means that tmax = E0*E0 will be taken
   ThetaMax =     0.3;   // Max. angle of Z
 
-  std::cout << "Initialized Dark Z boson for material density = " << DensityIn << std::endl;
+  std::cout << "Initialized Dark LFC scalar for material density = " << DensityIn << std::endl;
+  std::cout << "For parent PDG ID = " << ParentPDGID << " and daugther PDG ID = " << DaughterPDGID << std::endl;
   std::cout << "Energy cutoff = " << EThresh << " GeV" << std::endl;
   std::cout << std::endl;
 }
@@ -78,6 +80,22 @@ DarkLFCScalars::DarkLFCScalars(double MAIn, double EThreshIn, double SigmaNormIn
 DarkLFCScalars::~DarkLFCScalars()
 {;}
 
+void DarkMatter::PrepareTable()
+{
+  ISampler = 0;
+  if(DMType == 1) ISampler = 1; // available only for vector; not yet fully tested
+  //ISampler = 0; // Force work without sampler 
+  MParent = 0.;
+  if(fabs(ParentPDGID) == 11) MParent = Mel;
+  if(fabs(ParentPDGID) == 13) MParent = Mmu;
+  //if(fabs(ParentPDGID) == 11 && MA < 0.001) return;
+  for(int ip=0; ip < nptable; ip++) {
+    sigmap[ip] = TotalCrossSectionCalc(ep[ip]);
+    sigmax[ip] = MaxCrossSectionCalcLFC(ep[ip]);
+    if(MA >= 0.001) sigmaxa[ip] = MaxCrossSectionAngleCalcLFC(ep[ip]);
+    sigmaxpsi[ip] = MaxCrossSectionPsiCalcLFCLog10(ep[ip]);
+  }
+}
 
 double DarkLFCScalars::TotalCrossSectionCalc(double E0)
 {

@@ -30,27 +30,28 @@ DMParticleLFCScalar* DMParticleLFCScalar::Definition()
   G4ParticleTable * pTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition * anInstance = pTable->FindParticle(name);
   const G4double muMass = G4MuonMinus::MuonMinusDefinition()->GetPDGMass();
-  const G4double Mel = G4Electron::Definition()->GetPDGMass()/MeV;
-  const G4double Mmu = G4MuonMinus::Definition()->GetPDGMass()/MeV;
+  const G4double elMass = G4Electron::Definition()->GetPDGMass();
   G4double RatioEA2 = muMass*muMass/(MassIn*MassIn);
   G4bool isStable = true;
   G4double WidthIn = 0.; // in MeV
   G4int IDPDG = 5400023; // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
 
   // compute width
+  // TODO: THIS PART IS NOT IMPLEMENTED YET!
   if(DecayType) {
     isStable = false;
     if (BranchingType == 0) {
       IDPDG = 5400123; // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
       name = "DMParticleLFCScalar";
-      if(MassIn < 2.001*muMass*GeV) isStable = true;
-      WidthIn = (1./2.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.-4.*RatioEA2);
+      if(MassIn > 2.001*muMass) {
+        WidthIn = (1./2.)*CLHEP::fine_structure_const*MassIn*epsilIn*epsilIn*sqrt(1.-4.*RatioEA2)*(1.-4.*RatioEA2);
+      }
     } else if (BranchingType == 1) {
       IDPDG = 5400199; // https://pdg.lbl.gov/2019/reviews/rpp2019-rev-monte-carlo-numbering.pdf
-      if (MassIn > Mel+Mmu) {
+      if (MassIn > elMass+muMass) {
         // width is implemented according to https://arxiv.org/abs/2202.04410
-        G4double p = sqrt(MassIn*MassIn-pow(Mel+Mmu,2.)*(MassIn*MassIn-pow(Mel-Mmu,2.)))/MassIn*0.5;
-        WidthIn = epsilIn*epsilIn*p/(8*M_PI)*(1.0-(Mel*Mel+Mmu*Mmu)/(MassIn*MassIn));
+        G4double p = sqrt(MassIn*MassIn-pow(elMass+muMass,2.)*(MassIn*MassIn-pow(elMass-muMass,2.)))/MassIn*0.5;
+        WidthIn = epsilIn*epsilIn*p/(8*M_PI)*(1.0-(elMass*elMass+muMass*muMass)/(MassIn*MassIn));
       }
     } else {
       G4cout << "BranchingType = " << BranchingType << " is not implemented, exiting" << G4endl;
@@ -92,15 +93,23 @@ DMParticleLFCScalar* DMParticleLFCScalar::Definition()
 
       // Define decay channels according to branching type
       if (BranchingType == 0) {
+        // X -> mu- + e+
+        G4VDecayChannel* mode = new G4PhaseSpaceDecayChannel(name, 1, 2, "mu-", "e+");
+        table->Insert(mode);
+        delete mode;
+      } else if (BranchingType == 1) {
+        // X -> mu- + e+
+        G4VDecayChannel* mode = new G4PhaseSpaceDecayChannel(name, 1, 2, "mu-", "e+");
+        table->Insert(mode);
+        delete mode;
+      } else if (BranchingType == 2) {
         // X -> tau- + mu+
         G4VDecayChannel* mode = new G4PhaseSpaceDecayChannel(name, 1., 2, "tau-", "mu+");
         table->Insert(mode);
         delete mode;
       } else {
-        // X -> mu- + e+
-        G4VDecayChannel* mode = new G4PhaseSpaceDecayChannel(name, 1, 2, "mu-", "e+");
-        table->Insert(mode);
-        delete mode;
+        G4cout << "BranchingType = " << BranchingType << " is not implemented, exiting" << G4endl;
+        exit(1);
       }
       anInstance->SetDecayTable(table);
       anInstance->DumpTable();

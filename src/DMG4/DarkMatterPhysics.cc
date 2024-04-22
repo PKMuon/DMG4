@@ -172,13 +172,29 @@ void DarkMatterPhysics::Init(){
       }
       myDarkMatter = new DarkMuPhilicPseudoScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
       break;
-    case 35:
+    case 41:
       G4cout << "Initialize DarkLFCScalars\n";
       if(DecayType) { // Temporary plug
         G4cout << G4endl << "DarkLFCScalars with decays is not yet implemented, exiting" << G4endl << G4endl;
         exit(1);
       }
-      myDarkMatter = new DarkLFCScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType);
+      // LFC conversion types
+      switch (BranchingType) {
+        // e to mu
+        case 0:
+          myDarkMatter = new DarkLFCScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType, 11, 13);
+          break;
+        // mu to e
+        case 1:
+          myDarkMatter = new DarkLFCScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType, 13, 11);
+          break;
+        // mu to tau
+        case 2:
+          myDarkMatter = new DarkLFCScalars(DMMass, EThresh, 1., ANucl, ZNucl, Density,  Epsilon, DecayType, 13, 15);
+          break;
+        default:
+          break;
+      }
       break;
     case 11:
       G4cout << "Initialize DarkPhotonsAnnihilation\n";
@@ -327,6 +343,9 @@ void DarkMatterPhysics::ConstructParticle()
     case 34:
       DMParticleZPrime::Definition();
       break;
+    case 41:
+      DMParticleLFCScalar::Definition();
+      break;
     default:
       break;
     }
@@ -341,23 +360,23 @@ void DarkMatterPhysics::ConstructProcess()
     if(myDarkMatter->GetDMType() == 1) {
       theDMParticlePtr = DMParticleAPrime::Definition();
     }
-    if(myDarkMatter->GetDMType() == 2) {
+    else if(myDarkMatter->GetDMType() == 2) {
       theDMParticlePtr = DMParticleScalar::Definition();
     }
-    if(myDarkMatter->GetDMType() == 3) {
+    else if(myDarkMatter->GetDMType() == 3) {
       theDMParticlePtr = DMParticleAxial::Definition();
     }
-    if(myDarkMatter->GetDMType() == 4) {
+    else if(myDarkMatter->GetDMType() == 4) {
       theDMParticlePtr = DMParticlePseudoScalar::Definition();
     }
-    if(myDarkMatter->GetDMType() == 5) {
+    else if(myDarkMatter->GetDMType() == 5) {
       theDMParticlePtr = DMParticleAPrime::Definition(); // A' for the moment, the spin 2 particle not yet implemented
     }
-    if(myDarkMatter->GetDMType() == 33) {
+    else if(myDarkMatter->GetDMType() == 41) { // LFC scalar
       theDMParticlePtr = DMParticleLFCScalar::Definition();
     }
   }
-  if(myDarkMatter->GetParentPDGID() == -11) { // Annihilation
+  else if(myDarkMatter->GetParentPDGID() == -11) { // Annihilation
     if(myDarkMatter->GetDMType() == 1) {
       theDMParticlePtr = DMParticleAPrime::Definition();
     }
@@ -377,14 +396,14 @@ void DarkMatterPhysics::ConstructProcess()
       theDMParticlePtr = DMParticleZPrime::Definition();
     }
   }
-  if(myDarkMatter->GetParentPDGID() == 13) {
-    if(myDarkMatter->GetDMType() >= 32 && myDarkMatter->GetDMType() < 35) { // LFC scalar
+  else if(myDarkMatter->GetParentPDGID() == 13) {
+    if(myDarkMatter->GetDMType() == 41) { // LFC scalar
       theDMParticlePtr = DMParticleLFCScalar::Definition();
     }
     else
       theDMParticlePtr = DMParticleZPrime::Definition(); // Always Z' for the moment, scalar etc. particles from muons not yet implemented
   }
-  if(myDarkMatter->GetParentPDGID() == 22) {
+  else if(myDarkMatter->GetParentPDGID() == 22) {
     theDMParticlePtr = DMParticleALP::Definition();
   }
 
@@ -417,81 +436,88 @@ void DarkMatterPhysics::ConstructProcess()
   // ... here the processes asociated with new physics should be registered
   //     as follows
   
-  if(myDarkMatter->GetParentPDGID() == 11) {
-    if (myDarkMatter->GetDMType() != 32) {
-      DMProcessDMBrem* DMBremPointer = new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
+  // Registering physics processes according to parent particle PDG ID
+  switch (myDarkMatter->GetParentPDGID()) {
+    // ------ ELECTRON PARENT ------
+    case 11:
+      if (myDarkMatter->GetDMType() != 41) {
+        DMProcessDMBrem* DMBremPointer = new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
+
+        // Instead of using ordtable:
+        G4ProcessManager* processManager = (G4Electron::ElectronDefinition())->GetProcessManager();
+        processManager->AddDiscreteProcess(DMBremPointer);
+        processManager = (G4Positron::PositronDefinition())->GetProcessManager();
+        processManager->AddDiscreteProcess(DMBremPointer);
+
+        //    phLHelper->RegisterProcess( DMBremPointer, G4Electron::ElectronDefinition() );
+        //    phLHelper->RegisterProcess( DMBremPointer, G4Positron::PositronDefinition() );
+      } else {
+        DMProcessLFConversion* DMLFCPointer = new DMProcessLFConversion(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
+
+        // Instead of using ordtable:
+        G4ProcessManager* processManager = (G4Electron::ElectronDefinition())->GetProcessManager();
+        processManager->AddDiscreteProcess(DMLFCPointer);
+        processManager = (G4Positron::PositronDefinition())->GetProcessManager();
+        processManager->AddDiscreteProcess(DMLFCPointer);
+      }
+      break;
+    // ------ ANNIHILATION CASE ------
+    case -11:
+      DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
+      G4double annihilationStepLimiterFactor=DMpar->GetRegisteredParam("AnnihilationStepLimiterFactor",5.);
+      DarkMatterAnnihilation *dmAnnihil=dynamic_cast<DarkMatterAnnihilation*>(myDarkMatter);
+      AnnihilationStepLimiter *dmLimiterProc=new AnnihilationStepLimiter(dmAnnihil,"StepLimiterAnnihilation");
+      dmLimiterProc->SetFactor(annihilationStepLimiterFactor);
+
+      DMProcessAnnihilation* dmAnnihilProc = new DMProcessAnnihilation(dmAnnihil, theDMParticlePtr, BiasSigmaFactor, dmLimiterProc);
+
+      /* Add the step limiter to the list of discrete processes for the e+
+       * before adding the annihilation process
+       * This will trigger the calculation of the max step length, including the maximum energy loss across the new step
+       * So these quantities can be used by this process for this step
+       */
+      G4ParticleDefinition* posi=G4Positron::Definition();
+      G4ProcessManager* processManager=posi->GetProcessManager();
+      processManager->AddDiscreteProcess(dmLimiterProc);
+
+      //Now add the annihilation process
+      //phLHelper->RegisterProcess(dmAnnihilProc, G4Positron::PositronDefinition()); // old way, required ordtable
+      processManager->AddDiscreteProcess(dmAnnihilProc);
+
+      break;
+    // ------ MUON PARENT ------
+    case 13:
+      if(myDarkMatter->GetDMType() != 41) { // LFC scalar
+        DMProcessDMBrem* DMBremPointer = new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
+
+        // Instead of using ordtable:
+        G4ProcessManager* processManager = (G4MuonMinus::MuonMinusDefinition())->GetProcessManager();
+        processManager->AddDiscreteProcess(DMBremPointer);
+        processManager = (G4MuonPlus::MuonPlusDefinition())->GetProcessManager();
+        processManager->AddDiscreteProcess(DMBremPointer);
+
+        //phLHelper->RegisterProcess( DMBremPointer, G4MuonMinus::MuonMinusDefinition() );
+        //phLHelper->RegisterProcess( DMBremPointer, G4MuonPlus::MuonPlusDefinition() );
+      } else {
+        DMProcessLFConversion* DMLFCPointer = new DMProcessLFConversion(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
+
+        // Instead of using ordtable:
+        G4ProcessManager* processManager = (G4MuonMinus::MuonMinusDefinition())->GetProcessManager();
+        processManager->AddDiscreteProcess(DMLFCPointer);
+        processManager = (G4MuonPlus::MuonPlusDefinition())->GetProcessManager();
+        processManager->AddDiscreteProcess(DMLFCPointer);
+      }
+      break;
+    // ------ PHOTON PARENT FOR ALP ------
+    case 22:
+      DMProcessPrimakoffALP* DMPrimakoffALPPointer = new DMProcessPrimakoffALP(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
 
       // Instead of using ordtable:
-      G4ProcessManager* processManager = (G4Electron::ElectronDefinition())->GetProcessManager();
-      processManager->AddDiscreteProcess(DMBremPointer);
-      processManager = (G4Positron::PositronDefinition())->GetProcessManager();
-      processManager->AddDiscreteProcess(DMBremPointer);
+      G4ProcessManager* processManager = (G4Gamma::GammaDefinition())->GetProcessManager();
+      processManager->AddDiscreteProcess(DMPrimakoffALPPointer);
 
-      //    phLHelper->RegisterProcess( DMBremPointer, G4Electron::ElectronDefinition() );
-      //    phLHelper->RegisterProcess( DMBremPointer, G4Positron::PositronDefinition() );
-    } else {
-      DMProcessLFConversion* DMLFCPointer = new DMProcessLFConversion(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
-
-      // Instead of using ordtable:
-      G4ProcessManager* processManager = (G4Electron::ElectronDefinition())->GetProcessManager();
-      processManager->AddDiscreteProcess(DMLFCPointer);
-      processManager = (G4Positron::PositronDefinition())->GetProcessManager();
-      processManager->AddDiscreteProcess(DMLFCPointer);
-    }
-  }
-  if(myDarkMatter->GetParentPDGID() == -11) {
-    DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
-    G4double annihilationStepLimiterFactor=DMpar->GetRegisteredParam("AnnihilationStepLimiterFactor",5.);
-    DarkMatterAnnihilation *dmAnnihil=dynamic_cast<DarkMatterAnnihilation*>(myDarkMatter);
-    AnnihilationStepLimiter *dmLimiterProc=new AnnihilationStepLimiter(dmAnnihil,"StepLimiterAnnihilation");
-    dmLimiterProc->SetFactor(annihilationStepLimiterFactor);
-
-    DMProcessAnnihilation* dmAnnihilProc = new DMProcessAnnihilation(dmAnnihil, theDMParticlePtr, BiasSigmaFactor, dmLimiterProc);
-
-    /* Add the step limiter to the list of discrete processes for the e+
-     * before adding the annihilation process
-     * This will trigger the calculation of the max step length, including the maximum energy loss across the new step
-     * So these quantities can be used by this process for this step
-     */
-    G4ParticleDefinition* posi=G4Positron::Definition();
-    G4ProcessManager* processManager=posi->GetProcessManager();
-    processManager->AddDiscreteProcess(dmLimiterProc);
-
-    //Now add the annihilation process
-    //phLHelper->RegisterProcess(dmAnnihilProc, G4Positron::PositronDefinition()); // old way, required ordtable
-    processManager->AddDiscreteProcess(dmAnnihilProc);
-
-  }
-  if(myDarkMatter->GetParentPDGID() == 13) {
-    if(myDarkMatter->GetDMType() == 32) { // LFC scalar
-      DMProcessLFConversion* DMLFCPointer = new DMProcessLFConversion(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
-
-      // Instead of using ordtable:
-      G4ProcessManager* processManager = (G4MuonMinus::MuonMinusDefinition())->GetProcessManager();
-      processManager->AddDiscreteProcess(DMLFCPointer);
-      processManager = (G4MuonPlus::MuonPlusDefinition())->GetProcessManager();
-      processManager->AddDiscreteProcess(DMLFCPointer);
-
-    } else {
-      DMProcessDMBrem* DMBremPointer = new DMProcessDMBrem(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
-
-      // Instead of using ordtable:
-      G4ProcessManager* processManager = (G4MuonMinus::MuonMinusDefinition())->GetProcessManager();
-      processManager->AddDiscreteProcess(DMBremPointer);
-      processManager = (G4MuonPlus::MuonPlusDefinition())->GetProcessManager();
-      processManager->AddDiscreteProcess(DMBremPointer);
-
-      //phLHelper->RegisterProcess( DMBremPointer, G4MuonMinus::MuonMinusDefinition() );
-      //phLHelper->RegisterProcess( DMBremPointer, G4MuonPlus::MuonPlusDefinition() );
-    }
-  }
-  if(myDarkMatter->GetParentPDGID() == 22) {
-    DMProcessPrimakoffALP* DMPrimakoffALPPointer = new DMProcessPrimakoffALP(myDarkMatter, theDMParticlePtr, BiasSigmaFactor);
-
-    // Instead of using ordtable:
-    G4ProcessManager* processManager = (G4Gamma::GammaDefinition())->GetProcessManager();
-    processManager->AddDiscreteProcess(DMPrimakoffALPPointer);
-
-    //phLHelper->RegisterProcess( DMPrimakoffALPPointer, G4Gamma::GammaDefinition() );
+      //phLHelper->RegisterProcess( DMPrimakoffALPPointer, G4Gamma::GammaDefinition() );
+    default:
+      break;
   }
 }
