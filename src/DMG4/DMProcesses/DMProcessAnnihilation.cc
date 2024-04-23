@@ -23,7 +23,7 @@
 #include "Randomize.hh"
 #include "G4ElementVector.hh"
 
-#include "DarkMatterParametersFactory.hh"
+#include "DarkMatterParametersRegistry.hh"
 
 #include "AnnihilationStepLimiter.hh"
 
@@ -37,7 +37,7 @@ DMProcessAnnihilation::DMProcessAnnihilation(DarkMatterAnnihilation *DarkMatterP
         0),m_limiter(LimiterIn) {
   SetProcessSubType(1); //fBremsstrahlung? // TODO: verify this
 
-  DMpar = DarkMatterParametersFactory::GetInstance();
+  DMpar = DarkMatterParametersRegistry::GetInstance();
   if (DMpar) {
     iBranchingType = (int) DMpar->GetRegisteredParam("BranchingType");
 

@@ -1,5 +1,5 @@
 #include "DarkMatterPhysics.hh"
-#include "DarkMatterParametersFactory.hh"
+#include "DarkMatterParametersRegistry.hh"
 
 #include "DarkMatter.hh"
 #include "DarkMatterAnnihilation.hh"
@@ -82,7 +82,7 @@ DarkMatterPhysics::~DarkMatterPhysics()
 
 void DarkMatterPhysics::Init(){
   //call an instance of the class
-  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
+  DarkMatterParametersRegistry* DMpar = DarkMatterParametersRegistry::GetInstance();
 
   G4double EThresh = DMpar->GetRegisteredParam("EThresh");
   G4int DMProcessType = DMpar->GetRegisteredParam("DMProcessType");
@@ -97,9 +97,6 @@ void DarkMatterPhysics::Init(){
   G4double fFactor = DMpar->GetRegisteredParam("Ffactor",0.1);
   //G4double IDMTheta = DMpar->GetRegisteredParam("IDMTheta",1.e-3); // is it to be used somewhere as argument?
   G4int BranchingType = DMpar->GetRegisteredParam("BranchingType",0);
-
-
-
 
 /*
  * A.C. all quantities obtained from DMPar have intrinsic G4 units
@@ -217,7 +214,7 @@ void DarkMatterPhysics::ConstructParticle()
    * The following lines are necessary to construct the particles that will be propagated for annihilation
    *
    */
-  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
+  DarkMatterParametersRegistry* DMpar = DarkMatterParametersRegistry::GetInstance();
 
   G4int DMProcessType = (G4int)(DMpar->GetRegisteredParam("DMProcessType"));
   G4int DecayType = (G4int)(DMpar->GetRegisteredParam("DecayType"));
@@ -393,7 +390,7 @@ void DarkMatterPhysics::ConstructProcess()
 //    phLHelper->RegisterProcess( DMBremPointer, G4Positron::PositronDefinition() );
   }
   if(myDarkMatter->GetParentPDGID() == -11) {
-    DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
+    DarkMatterParametersRegistry* DMpar = DarkMatterParametersRegistry::GetInstance();
     G4double annihilationStepLimiterFactor=DMpar->GetRegisteredParam("AnnihilationStepLimiterFactor",5.);
     DarkMatterAnnihilation *dmAnnihil=dynamic_cast<DarkMatterAnnihilation*>(myDarkMatter);
     AnnihilationStepLimiter *dmLimiterProc=new AnnihilationStepLimiter(dmAnnihil,"StepLimiterAnnihilation");

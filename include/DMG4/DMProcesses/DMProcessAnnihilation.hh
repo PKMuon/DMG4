@@ -10,7 +10,7 @@
 class DarkMatter;
 class DarkMatterAnnihilation;
 class G4ParticleDefinition;
-class DarkMatterParametersFactory;
+class DarkMatterParametersRegistry;
 class AnnihilationStepLimiter;
 
 class G4Element;
@@ -41,7 +41,7 @@ class DMProcessAnnihilation : public G4VDiscreteProcess
     G4ParticleDefinition* theDMParticlePtr;
     G4double BiasSigmaFactor;
 
-    DarkMatterParametersFactory* DMpar;
+    DarkMatterParametersRegistry* DMpar;
     G4int iBranchingType;
     G4double mChi,mChi1,mChi2;
 

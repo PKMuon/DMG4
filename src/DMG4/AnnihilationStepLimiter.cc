@@ -9,7 +9,7 @@
 
 #include "DarkMatter.hh"
 #include "DarkMatterAnnihilation.hh"
-#include "DarkMatterParametersFactory.hh"
+#include "DarkMatterParametersRegistry.hh"
 
 AnnihilationStepLimiter::AnnihilationStepLimiter(DarkMatterAnnihilation* m_DarkMatterAnnihilation_in,const G4String& aName)
   : G4VDiscreteProcess(aName,fUserDefined),
@@ -18,22 +18,18 @@ AnnihilationStepLimiter::AnnihilationStepLimiter(DarkMatterAnnihilation* m_DarkM
     factor(1.)
 {
   SetProcessSubType(2);
-
-
-
-
 }
 
 
 AnnihilationStepLimiter::~AnnihilationStepLimiter()
-{
-}
+{}
 
 
 G4bool AnnihilationStepLimiter::IsApplicable(const G4ParticleDefinition& particle)
 {
   return (particle==*(G4Positron::Definition()));
 }
+
 
 G4double AnnihilationStepLimiter::GetMeanFreePath(const G4Track&, G4double, G4ForceCondition*){
   return DBL_MAX;
@@ -77,6 +73,7 @@ G4double
   return DBL_MAX;
 }
 
+
 G4VParticleChange*
   AnnihilationStepLimiter::PostStepDoIt( const G4Track& aTrack,
                                  const G4Step&  )
@@ -87,7 +84,8 @@ G4VParticleChange*
    return &aParticleChange;
 }
 
-G4double AnnihilationStepLimiter::GetMaxEloss(G4double E){
+G4double AnnihilationStepLimiter::GetMaxEloss(G4double E)
+{
   G4double Mres=m_DarkMatterAnnihilation->GetMA()*GeV;
   G4double W=m_DarkMatterAnnihilation->Width()*GeV;
   G4double Wstar=W*(Mres/(2*CLHEP::electron_mass_c2));
@@ -96,13 +94,14 @@ G4double AnnihilationStepLimiter::GetMaxEloss(G4double E){
   return maxEloss;
 }
 
+
 //E is the TOTAL POSITRON energy
-G4double AnnihilationStepLimiter::dSigmadEoverSigma(G4double E){
+G4double AnnihilationStepLimiter::dSigmadEoverSigma(G4double E)
+{
   G4double Mres=m_DarkMatterAnnihilation->GetMA()*GeV;
   G4double Eres=(Mres*Mres-2*CLHEP::electron_mass_c2)/(2*CLHEP::electron_mass_c2);
   G4double W=m_DarkMatterAnnihilation->Width()*GeV;
   G4double Wstar=W*(Mres/(2*CLHEP::electron_mass_c2));
-
 
 
   G4double ret=1;
@@ -112,6 +111,4 @@ G4double AnnihilationStepLimiter::dSigmadEoverSigma(G4double E){
 
 //  G4cout<<"dS: "<<Mres/GeV<<" "<<Eres/GeV<<" "<<W/GeV<<" "<<Wstar/GeV<<" "<<E/GeV<<" "<<ret<<G4endl;
   return ret;
-
 }
-

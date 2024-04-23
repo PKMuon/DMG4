@@ -1,5 +1,5 @@
 #include "DMParticleZPrime.hh"
-#include "DarkMatterParametersFactory.hh"
+#include "DarkMatterParametersRegistry.hh"
 
 #include "G4ParticleTable.hh"
 #include "G4SystemOfUnits.hh"
@@ -30,8 +30,8 @@ DMParticleZPrime* DMParticleZPrime::Definition()
       (1.-(pow((mass1-mass2),2.)-4.*mass1*mass2)/(2.*MassIn*MassIn)-(pow(mass1*mass1-mass2*mass2,2.)/(2.*pow(MassIn,4.))));
   };
 
-  //get parameters from factory (NOTE: mass is parsed in GeV)
-  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
+  //get parameters from registry (NOTE: mass is parsed in GeV)
+  DarkMatterParametersRegistry* DMpar = DarkMatterParametersRegistry::GetInstance();
   G4double MassIn    = DMpar->GetRegisteredParam("DMMass");
   G4double epsilIn   = DMpar->GetRegisteredParam("Epsilon");
   G4double alphaD = DMpar->GetRegisteredParam("AlphaD", 0.5);

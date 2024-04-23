@@ -1,5 +1,5 @@
 #include "DMParticleScalar.hh"
-#include "DarkMatterParametersFactory.hh"
+#include "DarkMatterParametersRegistry.hh"
 
 #include "G4ParticleTable.hh"
 #include "G4SystemOfUnits.hh"
@@ -15,8 +15,8 @@ DMParticleScalar* DMParticleScalar::Definition()
   if( theInstance ) {
     return theInstance;
   }
-  //get parameters from factory (NOTE: mass is parsed in GeV)
-  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
+  //get parameters from registry (NOTE: mass is parsed in GeV)
+  DarkMatterParametersRegistry* DMpar = DarkMatterParametersRegistry::GetInstance();
   G4double MassIn    = DMpar->GetRegisteredParam("DMMass");
   G4double epsilIn   = DMpar->GetRegisteredParam("Epsilon");
   G4double DecayType = DMpar->GetRegisteredParam("DecayType");

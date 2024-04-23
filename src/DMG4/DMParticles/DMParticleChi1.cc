@@ -1,5 +1,5 @@
 #include "DMParticleChi1.hh"
-#include "DarkMatterParametersFactory.hh"
+#include "DarkMatterParametersRegistry.hh"
 
 #include "G4ParticleTable.hh"
 #include "G4SystemOfUnits.hh"
@@ -14,8 +14,8 @@ DMParticleChi1* DMParticleChi1::Definition()
   if( theInstance ) {
     return theInstance;
   }
-  //get parameters from factory (NOTE: mass is parsed in GeV)
-  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
+  //get parameters from registry (NOTE: mass is parsed in GeV)
+  DarkMatterParametersRegistry* DMpar = DarkMatterParametersRegistry::GetInstance();
   double MassChi1 = (DMpar->GetRegisteredParam("DMMass")) * DMpar->GetRegisteredParam("RDM", 1./3.);
 
   const G4String name = "DMParticleChi1";

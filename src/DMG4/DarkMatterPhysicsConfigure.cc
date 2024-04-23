@@ -1,5 +1,5 @@
 #include "DarkMatterPhysics.hh"
-#include "DarkMatterParametersFactory.hh"
+#include "DarkMatterParametersRegistry.hh"
 
 #include "G4SystemOfUnits.hh"
 
@@ -33,7 +33,7 @@
 bool DarkMatterPhysics::DarkMatterPhysicsConfigure() 
 {
   //call an instance of the class
-  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();
+  DarkMatterParametersRegistry* DMpar = DarkMatterParametersRegistry::GetInstance();
   
   DMpar->RegisterNewParam("BiasSigmaFactor0", 1.e9);
   DMpar->RegisterNewParam("EThresh", 35.*GeV); // for sensitivity calculations invisible mode
