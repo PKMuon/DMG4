@@ -203,7 +203,7 @@ double DarkMatterAnnihilation::GetSigmaTotAtomicEffectsOneShellFull(double E0,in
       double zThis=zmin+dz*iz+dz/2;
       double sThis=2*Mel*Mel+2*Ep*(Em-zThis*Pm);
       double preThis=this->PreFactor(sThis)/this->q(sThis);
-      if ((preThis<0)||(preThis!=preThis)){
+      if ((preThis<0)||(!isfinite(preThis))){
         preThis=0; //numerical precision
       }
       pre=pre+preThis;
