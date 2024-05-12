@@ -68,7 +68,7 @@ double DarkMatterAnnihilation::sMin(){
     smin=(mChi1+mChi2)*(mChi1+mChi2);
   }
   else{
-preFac    smin=(4*mChi*mChi);
+    smin=(4*mChi*mChi);
   }
   return smin;
 }
