@@ -68,7 +68,7 @@ double DarkMatterAnnihilation::sMin(){
     smin=(mChi1+mChi2)*(mChi1+mChi2);
   }
   else{
-    smin=(4*mChi*mChi);
+preFac    smin=(4*mChi*mChi);
   }
   return smin;
 }
@@ -221,7 +221,7 @@ double DarkMatterAnnihilation::GetSigmaTotAtomicEffectsOneShellFull(double E0,in
 
     double thisSigmaShell = pre*(arg1-arg2);
 
-    if ((thisSigmaShell<0)||(thisSigmaShell!=thisSigmaShell)){
+    if ((thisSigmaShell<0)||(!isfinite(thisSigmaShell))){
       thisSigmaShell=0; //work-around for numerical precision
     }
 
