@@ -70,7 +70,7 @@ int main() {
   G4double Emin = EThresh;
   unsigned int nSteps = 1000;
   G4double Ediff = (Emax - Emin)/nSteps;
-  double ekin;
+  double etot;
 
   // Define output ROOT files with plots
   TFile* hOutputFile = new TFile("result.root", "RECREATE");
@@ -110,11 +110,11 @@ int main() {
   }
 
   for(unsigned int i=0; i<nSteps; i++) {
-    ekin = Emin + Ediff * i;
-    if (myDarkMatter->EmissionAllowed(ekin, DensityPb)) {
-      double preF = myDarkMatter->PreFactor(ekin);
-      double BW = myDarkMatter->BreitWignerDenominator(ekin);
-      double totalCS = myDarkMatter->GetSigmaTot(ekin);
+    etot = Emin + Ediff * i;
+    if (myDarkMatter->EmissionAllowed(etot, DensityPb)) {
+      double preF = myDarkMatter->PreFactor(etot);
+      double BW = myDarkMatter->BreitWignerDenominator(etot);
+      double totalCS = myDarkMatter->GetSigmaTot(etot);
 
       // Calculate CS with atomic effects
       double totalCSAtomicEffects = 0.;
@@ -123,8 +123,8 @@ int main() {
         int ZeleShell = shellElectronZ[Z].at(is);
         const std::vector<double>& eneShell = shellElectronEnergies[Z].at(is);
 
-        double sigmaShell = myDarkMatter->GetSigmaTotAtomicEffectsOneShell(ekin, ZeleShell, eneShell);
-        double sigmaShellFull = myDarkMatter->GetSigmaTotAtomicEffectsOneShellFull(ekin, ZeleShell, eneShell);
+        double sigmaShell = myDarkMatter->GetSigmaTotAtomicEffectsOneShell(etot, ZeleShell, eneShell);
+        double sigmaShellFull = myDarkMatter->GetSigmaTotAtomicEffectsOneShellFull(etot, ZeleShell, eneShell);
 
         totalCSAtomicEffects += sigmaShell;
         totalCSAtomicEffectsFull += sigmaShellFull;
@@ -133,11 +133,11 @@ int main() {
       //G4cout << Form("%3.2f GeV:   Prefactor = %5.2e [pb]  --  1/BW = %3.2e [GeV^4]  --  total CS = %5.2e [pb]", ekin, preF, 1./BW, totalCS) << G4endl;
 
       // Save info in TGraph
-      gSigma->SetPoint(i, ekin, totalCS);
-      gPreFactor->SetPoint(i, ekin, preF);
-      gBW->SetPoint(i, ekin, BW);
-      gSigmaAE->SetPoint(i, ekin, totalCSAtomicEffects);
-      gSigmaAEFull->SetPoint(i, ekin, totalCSAtomicEffectsFull);
+      gSigma->SetPoint(i, etot, totalCS);
+      gPreFactor->SetPoint(i, etot, preF);
+      gBW->SetPoint(i, etot, BW);
+      gSigmaAE->SetPoint(i, etot, totalCSAtomicEffects);
+      gSigmaAEFull->SetPoint(i, etot, totalCSAtomicEffectsFull);
     }
   }
 
@@ -145,17 +145,17 @@ int main() {
   // Test sampling of cross-section at peak E0 = MA*MA / 2*m_e
   // ---------------------------------------------------------
 
-  ekin = MA*MA/(2*5.11e-4);
+  etot = MA*MA/(2*5.11e-4);
 
-  G4cout << "Testing sampling for resonant annihilation at E = " << ekin << " GeV, for coupling = " << coupling << ", mass = " << MA << " GeV" << G4endl;
+  G4cout << "Testing sampling for resonant annihilation at E = " << etot << " GeV, for coupling = " << coupling << ", mass = " << MA << " GeV" << G4endl;
 
   int NTry=1000;
   int ITry;
   double angle;
   for(int i=0; i<NTry; i++) {
 
-    ITry = myDarkMatter->Emission(ekin, DensityPb, 1.);
-    angle = myDarkMatter->SimulateEmissionResonant(ekin);
+    ITry = myDarkMatter->Emission(etot, DensityPb, 1.);
+    angle = myDarkMatter->SimulateEmissionResonant(etot);
     hAngle->Fill(angle);
 
     G4cout << "Emission simulated, Theta = " << angle << G4endl;
