@@ -108,6 +108,6 @@ G4double AnnihilationStepLimiter::dSigmadEoverSigma(G4double E)
     ret=Wstar*2*fabs(E-Eres)/((E-Eres)*(E-Eres)+Wstar*Wstar);
   }
 
-//  G4cout<<"dS: "<<Mres/GeV<<" "<<Eres/GeV<<" "<<W/GeV<<" "<<Wstar/GeV<<" "<<E/GeV<<" "<<ret<<G4endl;
+  //G4cout<<"dS: "<<Mres/GeV<<" "<<Eres/GeV<<" "<<W/GeV<<" "<<Wstar/GeV<<" "<<E/GeV<<" "<<ret<<G4endl;
   return ret;
 }
