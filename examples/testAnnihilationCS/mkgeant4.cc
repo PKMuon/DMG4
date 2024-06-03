@@ -85,7 +85,6 @@ int main() {
   TGraph *gPreFactor = new TGraph(nSteps);
   TGraph *gBW = new TGraph(nSteps);
   TGraph *gEnergyLoss = new TGraph(nSteps);
-  TGraph *gMaxStep = new TGraph(nSteps);
   TH1D *hAngle = new TH1D("hAngle","Angular distribution; #eta; nevts [-]", 100,-1,1);
 
   G4double width = myDarkMatter->Width()*GeV;
@@ -137,11 +136,9 @@ int main() {
         totalCSAtomicEffectsFull += sigmaShellFull;
       }
       double energyLoss = dmLimiterProc->GetMaxEloss(etot*GeV)/GeV;
-      G4double W=myDarkMatter->Width()*GeV;
-      G4double Wstar=W*(MA/(2*me));
-      G4double maxStep=Wstar/energyLoss;
 
-      //G4cout << Form("%3.2f GeV:   Prefactor = %5.2e [pb]  --  1/BW = %3.2e [GeV^4]  --  total CS = %5.2e [pb]", ekin, preF, 1./BW, totalCS) << G4endl;
+      //G4cout << Form("E = %3.2f GeV:   Prefactor = %5.2e [pb]  --  1/BW = %3.2e [GeV^4]  --  total CS = %5.2e [pb]", etot, preF, 1./BW, totalCS) << G4endl;
+      //G4cout << Form("E = %3.2f [GeV]  --  Energy Loss = %3.2e [GeV]  --  Eres = %3.2e [GeV]", etot, energyLoss, Eres) << G4endl;
 
       // Save info in TGraph
       gSigma->SetPoint(i, etot, totalCS);
@@ -149,7 +146,6 @@ int main() {
       gBW->SetPoint(i, etot, BW);
       double ediff = (etot==Eres)? 1 : energyLoss/fabs(Eres-etot);
       gEnergyLoss->SetPoint(i, etot, ediff);
-      gMaxStep->SetPoint(i, etot, maxStep);
       gSigmaAE->SetPoint(i, etot, totalCSAtomicEffects);
       gSigmaAEFull->SetPoint(i, etot, totalCSAtomicEffectsFull);
     }
@@ -248,21 +244,6 @@ int main() {
   gEnergyLoss->GetYaxis()->SetTitle("Diff");
   c->SetLogy();
   c->Write();
-
-  // Save StepLimiter graph
-  c->Clear();
-  c->SetName("MaxStep");
-  c->SetGrid();
-  gMaxStep->SetTitle(Form("Max Step from step limiter for E_{res} = %3.2e GeV and #Gamma = %3.2e MeV", Eres*1.e3, width));
-  gMaxStep->SetMarkerStyle(21);
-  gMaxStep->SetMarkerColor(kBlue);
-  gMaxStep->Draw("ACP");
-  gMaxStep->GetXaxis()->SetTitle("E_{primary} [GeV]");
-  gMaxStep->GetYaxis()->SetTitle("Step limit");
-  c->SetLogy();
-  c->Write();
-
-
 
   // Save angular distribution histogram
   c->Clear();
