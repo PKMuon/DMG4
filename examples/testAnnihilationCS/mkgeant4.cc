@@ -9,6 +9,7 @@
 #include "DarkMatterAnnihilation.hh"
 #include "DarkPhotonsAnnihilation.hh"
 #include "DarkZAnnihilation.hh"
+#include "AnnihilationStepLimiter.hh"
 
 #include "Randomize.hh"
 
@@ -49,7 +50,7 @@ int main() {
   //G4double EThresh = 2000.; // to turn off A emissions
 
   // Set parameters to be passed to DarkMatterAnnihilation class
-  G4double MA = 0.25;
+  G4double MA = 0.25; // GeV
   G4double coupling = 1e-5;
   G4double SigmaNorm = 1.;
   G4double ANuclPb = 207.;
@@ -62,12 +63,16 @@ int main() {
 
   // Initialize DarkMatterAnnihilation instance
   DarkMatterAnnihilation* myDarkMatter = new DarkZAnnihilation(MA, EThresh, SigmaNorm, ANuclPb, ZNuclPb, DensityPb, coupling, IDecayIn, rIn, alphaD, IBranchingIn);
+  auto *dmLimiterProc=new AnnihilationStepLimiter(myDarkMatter,"StepLimiterAnnihilation");
+  dmLimiterProc->SetFactor(2);
 
   myDarkMatter->PrepareTable();
 
   // Set energy range and steps
   G4double Emax = 100.;
   G4double Emin = EThresh;
+  G4double me = CLHEP::electron_mass_c2/GeV;
+  G4double Eres=(MA*MA-2*me*me)/(2*me);
   unsigned int nSteps = 1000;
   G4double Ediff = (Emax - Emin)/nSteps;
   double etot;
@@ -79,9 +84,11 @@ int main() {
   TGraph *gSigmaAEFull = new TGraph(nSteps);
   TGraph *gPreFactor = new TGraph(nSteps);
   TGraph *gBW = new TGraph(nSteps);
+  TGraph *gEnergyLoss = new TGraph(nSteps);
+  TGraph *gMaxStep = new TGraph(nSteps);
   TH1D *hAngle = new TH1D("hAngle","Angular distribution; #eta; nevts [-]", 100,-1,1);
 
-  G4double width = myDarkMatter->Width();
+  G4double width = myDarkMatter->Width()*GeV;
 
   // ---------------------------------------------------------------
   // Test of total cross-section as a function of the primary energy
@@ -129,6 +136,10 @@ int main() {
         totalCSAtomicEffects += sigmaShell;
         totalCSAtomicEffectsFull += sigmaShellFull;
       }
+      double energyLoss = dmLimiterProc->GetMaxEloss(etot*GeV)/GeV;
+      G4double W=myDarkMatter->Width()*GeV;
+      G4double Wstar=W*(MA/(2*me));
+      G4double maxStep=Wstar/energyLoss;
 
       //G4cout << Form("%3.2f GeV:   Prefactor = %5.2e [pb]  --  1/BW = %3.2e [GeV^4]  --  total CS = %5.2e [pb]", ekin, preF, 1./BW, totalCS) << G4endl;
 
@@ -136,6 +147,9 @@ int main() {
       gSigma->SetPoint(i, etot, totalCS);
       gPreFactor->SetPoint(i, etot, preF);
       gBW->SetPoint(i, etot, BW);
+      double ediff = (etot==Eres)? 1 : energyLoss/fabs(Eres-etot);
+      gEnergyLoss->SetPoint(i, etot, ediff);
+      gMaxStep->SetPoint(i, etot, maxStep);
       gSigmaAE->SetPoint(i, etot, totalCSAtomicEffects);
       gSigmaAEFull->SetPoint(i, etot, totalCSAtomicEffectsFull);
     }
@@ -145,17 +159,15 @@ int main() {
   // Test sampling of cross-section at peak E0 = MA*MA / 2*m_e
   // ---------------------------------------------------------
 
-  etot = MA*MA/(2*5.11e-4);
-
-  G4cout << "Testing sampling for resonant annihilation at E = " << etot << " GeV, for coupling = " << coupling << ", mass = " << MA << " GeV" << G4endl;
+  G4cout << "Testing sampling for resonant annihilation at E = " << Eres << " GeV, for coupling = " << coupling << ", mass = " << MA << " GeV" << G4endl;
 
   int NTry=1000;
   int ITry;
   double angle;
   for(int i=0; i<NTry; i++) {
 
-    ITry = myDarkMatter->Emission(etot, DensityPb, 1.);
-    angle = myDarkMatter->SimulateEmissionResonant(etot);
+    ITry = myDarkMatter->Emission(Eres, DensityPb, 1.);
+    angle = myDarkMatter->SimulateEmissionResonant(Eres);
     hAngle->Fill(angle);
 
     G4cout << "Emission simulated, Theta = " << angle << G4endl;
@@ -177,14 +189,14 @@ int main() {
   c->SetName("totalCS");
   c->SetGrid();
   TLegend* legend = new TLegend();
-  gSigma->SetTitle(Form("Total CS for MA = %3.2e MeV and coupling = %3.2e with #Gamma = %3.2e MeV", MA*1.e3, coupling, width*1.e3));
+  gSigma->SetTitle(Form("Total CS for MA = %3.2e MeV and coupling = %3.2e with #Gamma = %3.2e MeV", MA*1.e3, coupling, width));
   gSigma->SetMarkerStyle(21);
   gSigma->SetMarkerColor(kBlack);
   legend->AddEntry(gSigma, "CS without atomic effects", "lp");
   gSigma->Draw("ACP");
   gSigma->GetXaxis()->SetTitle("E_{primary} [GeV]");
   gSigma->GetYaxis()->SetTitle("Cross-section [pb]");
-  gSigmaAE->SetTitle(Form("Total CS (with atomic effects for MA = %3.2e MeV and coupling = %3.2e with #Gamma = %3.2e MeV", MA*1.e3, coupling, width*1.e3));
+  gSigmaAE->SetTitle(Form("Total CS (with atomic effects for MA = %3.2e MeV and coupling = %3.2e with #Gamma = %3.2e MeV", MA*1.e3, coupling, width));
   legend->AddEntry(gSigmaAE, "CS with atomic effects in BW denominator", "lp");
   gSigmaAE->SetMarkerStyle(21);
   gSigmaAE->SetMarkerColor(kBlue);
@@ -202,7 +214,7 @@ int main() {
   c->Clear();
   c->SetName("CSprefactor");
   c->SetGrid();
-  gPreFactor->SetTitle(Form("Prefactor of resonant CS for MA = %3.2e MeV and coupling = %3.2e with #Gamma = %3.2e MeV", MA*1.e3, coupling, width*1.e3));
+  gPreFactor->SetTitle(Form("Prefactor of resonant CS for MA = %3.2e MeV and coupling = %3.2e with #Gamma = %3.2e MeV", MA*1.e3, coupling, width));
   gPreFactor->SetMarkerStyle(21);
   gPreFactor->SetMarkerColor(kBlue);
   gPreFactor->Draw("ACP");
@@ -215,7 +227,7 @@ int main() {
   c->Clear();
   c->SetName("BWdenominator");
   c->SetGrid();
-  gBW->SetTitle(Form("Breit-Wigner denominator for resonant annihilation production with #Gamma = %3.2e MeV", width*1.e3));
+  gBW->SetTitle(Form("Breit-Wigner denominator for resonant annihilation production with #Gamma = %3.2e MeV", width));
   gBW->SetMarkerStyle(21);
   gBW->SetMarkerColor(kBlue);
   gBW->Draw("ACP");
@@ -223,6 +235,34 @@ int main() {
   gBW->GetYaxis()->SetTitle("Denominator [GeV^{-4}]");
   c->SetLogy();
   c->Write();
+
+  // Save Energy Loss graph
+  c->Clear();
+  c->SetName("EnergyLoss");
+  c->SetGrid();
+  gEnergyLoss->SetTitle(Form("Max energy loss from step limiter #frac{#deltaE_{max}}{E-E_{res}} for E_{res} = %3.2e GeV and #Gamma = %3.2e MeV", Eres*1.e3, width));
+  gEnergyLoss->SetMarkerStyle(21);
+  gEnergyLoss->SetMarkerColor(kBlue);
+  gEnergyLoss->Draw("ACP");
+  gEnergyLoss->GetXaxis()->SetTitle("E_{primary} [GeV]");
+  gEnergyLoss->GetYaxis()->SetTitle("Diff");
+  c->SetLogy();
+  c->Write();
+
+  // Save StepLimiter graph
+  c->Clear();
+  c->SetName("MaxStep");
+  c->SetGrid();
+  gMaxStep->SetTitle(Form("Max Step from step limiter for E_{res} = %3.2e GeV and #Gamma = %3.2e MeV", Eres*1.e3, width));
+  gMaxStep->SetMarkerStyle(21);
+  gMaxStep->SetMarkerColor(kBlue);
+  gMaxStep->Draw("ACP");
+  gMaxStep->GetXaxis()->SetTitle("E_{primary} [GeV]");
+  gMaxStep->GetYaxis()->SetTitle("Step limit");
+  c->SetLogy();
+  c->Write();
+
+
 
   // Save angular distribution histogram
   c->Clear();
