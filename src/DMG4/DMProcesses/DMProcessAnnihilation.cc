@@ -273,10 +273,10 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
 
 
 #ifdef EDEP_ALONG_STEP
- // G4cout<<"PostStepDoIt1 "<<aStep.GetPreStepPoint()->GetKineticEnergy()/GeV<<" "<<aStep.GetPostStepPoint()->GetKineticEnergy()/GeV<<G4endl;
- // G4cout<<"PostStepDoIt1a "<<aTrack.GetTrackID()<<" "<<aTrack.GetParentID()<<G4endl;
- // G4cout<<"PostStepDoIt2 "<<initialCrossSection<<" "<<finalCrossSection<<G4endl;
- // G4cout<<"PostStepDoIt3 "<<this->CrossSectionStepE<<" "<<this->CrossSectionStepVal<<" "<<prob<<G4endl;
+  //G4cout<<"PostStepDoIt1 "<<aStep.GetPreStepPoint()->GetTotalEnergy()/GeV<<" "<<aStep.GetPostStepPoint()->GetTotalEnergy()/GeV<<" "<<aTrack.GetTotalEnergy()/GeV<<G4endl;
+  //G4cout<<"PostStepDoIt1a "<<aTrack.GetTrackID()<<" "<<aTrack.GetParentID()<<" "<<diffE<<G4endl;
+  //G4cout<<"PostStepDoIt2 "<<initialCrossSection<<" "<<finalCrossSection<<G4endl;
+  //G4cout<<"PostStepDoIt3 "<<this->CrossSectionStepE<<" "<<this->CrossSectionStepVal<<" "<<prob<<G4endl;
 
   G4double p=G4UniformRand();
   //Do nothing if p>prob
