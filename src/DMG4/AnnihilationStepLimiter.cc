@@ -54,9 +54,10 @@ G4double
 
     //Track energy in G4 units
     G4double E=aTrack.GetTotalEnergy();
+    G4double Ekin=aTrack.GetKineticEnergy();
 
     //compute dEdX and delta0
-    G4double dEdX=emCal.GetDEDX(E,aTrack.GetParticleDefinition(),aTrack.GetMaterial());
+    G4double dEdX=emCal.GetDEDX(Ekin,aTrack.GetParticleDefinition(),aTrack.GetMaterial());
     G4double delta0=1./dEdX;
     delta0 = delta0 / factor;
 
