@@ -51,21 +51,19 @@ G4double
 
     //G4 convention: put immediately units
     G4double Mres=m_DarkMatterAnnihilation->GetMA()*GeV;
-    G4double Eres=(Mres*Mres-2*CLHEP::electron_mass_c2*CLHEP::electron_mass_c2)/(2*CLHEP::electron_mass_c2);
-    G4double W=m_DarkMatterAnnihilation->Width()*GeV;
-    G4double Wstar=W*(Mres/(2*CLHEP::electron_mass_c2));
 
     //Track energy in G4 units
     G4double E=aTrack.GetTotalEnergy();
 
     //compute dEdX and delta0
     G4double dEdX=emCal.GetDEDX(E,aTrack.GetParticleDefinition(),aTrack.GetMaterial());
-    G4double delta0=Wstar/dEdX;
+    G4double delta0=1./dEdX;
     delta0 = delta0 / factor;
 
     //compute the step length (see:https://gitlab.cern.ch/P348/DMG4/-/work_items/20)
     G4double maxStepDen=dSigmadEoverSigma(E);
     AnnihilationMaxStep=delta0/maxStepDen;
+    //std::cout << "Annihilation max step: " << AnnihilationMaxStep << std::endl;
 
     return AnnihilationMaxStep;
   }
@@ -85,12 +83,8 @@ G4VParticleChange*
 
 G4double AnnihilationStepLimiter::GetMaxEloss(G4double E)
 {
-  G4double Mres=m_DarkMatterAnnihilation->GetMA()*GeV;
-  G4double W=m_DarkMatterAnnihilation->Width()*GeV;
-  G4double Wstar=W*(Mres/(2*CLHEP::electron_mass_c2));
-
-  G4double maxEloss=Wstar/dSigmadEoverSigma(E);
-  return maxEloss;
+  //std::cout << "Max E loss: " << 1./dSigmadEoverSigma(E) << std::endl;
+  return 1./dSigmadEoverSigma(E);
 }
 
 
@@ -105,7 +99,7 @@ G4double AnnihilationStepLimiter::dSigmadEoverSigma(G4double E)
 
   G4double ret=1;
   if (fabs(E-Eres)>Wstar){
-    ret=Wstar*2*fabs(E-Eres)/((E-Eres)*(E-Eres)+Wstar*Wstar);
+    ret=2*fabs(E-Eres)/((E-Eres)*(E-Eres)+Wstar*Wstar);
   }
 
   //G4cout<<"dS: "<<Mres/GeV<<" "<<Eres/GeV<<" "<<W/GeV<<" "<<Wstar/GeV<<" "<<E/GeV<<" "<<ret<<G4endl;
