@@ -98,7 +98,7 @@ G4double AnnihilationStepLimiter::dSigmadEoverSigma(G4double E)
   G4double Wstar=W*(Mres/(2*CLHEP::electron_mass_c2));
 
 
-  G4double ret=1;
+  G4double ret=1./Wstar;
   if (fabs(E-Eres)>Wstar){
     ret=2*fabs(E-Eres)/((E-Eres)*(E-Eres)+Wstar*Wstar);
   }
