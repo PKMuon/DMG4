@@ -1,3 +1,6 @@
+                              Fixed inconsistent definitions of resonant energy in DMProcessAnnihilation and AnnihilationStepLimiter
+                              Simplified methods in AnnihilationStepLimiter class
+                              Fixed instances where kinetic energy was used instead of total energy in DMProcessAnnihilation
                               Declare some variables long double to solve precision issues in annihilation classes
                               Add variable EKinThresh (kinematic threshold) and use it instead of big margin value 2*MA
                               Add option to build and use library on MacOS : flat_namespace

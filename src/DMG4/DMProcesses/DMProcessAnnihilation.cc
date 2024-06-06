@@ -55,7 +55,7 @@ DMProcessAnnihilation::DMProcessAnnihilation(DarkMatterAnnihilation *DarkMatterP
   //Init Xi
   //see documentation: https://gitlab.cern.ch/P348/DMG4/-/issues/14
   G4double deltaE = 0.005; //according to B. Banto studies (5 MeV), documentation before
-  G4double Emax=(myDarkMatterAnnihilation->GetMA()*myDarkMatterAnnihilation->GetMA())/(2*Mel); //this is resonant energy in GeV
+  G4double Emax=(myDarkMatterAnnihilation->GetMA()*myDarkMatterAnnihilation->GetMA()-2*Mel*Mel)/(2*Mel); //this is resonant energy in GeV
 
   xi=Emax/(Emax+deltaE);
 
@@ -81,7 +81,6 @@ G4ForceCondition* /*condition*/) {
 
 
   G4double DensityMat = aTrack.GetMaterial()->GetDensity() / (g / cm3);
-  G4double ekin = aTrack.GetKineticEnergy() / GeV; //this is the kinetic energy of the positron at the beginning of the step
   G4double etot = aTrack.GetTotalEnergy() / GeV; //this is the total energy of the positron at the beginning of the step
 
 
@@ -158,8 +157,8 @@ G4ForceCondition* /*condition*/) {
       xi=Emax/(Emax+dEmax);
       if (xi<.8) //G4 suggestion
         xi=.8;
+      //G4cout<<"DMProcessGetMeanFreePath: E_f="<<aTrack.GetTotalEnergy()/GeV<<"[GeV]; max energy loss: "<<dEmax<<"[GeV]; xi="<<xi<<" Emax/xi="<< Emax/xi<< "[GeV]"<< G4endl;
     }
-    //G4cout<<"DMProcessGetMeanFreePath: "<<aTrack.GetKineticEnergy()/GeV<<" "<<dEmax<<" "<<xi<<G4endl;
 
     //First case, the energy at the beginning of the step is smaller than the resonant energy
     if (etot < Emax){
@@ -173,8 +172,8 @@ G4ForceCondition* /*condition*/) {
     }
     //Second case, the energy at the beginning of the step is larger than the resonant energy and also than Emax/xi
     //take the value xi*E (0<xi<1)
-    else if (ekin > (Emax/xi)){
-      this->CrossSectionStepE=xi*ekin;
+    else if (etot > (Emax/xi)){
+      this->CrossSectionStepE=xi*etot;
 #ifdef ATOMIC_EFFECTS
       this->CrossSectionStepVal=myDarkMatterAnnihilation->GetSigmaTotAtomicEffects(this->CrossSectionStepE, shellElectronZ[Z], shellElectronEnergies[Z]);
 #else
@@ -218,8 +217,8 @@ G4ForceCondition* /*condition*/) {
 
 //This method is called if this process is selected as that responsible for the step limitation
 G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, const G4Step &aStep) {
-  const G4double incidentE = aTrack.GetKineticEnergy(); //this is the energy at the end of the step
-  const G4double initialE =  aStep.GetPreStepPoint()->GetKineticEnergy(); //this is the energy at the beginning of the step
+  const G4double incidentE = aTrack.GetTotalEnergy(); //this is the energy at the end of the step
+  const G4double initialE =  aStep.GetPreStepPoint()->GetTotalEnergy(); //this is the energy at the beginning of the step
   G4double DMMass = myDarkMatterAnnihilation->GetMA()*GeV; // in MeV
 
   auto elms=aTrack.GetMaterial()->GetElementVector();
@@ -274,10 +273,10 @@ G4VParticleChange* DMProcessAnnihilation::PostStepDoIt(const G4Track &aTrack, co
 
 
 #ifdef EDEP_ALONG_STEP
- // G4cout<<"PostStepDoIt1 "<<aStep.GetPreStepPoint()->GetKineticEnergy()/GeV<<" "<<aStep.GetPostStepPoint()->GetKineticEnergy()/GeV<<G4endl;
- // G4cout<<"PostStepDoIt1a "<<aTrack.GetTrackID()<<" "<<aTrack.GetParentID()<<G4endl;
- // G4cout<<"PostStepDoIt2 "<<initialCrossSection<<" "<<finalCrossSection<<G4endl;
- // G4cout<<"PostStepDoIt3 "<<this->CrossSectionStepE<<" "<<this->CrossSectionStepVal<<" "<<prob<<G4endl;
+  //G4cout<<"PostStepDoIt1 "<<aStep.GetPreStepPoint()->GetTotalEnergy()/GeV<<" "<<aStep.GetPostStepPoint()->GetTotalEnergy()/GeV<<" "<<aTrack.GetTotalEnergy()/GeV<<G4endl;
+  //G4cout<<"PostStepDoIt1a "<<aTrack.GetTrackID()<<" "<<aTrack.GetParentID()<<" "<<diffE<<G4endl;
+  //G4cout<<"PostStepDoIt2 "<<initialCrossSection<<" "<<finalCrossSection<<G4endl;
+  //G4cout<<"PostStepDoIt3 "<<this->CrossSectionStepE<<" "<<this->CrossSectionStepVal<<" "<<prob<<G4endl;
 
   G4double p=G4UniformRand();
   //Do nothing if p>prob
