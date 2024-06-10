@@ -88,7 +88,7 @@ build-el9:
 
   # prepare environment
   before_script:
-    - yum -q -y install libX11 libX11-devel motif motif-devel mesa-libGL-devel mesa-libEGL-devel libXpm libtirpc which make
+    - yum -q -y install libX11 libX11-devel motif motif-devel mesa-libGL-devel mesa-libEGL-devel libXpm libtirpc which make glibc-devel
     - source /cvmfs/sft.cern.ch/lcg/views/LCG_105/x86_64-el9-gcc12-opt/setup.sh
     - export COMPILER_TYPE="gcc"
     - cat /etc/redhat-release
