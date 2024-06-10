@@ -80,7 +80,7 @@ build-el9:
   stage: test
 
   # use same OS as lxplus (EL9)
-  #image: gitlab-registry.cern.ch/linuxsupport/alma9-base:latest
+  image: gitlab-registry.cern.ch/linuxsupport/alma9-base:latest
 
   tags:
   # Make your job be executed in a shared runner that has CVMFS mounted
@@ -90,6 +90,7 @@ build-el9:
   before_script:
     - yum -q -y install libX11 libX11-devel motif motif-devel mesa-libGL-devel mesa-libEGL-devel libXpm libtirpc which
     - source /cvmfs/sft.cern.ch/lcg/views/LCG_104/x86_64-el9-gcc12-opt/setup.sh
+    - export COMPILER_TYPE="gcc"
     - cat /etc/redhat-release
     - g++ --version
     - cmake --version
