@@ -8,7 +8,7 @@ stages:
   - test
   - deploy
 
-.build-cc7:
+build-cc7:
   stage: test
 
   # use same OS as old lxplus7 (CC7)
@@ -89,11 +89,11 @@ build-el9:
   # prepare environment
   before_script:
     - yum -q -y install libX11 libX11-devel motif motif-devel mesa-libGL-devel mesa-libEGL-devel libXpm libtirpc which make glibc-devel
-    - source /cvmfs/sft.cern.ch/lcg/views/LCG_105/x86_64-el9-gcc12-opt/setup.sh
-    - export COMPILER_TYPE="gcc"
+    - source /cvmfs/sft.cern.ch/lcg/views/setupViews.sh LCG_105 x86_64-el9-gcc12-opt
     - cat /etc/redhat-release
     - g++ --version
     - cmake --version
+    - make --version
     - root-config --version
     - root-config --features
 
