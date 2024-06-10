@@ -80,7 +80,7 @@ build-el9:
   stage: test
 
   # use same OS as lxplus (EL9)
-  image: gitlab-registry.cern.ch/linuxsupport/alma9-base:latest
+  #image: gitlab-registry.cern.ch/linuxsupport/alma9-base:latest
 
   tags:
   # Make your job be executed in a shared runner that has CVMFS mounted
