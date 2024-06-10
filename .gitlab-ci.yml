@@ -89,7 +89,7 @@ build-el9:
   # prepare environment
   before_script:
     - yum -q -y install libX11 libX11-devel motif motif-devel mesa-libGL-devel mesa-libEGL-devel
-    - source /cvmfs/sft.cern.ch/lcg/views/setupViews.sh LCG_105 x86_64-el9-gcc13-opt
+    - source /cvmfs/sft.cern.ch/lcg/views/setupViews.csh LCG_105 x86_64-el9-gcc13-opt
     - cat /etc/redhat-release
     - g++ --version
     - cmake --version
@@ -111,7 +111,7 @@ build-el9:
     - cd examples/example11
     - ./runconfigure
     - make
-    - source config.sh
+    - source config.csh
     - ./mkgeant4 cardg_test.g4mac
     - cp Report.txt Report.txtSV
     - cd ../..
