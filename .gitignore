@@ -12,3 +12,7 @@ CMakeFiles/
 config.txt
 config.sh
 config.csh
+
+# files created in examples
+mkgeant4
+*.root
