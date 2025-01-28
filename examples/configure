@@ -101,4 +101,8 @@ if [ "x${ROOTLOCATION}" != "x" ] ; then
   ARGLIST="${ARGLIST} -DROOTSYS=${ROOTLOCATION}"
 fi
 
+if [ "${COMPMODE}" != "None" ] ; then
+  ARGLIST="${ARGLIST} -DCMAKE_BUILD_TYPE=${COMPMODE}"
+fi
+
 cmake ${ARGLIST} ../.
