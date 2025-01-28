@@ -9,4 +9,5 @@ echo "GSLLOCATION=${GSLLOCATION}"
 echo "GEANT4LOCATION=${GEANT4LOCATION}" > config.txt
 echo "GSLLOCATION=${GSLLOCATION}" >> config.txt
 #
+# Enable debug mode during gitlab CI for coverage
 ./configure --with-geant4=${GEANT4LOCATION} --with-gsl=${GSLLOCATION} --enable-debug

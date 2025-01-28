@@ -15,6 +15,10 @@
 .gcovr-script: &gcovr-script
   - >
     gcovr -r $(readlink -f .) \
+      -e "$(readlink -f include)/*" \
+      -e "$(readlink -f examples)/*" \
+      -e "$(readlink -f src)/*" \
+      --object-directory=$(readlink -f .) \
       --exclude-throw-branches \
       --exclude-unreachable-branches \
       --gcov-ignore-parse-errors \
@@ -28,7 +32,7 @@
     reports:
       coverage_report:
         coverage_format: cobertura
-        path: DMG4/coverage.${CI_COMMIT_BRANCH}.xml
+        path: coverage.${CI_COMMIT_BRANCH}.xml
     paths:
       - examples/testCS/testDP.log
       - examples/testCS/testSC.log
