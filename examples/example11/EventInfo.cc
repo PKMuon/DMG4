@@ -25,7 +25,7 @@ void EventInfo::AddParentInfo(const G4Step* aStep) {
 
 void EventInfo::AddDaughterInfo(const G4Step* aStep) {
   G4int trackID = aStep->GetTrack()->GetTrackID();
-  if(dmEvents.contains(trackID)) {
+  if(auto it = dmEvents.find(trackID); it != dmEvents.end()) {
     // Add new DM event's daughter info
     dmEvents[trackID].AddDaughterInfo(aStep);
   } else {
