@@ -40,6 +40,33 @@
       - examples/testCS/testAX.log
 
 
+.run-example-geant4:
+  - cd examples/example11
+  - *runconfigure-test
+  - make
+  - source config.sh
+  # Test A' -> invis
+  - ./mkgeant4 -w cardg_test.g4mac -pDMMass=0.0167 -pEpsilon=0.001 -pBiasSigmaFactor0=1.e9 -pDMProcess=1 -pDecayType=0 -pBranchingType=0
+  # Test A' -> e+e-
+  - ./mkgeant4 -w cardg_test.g4mac -pDMMass=0.0167 -pEpsilon=0.001 -pBiasSigmaFactor0=1.e9 -pDMProcess=1 -pDecayType=1 -pBranchingType=0
+  # Test A' -> chi_1 chi_2
+  - ./mkgeant4 -w cardg_test.g4mac -pDMMass=0.0167 -pEpsilon=0.001 -pBiasSigmaFactor0=1.e9 -pDMProcess=1 -pDecayType=2 -pBranchingType=2 -pAlphaD=0.1
+  # Test A' -> chi_i chi_j (dirac inelastic)
+  - ./mkgeant4 -w cardg_test.g4mac -pDMMass=0.0167 -pEpsilon=0.001 -pBiasSigmaFactor0=1.e9 -pDMProcess=1 -pDecayType=2 -pBranchingType=3 -pAlphaD=0.1
+  # Test Sc -> invis
+  - ./mkgeant4 -w cardg_test.g4mac -pDMMass=0.0167 -pEpsilon=0.001 -pBiasSigmaFactor0=1.e9 -pDMProcess=2 -pDecayType=0 -pBranchingType=0
+  # Test Sc -> e+e-
+  - ./mkgeant4 -w cardg_test.g4mac -pDMMass=0.0167 -pEpsilon=0.001 -pBiasSigmaFactor0=1.e9 -pDMProcess=2 -pDecayType=1 -pBranchingType=0
+  # Test Ax -> invis
+  - ./mkgeant4 -w cardg_test.g4mac -pDMMass=0.0167 -pEpsilon=0.001 -pBiasSigmaFactor0=1.e9 -pDMProcess=3 -pDecayType=0 -pBranchingType=0
+  # Test Ax -> e+e-
+  - ./mkgeant4 -w cardg_test.g4mac -pDMMass=0.0167 -pEpsilon=0.001 -pBiasSigmaFactor0=1.e9 -pDMProcess=3 -pDecayType=1 -pBranchingType=0
+  # Test Ps -> invis
+  - ./mkgeant4 -w cardg_test.g4mac -pDMMass=0.0167 -pEpsilon=0.001 -pBiasSigmaFactor0=1.e9 -pDMProcess=4 -pDecayType=0 -pBranchingType=0
+  # Test Ps -> e+e-
+  - ./mkgeant4 -w cardg_test.g4mac -pDMMass=0.0167 -pEpsilon=0.001 -pBiasSigmaFactor0=1.e9 -pDMProcess=4 -pDecayType=1 -pBranchingType=0
+  - cd ../..
+
 
 .run-examples: &run-examples
   - cd examples/example1
@@ -48,14 +75,6 @@
   - ./mkgeant4
   - cd ../..
   
-  - cd examples/example11
-  - *runconfigure-test
-  - make
-  - source config.sh
-  - ./mkgeant4 cardg_test.g4mac
-  - cp Report.txt Report.txtSV
-  - cd ../..
-
   # test DMG4 cross section stability
   - cd examples/testCS
   - *runconfigure-test
@@ -86,8 +105,18 @@
   - cd ../..
 
 
-
 # EXAMPLE COMPILATION AND TESTING
+test-example-geant4:
+  stage: test
+  dependencies:
+    - build-el9
+  extends:
+    - .compile-configuration
+    - .coverage-artifacts
+  script:
+    - *run-example-geant4
+    - *gcovr-script
+
 test-examples:
   stage: test
   dependencies:
