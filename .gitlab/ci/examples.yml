@@ -2,11 +2,11 @@
 #
 # Configuration of examples with Debug flag ON
 .runconfigure-test: &runconfigure-test
-  - ../configure --with-geant4=${GEANT4LOCATION} --with-dmg4=${DMG4LOCATION} --with-gsl=${GSLLOCATION} --enable-debug
+  - ../configure --with-geant4=${GEANT4LOCATION} --with-gsl=${GSLLOCATION} --enable-debug
 
 # Configuration of examples with Debug flag ON and ROOT
 .runconfigure-test-root: &runconfigure-test-root
-  - ../configure --with-geant4=${GEANT4LOCATION} --with-dmg4=${DMG4LOCATION} --with-gsl=${GSLLOCATION} --with-root --enable-debug
+  - ../configure --with-geant4=${GEANT4LOCATION} --with-gsl=${GSLLOCATION} --with-root --enable-debug
 
 
 # Feed coverage to GitLab as suggested by R. Dusaev
