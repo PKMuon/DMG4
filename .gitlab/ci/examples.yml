@@ -2,10 +2,12 @@
 #
 # Configuration of examples with Debug flag ON
 .runconfigure-test: &runconfigure-test
+  - source ../../config.txt
   - ../configure --with-geant4=${GEANT4LOCATION} --with-gsl=${GSLLOCATION} --enable-debug
 
 # Configuration of examples with Debug flag ON and ROOT
 .runconfigure-test-root: &runconfigure-test-root
+  - source ../../config.txt
   - ../configure --with-geant4=${GEANT4LOCATION} --with-gsl=${GSLLOCATION} --with-root --enable-debug
 
 
