@@ -18,14 +18,14 @@ EventInfo::EventInfo() {
 void EventInfo::AddParentInfo(const G4Step* aStep) {
   G4int trackID = aStep->GetTrack()->GetTrackID();
   G4String particleName = aStep->GetTrack()->GetParticleDefinition()->GetParticleName();
-  G4cout << "INFO: EventInfo: Particle (" << particleName << ", " << trackID << ")  added to map!" << G4endl;
+  //G4cout << "INFO: EventInfo: Particle (" << particleName << ", " << trackID << ")  added to map!" << G4endl;
   // Add new DM event's parent info
   dmEvents[trackID].AddParentInfo(aStep);
 }
 
 void EventInfo::AddDaughterInfo(const G4Step* aStep) {
   G4int trackID = aStep->GetTrack()->GetTrackID();
-  if(auto it = dmEvents.find(trackID); it != dmEvents.end()) {
+  if(dmEvents.find(trackID) != dmEvents.end()) {
     // Add new DM event's daughter info
     dmEvents[trackID].AddDaughterInfo(aStep);
   } else {

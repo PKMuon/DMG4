@@ -1,6 +1,8 @@
 #include "DarkMatterPhysics.hh"
 #include "DarkMatterParametersRegistry.hh"
 
+#include "Configure.hh"
+
 #include "G4SystemOfUnits.hh"
 
 
@@ -32,21 +34,48 @@
 
 bool DarkMatterPhysics::DarkMatterPhysicsConfigure() 
 {
+  // -- The Parser --------------
+  PhysicsParametersSet& p = PhysicsParametersSet::self();
+  // Register all parameters at once
+  //for (const auto &par : p) DMpar->RegisterNewParam(p.first, p.second);
+
+  // Parameters from parser
+  // CHECK --> Process and particle identifiers
+  G4double DMProcess        = p.get("DMProcess", 1.);
+  G4double BranchingType    = p.get("BranchingType", 1.);
+  G4double DecayType        = p.get("DecayType", 1.);
+
+  // CHECK --> Mass, coupling and bias settings
+  G4double DMMass           = p.get("DMMass", 0.25);
+  G4double Epsilon          = p.get("Epsilon", 0.01);
+  G4double AlphaD           = p.get("AlphaD", 0.1);
+  G4double BiasSigmaFactor0 = p.get("BiasSigmaFactor0", 1.e9);
+
+  // CHECK -- Settings related to production threshold and step size
+  G4double EThresh          = p.get("eThreshold", 35.); // for sensitivity calculations invisible mode
+  G4double dEmaxPerStep     = p.get("dEmaxPerStep", 5.); // for sensitivity calculations invisible mode
+
+  // Remaining parameters used in semi-visible models
+  G4double RDM              = p.get("RDM", 1./3);
+  G4double Ffactor          = p.get("Ffactor", 0.4);
+  G4double IDMTheta         = p.get("IDMTheta", 1.e-3);
+
+  // -- Register new parameters --
   //call an instance of the class
   DarkMatterParametersRegistry* DMpar = DarkMatterParametersRegistry::GetInstance();
   
-  DMpar->RegisterNewParam("BiasSigmaFactor0", 1.e13);
-  DMpar->RegisterNewParam("EThresh", 35.*GeV); // for sensitivity calculations invisible mode
+  DMpar->RegisterNewParam("BiasSigmaFactor0", BiasSigmaFactor0);
+  DMpar->RegisterNewParam("EThresh", EThresh*GeV); // for sensitivity calculations invisible mode
   //G4double EThresh = 18.; // for sensitivity calculations visible mode
   //G4double EThresh = 1.; // for shape studies
   //G4double EThresh = 2000.; // to turn off A emissions  
 
   //select particle type and details
-  DMpar->RegisterNewParam("DMProcessType", 16.); // 1 - 4: Brem. process for Vector, Scalar, Axial, Pseudoscalar, 5 - spin 2, 21 - ALP
+  DMpar->RegisterNewParam("DMProcessType", DMProcess); // 1 - 4: Brem. process for Vector, Scalar, Axial, Pseudoscalar, 5 - spin 2, 21 - ALP
                                                 // 11 - 14: Annihilation, 15 - annihilation through spin 2 DM, 16 - Z' annihilation
                                                 // 31 - ZPrime (muon beams)
-  DMpar->RegisterNewParam("DMMass", 0.167*GeV);
-  DMpar->RegisterNewParam("Epsilon", 0.0001);
+  DMpar->RegisterNewParam("DMMass", DMMass*GeV);
+  DMpar->RegisterNewParam("Epsilon", Epsilon);
 
   // Initialize for Pb
   DMpar->RegisterNewParam("ANucl"      ,207.   );
@@ -89,7 +118,7 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
      10: B-L vanilla model,      nu-nu final state
      11: B-L DM model,           scalar DM final state
    */
-  DMpar->RegisterNewParam("BranchingType", 10.);
+  DMpar->RegisterNewParam("BranchingType", BranchingType);
 
   /* additional parameters for annihilation (if absent the default ones will be used)*/
   //DMpar->RegisterNewParam("RDM", 1./3.);
@@ -107,7 +136,7 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
   /* Additional parameters to handle narrow width resonances in annihilation
    * dEmaxPerStep -> the maximum energy loss per step in the material(s) where the annihilation is allowed
    */
-  //DMpar->RegisterNewParam("dEmaxPerStep",5*MeV)
+  DMpar->RegisterNewParam("dEmaxPerStep",dEmaxPerStep*MeV);
 
   return true;
 }

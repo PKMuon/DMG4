@@ -51,12 +51,14 @@ void EventAction::EndOfEventAction(const G4Event* evt)
   theSteppingAction->Finalize();
 
   // Write event to file
-  ofstream outFile("Report.txt", std::ofstream::app);
-  outFile << "EVENT" << std::endl;
-  outFile << evt->GetEventID() << " " << NEmissions << std::endl;
-  myEventInfo->DumpInfo(outFile);
-  outFile << "ENDEVENT" << std::endl;
-  outFile.close();
+  if(myDetector->GetAEmission()) {
+    ofstream outFile("Report.txt", std::ofstream::app);
+    outFile << "EVENT" << std::endl;
+    outFile << evt->GetEventID() << " " << NEmissions << std::endl;
+    myEventInfo->DumpInfo(outFile);
+    outFile << "ENDEVENT" << std::endl;
+    outFile.close();
+  }
 
   G4cout << ">>> End of event " << evt->GetEventID() << std::endl;  
 }
