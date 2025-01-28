@@ -71,10 +71,13 @@
   - sed -r 's#DM_TYPE_NAME#DarkAxials#g' mkgeant4.cc.template > mkgeant4.cc
   - make
   - ./mkgeant4 > testAX.log
+
+  - cd ../..
  
   # test DMG4 cross section stability for annihilation
   - cd examples/testAnnihilationCS
   - *runconfigure-test-root
+  - ./mkgeant4
 
 
 
