@@ -79,6 +79,7 @@
   - *runconfigure-test-root
   - make
   - ./mkgeant4
+  - cd ../..
 
 
 
