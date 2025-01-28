@@ -6,7 +6,6 @@
 class DetectorConstruction;
 class EventAction;
 
-
 class SteppingActionDMG4 : public G4UserSteppingAction
 {
   public:
@@ -21,5 +20,6 @@ class SteppingActionDMG4 : public G4UserSteppingAction
 
   private:
 
+    DetectorConstruction* myDetector;
     EventAction* eventAction;
 };

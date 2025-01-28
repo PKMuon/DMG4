@@ -4,6 +4,7 @@
 #include "PrimaryGeneratorAction.hh"
 #include "EventAction.hh"
 #include "SteppingActionDMG4.hh"
+#include "StackingAction.hh"
 
 #include "QGSP_BERT.hh"
 #include "FTFP_BERT.hh"
@@ -56,12 +57,15 @@ int main(int argc,char** argv) {
 #endif
    
   // UserAction classes
-  //runManager->SetUserAction(runAction);
   runManager->SetUserAction(new PrimaryGeneratorAction(mkexp));
 
+  // Define UserEventAction to store and write event information to output
   EventAction* myEA = new EventAction(mkexp, myPhysics->GetDarkMatterPointer());
   runManager->SetUserAction(myEA);
+  // Define UserSteppingAction to save DM information
   runManager->SetUserAction(new SteppingActionDMG4(mkexp, myEA));
+  // Define UserStackingAction to skip non-DM events
+  runManager->SetUserAction(new StackingAction(mkexp));
 
   // User interactions
   G4UImanager * UI = G4UImanager::GetUIpointer();  

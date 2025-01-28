@@ -1,6 +1,7 @@
 #pragma once
 
 #include "G4UserEventAction.hh"
+#include "EventInfo.hh"
 
 class DetectorConstruction;
 class SteppingActionDMG4;
@@ -21,12 +22,14 @@ class EventAction : public G4UserEventAction
     void EndOfEventAction(const G4Event*);
     void SetSteppingAction(SteppingActionDMG4* action) {theSteppingAction = action;}
     DarkMatter* GetDarkMatterPointer() {return myDarkMatter;}
+    EventInfo* GetEventInfoPointer() {return myEventInfo;}
     void CountEmission() {NEmissions++;}
 
   private:
     DetectorConstruction* myDetector;
     SteppingActionDMG4* theSteppingAction;
     DarkMatter* myDarkMatter;
+    EventInfo* myEventInfo;
 
     G4int NEmissions;
 };
