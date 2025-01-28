@@ -4,6 +4,16 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project(DMG4)
 
+#----------------------------------------------------------------------------
+# Added by B.B.
+# Add coverage to debug flags for gcc compilation
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
+  MESSAGE( "Build mode: Debug" )
+  SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ggdb -O0 --coverage")
+  add_link_options("--coverage")
+endif(CMAKE_BUILD_TYPE STREQUAL Debug)
+
+
 # This below is to compile statements with nullptr (compilers 4.9, 6.3). At some point will not be needed?
 #Added by A.C.
 OPTION(BUILD_GOA "Build for genova cluster" OFF)

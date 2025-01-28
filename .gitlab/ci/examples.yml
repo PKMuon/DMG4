@@ -1,0 +1,100 @@
+# ------------- TEST OF EXAMPLES -------------
+#
+# Configuration of examples with Debug flag ON
+.runconfigure-test: &runconfigure-test
+  - source ../../config.txt
+  - ../configure --with-geant4=${GEANT4LOCATION} --with-gsl=${GSLLOCATION} --enable-debug
+
+# Configuration of examples with Debug flag ON and ROOT
+.runconfigure-test-root: &runconfigure-test-root
+  - source ../../config.txt
+  - ../configure --with-geant4=${GEANT4LOCATION} --with-gsl=${GSLLOCATION} --with-root --enable-debug
+
+
+# Feed coverage to GitLab as suggested by R. Dusaev
+.gcovr-script: &gcovr-script
+  - >
+    gcovr -r $(readlink -f .) \
+      -e "$(readlink -f include)/*" \
+      -e "$(readlink -f examples)/*" \
+      -e "$(readlink -f src)/*" \
+      --object-directory=$(readlink -f .) \
+      --exclude-throw-branches \
+      --exclude-unreachable-branches \
+      --gcov-ignore-parse-errors \
+      --xml=coverage.${CI_COMMIT_BRANCH}.xml \
+      --txt
+
+.coverage-artifacts:
+  coverage: '/^TOTAL.*\s+(\d+\%)$/'
+  artifacts:
+    expire_in: 12 hours
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.${CI_COMMIT_BRANCH}.xml
+    paths:
+      - examples/testCS/testDP.log
+      - examples/testCS/testSC.log
+      - examples/testCS/testPS.log
+      - examples/testCS/testAX.log
+
+
+
+.run-examples: &run-examples
+  - cd examples/example1
+  - *runconfigure-test
+  - make
+  - ./mkgeant4
+  - cd ../..
+  
+  - cd examples/example11
+  - *runconfigure-test
+  - make
+  - source config.sh
+  - ./mkgeant4 cardg_test.g4mac
+  - cp Report.txt Report.txtSV
+  - cd ../..
+
+  # test DMG4 cross section stability
+  - cd examples/testCS
+  - *runconfigure-test
+   
+  - sed -r 's#DM_TYPE_NAME#DarkPhotons#g' mkgeant4.cc.template > mkgeant4.cc
+  - make
+  - ./mkgeant4 > testDP.log
+
+  - sed -r 's#DM_TYPE_NAME#DarkScalars#g' mkgeant4.cc.template > mkgeant4.cc
+  - make
+  - ./mkgeant4 > testSC.log
+  
+  - sed -r 's#DM_TYPE_NAME#DarkPseudoScalars#g' mkgeant4.cc.template > mkgeant4.cc
+  - make
+  - ./mkgeant4 > testPS.log
+  
+  - sed -r 's#DM_TYPE_NAME#DarkAxials#g' mkgeant4.cc.template > mkgeant4.cc
+  - make
+  - ./mkgeant4 > testAX.log
+
+  - cd ../..
+ 
+  # test DMG4 cross section stability for annihilation
+  - cd examples/testAnnihilationCS
+  - *runconfigure-test-root
+  - make
+  - ./mkgeant4
+  - cd ../..
+
+
+
+# EXAMPLE COMPILATION AND TESTING
+test-examples:
+  stage: test
+  dependencies:
+    - build-el9
+  extends:
+    - .compile-configuration
+    - .coverage-artifacts
+  script:
+    - *run-examples
+    - *gcovr-script

@@ -87,4 +87,8 @@ if [ "x${GOACONFIG}" == "xYES" ] ; then
   ARGLIST="${ARGLIST} -DBUILD_GOA=ON"
 fi
 
+if [ "${COMPMODE}" != "None" ] ; then
+  ARGLIST="${ARGLIST} -DCMAKE_BUILD_TYPE=${COMPMODE}"
+fi
+
 cmake ${ARGLIST} .
