@@ -121,16 +121,16 @@ bool DarkMatterPhysics::DarkMatterPhysicsConfigure()
   DMpar->RegisterNewParam("BranchingType", BranchingType);
 
   /* additional parameters for annihilation (if absent the default ones will be used)*/
-  //DMpar->RegisterNewParam("RDM", 1./3.);
-  //DMpar->RegisterNewParam("AlphaD", 0.5);
+  DMpar->RegisterNewParam("RDM", RDM);
+  DMpar->RegisterNewParam("AlphaD", AlphaD);
   
   /* additional parameters for semivisible DM, in addition to above parameters for annihilation (if absent the default ones will be used)
    * RDM -> mChi/mA ratio
    * AlphaD -> value of alphaDark
    * */
-  //DMpar->RegisterNewParam("Ffactor", 0.4);
+  DMpar->RegisterNewParam("Ffactor", Ffactor);
   /* additional parameter for Dirac DM, describing the dark fermion mixing (if absent the default ones will be used)*/
-  //DMpar->RegisterNewParam("IDMTheta", 1.e-3);
+  DMpar->RegisterNewParam("IDMTheta", IDMTheta);
 
 
   /* Additional parameters to handle narrow width resonances in annihilation
