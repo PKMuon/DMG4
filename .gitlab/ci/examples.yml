@@ -15,9 +15,6 @@
 .gcovr-script: &gcovr-script
   - >
     gcovr -r $(readlink -f .) \
-      -e "$(readlink -f include)/*" \
-      -e "$(readlink -f examples)/*" \
-      -e "$(readlink -f src)/*" \
       --object-directory=$(readlink -f .) \
       --exclude-throw-branches \
       --exclude-unreachable-branches \
