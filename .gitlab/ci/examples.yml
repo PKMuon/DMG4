@@ -40,7 +40,7 @@
       - examples/testCS/testAX.log
 
 
-.run-example-geant4:
+.run-example-geant4: &run-example-geant4
   - cd examples/example11
   - *runconfigure-test
   - make
