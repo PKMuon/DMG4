@@ -3,6 +3,17 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project(DMG4examples)
 
+
+#----------------------------------------------------------------------------
+# Added by B.B.
+# Add coverage to debug flags for gcc compilation
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
+  MESSAGE( "Build mode: Debug" )
+  SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ggdb -O0 --coverage")
+  add_link_options("--coverage")
+endif(CMAKE_BUILD_TYPE STREQUAL Debug)
+
+
 #----------------------------------------------------------------------------
 # Find Geant4 package, activating all available UI and Vis drivers by default
 # You can set WITH_GEANT4_UIVIS to OFF via the command line or ccmake/cmake-gui
