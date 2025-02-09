@@ -1,11 +1,11 @@
-# EXAMPLE 11 (Geant4)
+# EXAMPLE 2 (Advanced Geant4 example)
 
 This example features the production of DM in a simple MC simulation using Geant4. The detector
 consists of a Pb block, towards which 100 GeV electrons are shot. The beam definition is given
 through the cardg.g4mac parameters. 
 
 Usage: type the following commands:
-```cpp
+```bash
   runconfigure
   make
   source config.csh  #  (or "source config.sh" for sh, bash shells, this is to be done only once)

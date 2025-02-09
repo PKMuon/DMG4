@@ -2,12 +2,12 @@
 #
 # Configuration of examples with Debug flag ON
 .runconfigure-test: &runconfigure-test
-  - source ../../config.txt
+  - source ../../../config.txt
   - ../configure --with-geant4=${GEANT4LOCATION} --with-gsl=${GSLLOCATION} --enable-debug
 
 # Configuration of examples with Debug flag ON and ROOT
 .runconfigure-test-root: &runconfigure-test-root
-  - source ../../config.txt
+  - source ../../../config.txt
   - ../configure --with-geant4=${GEANT4LOCATION} --with-gsl=${GSLLOCATION} --with-root --enable-debug
 
 
@@ -31,14 +31,14 @@
         coverage_format: cobertura
         path: coverage.${CI_COMMIT_BRANCH}.xml
     paths:
-      - examples/testCS/testDP.log
-      - examples/testCS/testSC.log
-      - examples/testCS/testPS.log
-      - examples/testCS/testAX.log
+      - examples/DarkMatterCS/testCS/testDP.log
+      - examples/DarkMatterCS/testCS/testSC.log
+      - examples/DarkMatterCS/testCS/testPS.log
+      - examples/DarkMatterCS/testCS/testAX.log
 
 
-.run-example-geant4: &run-example-geant4
-  - cd examples/example11
+.run-Geant4-examples: &run-Geant4-examples
+  - cd examples/Geant4/example2
   - *runconfigure-test
   - make
   - source config.sh
@@ -62,18 +62,18 @@
   - ./mkgeant4 -w cardg_test.g4mac -pDMMass=0.0167 -pEpsilon=0.001 -pBiasSigmaFactor0=1.e9 -pDMProcess=4 -pDecayType=0 -pBranchingType=0
   # Test Ps -> e+e-
   - ./mkgeant4 -w cardg_test.g4mac -pDMMass=0.0167 -pEpsilon=0.001 -pBiasSigmaFactor0=1.e9 -pDMProcess=4 -pDecayType=1 -pBranchingType=0
-  - cd ../..
+  - cd ../../../
 
 
-.run-examples: &run-examples
-  - cd examples/example1
+.run-CS-examples: &run-CS-examples
+  - cd examples/DarkMatterCS/example1
   - *runconfigure-test
   - make
   - ./mkgeant4
-  - cd ../..
+  - cd ..
   
   # test DMG4 cross section stability
-  - cd examples/testCS
+  - cd testCS
   - *runconfigure-test
    
   - sed -r 's#DM_TYPE_NAME#DarkPhotons#g' mkgeant4.cc.template > mkgeant4.cc
@@ -92,14 +92,14 @@
   - make
   - ./mkgeant4 > testAX.log
 
-  - cd ../..
+  - cd ..
  
   # test DMG4 cross section stability for annihilation
-  - cd examples/testAnnihilationCS
+  - cd testAnnihilationCS
   - *runconfigure-test-root
   - make
   - ./mkgeant4
-  - cd ../..
+  - cd ../../../
 
 
 # EXAMPLE COMPILATION AND TESTING
@@ -111,7 +111,7 @@ test-example-geant4:
     - .compile-configuration
     - .coverage-artifacts
   script:
-    - *run-example-geant4
+    - *run-Geant4-examples
     - *gcovr-script
 
 test-examples:
@@ -122,5 +122,5 @@ test-examples:
     - .compile-configuration
     - .coverage-artifacts
   script:
-    - *run-examples
+    - *run-CS-examples
     - *gcovr-script

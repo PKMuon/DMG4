@@ -1,0 +1,20 @@
+/run/initialize
+
+/tracking/verbose 0
+
+/gps/particle e-
+
+/gps/pos/type Plane
+/gps/pos/shape Circle
+/gps/pos/centre 0. 0. -2000. cm
+/gps/pos/radius 1.45 cm
+/gps/ang/type iso
+/gps/ang/maxtheta 0.0001 rad
+
+/gps/energy    100. GeV
+
+/random/setSeeds 51 1
+
+/run/beamOn 100
+
+exit
