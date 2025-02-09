@@ -39,7 +39,7 @@
 
 
 SteppingActionDMG4::SteppingActionDMG4(DetectorConstruction* myDC, EventAction* myEA)
-: myDetector(myDC), eventAction(myEA)
+: eventAction(myEA)
 {
   eventAction->SetSteppingAction(this);
 }
@@ -47,39 +47,20 @@ SteppingActionDMG4::SteppingActionDMG4(DetectorConstruction* myDC, EventAction* 
 
 void SteppingActionDMG4::UserSteppingAction(const G4Step* aStep)
 {
-  if(myDetector->GetKillEvent()) {
-    aStep->GetTrack()->SetKineticEnergy(0.);
-    aStep->GetTrack()->SetTrackStatus(fStopAndKill);
-  }
-
   G4StepPoint* SPointPreStep = aStep->GetPreStepPoint();
-  G4StepPoint* SPointPostStep = aStep->GetPostStepPoint();
+  //G4StepPoint* SPointPostStep = aStep->GetPostStepPoint();
+  //G4double ekin = aStep->GetTrack()->GetKineticEnergy()/GeV;
+  //G4double ekinprestep = SPointPreStep->GetKineticEnergy()/GeV;
+  //G4ParticleDefinition* theParticleDefinition = aStep->GetTrack()->GetDefinition();
 
-  if(SPointPostStep->GetProcessDefinedStep() != 0) {
-    if(aStep->GetTrack()->GetCurrentStepNumber() == 1 && aStep->GetTrack()->GetCreatorProcess() != 0) {
-      G4String creatorProcess = aStep->GetTrack()->GetCreatorProcess()->GetProcessName();
-      if(creatorProcess.find(string("DMProcess")) != string::npos) {
+  if(aStep->GetPostStepPoint()->GetProcessDefinedStep() != 0) {
+    if((aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()).find(string("DMProcess")) != string::npos) {
 
-        myDetector->SetAEmission(1);
-        eventAction->CountEmission();
-        eventAction->GetEventInfoPointer()->AddParentInfo(aStep);
+      eventAction->CountEmission();
 
-        G4cout << "Dark Matter production with E = " << SPointPostStep->GetKineticEnergy()/GeV << " at (" << SPointPostStep->GetPosition()[0] << ", " << SPointPostStep->GetPosition()[1] << ", " << SPointPostStep->GetPosition()[2] << ")" << G4endl;
-      }
+      G4cout << "Dark Matter production at E = " << SPointPreStep->GetKineticEnergy()/GeV << G4endl;
     }
   }
-
-  if(SPointPostStep->GetProcessDefinedStep() != 0) {
-    if((SPointPostStep->GetProcessDefinedStep()->GetProcessName()).find(string("Decay")) != string::npos) {
-      if((aStep->GetTrack()->GetParticleDefinition()->GetParticleName()).find(string("DM")) != string::npos) {
-
-        eventAction->GetEventInfoPointer()->AddDaughterInfo(aStep);
-
-        G4cout << "Dark Matter decay with E = " << SPointPostStep->GetKineticEnergy()/GeV << " at (" << SPointPostStep->GetPosition()[0] << ", " << SPointPostStep->GetPosition()[1] << ", " << SPointPostStep->GetPosition()[2] << ")" << G4endl;
-      }
-    }
-  }
-
 }
 
 

@@ -1,0 +1,6 @@
+ This G4 application uses default configuration in DMG4/DarkMatterPhysicsConfigure.cc. If you want to change it, copy the file here.
+ Usage: type the following commands:
+   runconfigure
+   make
+   source config.csh    (or "source config.sh" for sh, bash shells, this is to be done only once)
+   mkgeant4 cardg.g4mac

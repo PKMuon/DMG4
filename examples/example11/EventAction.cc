@@ -15,24 +15,17 @@
 #include "G4SystemOfUnits.hh"
 #include "G4ios.hh"
 
-#include "EventInfo.hh"
-
 
 EventAction::EventAction(DetectorConstruction* myDC, DarkMatter* DMPointer)
 : myDetector(myDC), myDarkMatter(DMPointer), NEmissions(0)
-{
-  myEventInfo = new EventInfo();
-  myDetector->ResetKillEvent();
-  ofstream outFile("Report.txt", std::ofstream::out);
-  outFile.close();
-}
+{;}
 
 
 EventAction::~EventAction()
 {
   G4cout << "Total number of DM emissions = " << NEmissions << G4endl;
-  ofstream outFile("Report.txt", std::ofstream::app);
-  if(myDetector->GetAEmission()) outFile << "Total number of DM emissions " << NEmissions << G4endl;
+  ofstream outFile("Report.txt");
+  if(NEmissions >= 3) outFile << "Total number of DM emissions = " << NEmissions << G4endl;
   outFile.close();
 }
 
@@ -40,7 +33,6 @@ EventAction::~EventAction()
 void EventAction::BeginOfEventAction(const G4Event* event)
 {
   theSteppingAction->Reset();
-  myEventInfo->Reset();
 
   myDetector->SetAEmission(0);
 }
@@ -50,15 +42,5 @@ void EventAction::EndOfEventAction(const G4Event* evt)
 {
   theSteppingAction->Finalize();
 
-  // Write event to file
-  if(myDetector->GetAEmission()) {
-    ofstream outFile("Report.txt", std::ofstream::app);
-    outFile << "EVENT" << std::endl;
-    outFile << evt->GetEventID() << " " << NEmissions << std::endl;
-    myEventInfo->DumpInfo(outFile);
-    outFile << "ENDEVENT" << std::endl;
-    outFile.close();
-  }
-
-  G4cout << ">>> End of event " << evt->GetEventID() << std::endl;  
+  G4cout << ">>> End of event " << evt->GetEventID() << endl;  
 }

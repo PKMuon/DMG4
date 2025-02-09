@@ -35,12 +35,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     inline G4LogicalVolume* GetlogicWorld() {return logicWorld;}
 
     void SetAEmission(G4int AE) {AEmission = AE;}
-    G4int GetAEmission() const {return AEmission;}
-
-    // Kill event flag
-    void ResetKillEvent() {KillEvent = false;}
-    void SetKillEvent() {KillEvent = true;}
-    G4bool GetKillEvent() const {return KillEvent;}
+    G4int GetAEmission() {return AEmission;}
 
   private:
 
@@ -68,7 +63,6 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     G4LogicalVolume*   logicBox;
 
     G4int AEmission;
-    G4bool KillEvent;
 };
 
 #endif

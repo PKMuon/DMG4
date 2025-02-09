@@ -4,7 +4,6 @@
 #include "PrimaryGeneratorAction.hh"
 #include "EventAction.hh"
 #include "SteppingActionDMG4.hh"
-#include "StackingAction.hh"
 
 #include "QGSP_BERT.hh"
 #include "FTFP_BERT.hh"
@@ -17,27 +16,15 @@
 
 #include "G4RunManager.hh"
 #include "G4PhysListFactory.hh"
-#include "G4ios.hh"
 
 #ifdef G4VIS_USE
 #include "G4VisExecutive.hh"
 #endif
 
-#include "Configure.hh"
-#include <iostream>
+#include "G4ios.hh"
 
 
 int main(int argc,char** argv) {
-
-  char * wCardFile = nullptr;
-  int parserOutFlag = parseArguments(argc, argv, wCardFile);
-  // Exit but before print usage
-  if(parserOutFlag < 0 ) {
-    print_usage( std::cerr, argv[0] );
-    G4cerr << "Exit due to previous error(s)." << std::endl;
-  }
-  // Exit with failure
-  if (parserOutFlag < 1) return EXIT_FAILURE;
 
   // Run manager
   G4RunManager * runManager = new G4RunManager;
@@ -69,15 +56,12 @@ int main(int argc,char** argv) {
 #endif
    
   // UserAction classes
+  //runManager->SetUserAction(runAction);
   runManager->SetUserAction(new PrimaryGeneratorAction(mkexp));
 
-  // Define UserEventAction to store and write event information to output
   EventAction* myEA = new EventAction(mkexp, myPhysics->GetDarkMatterPointer());
   runManager->SetUserAction(myEA);
-  // Define UserSteppingAction to save DM information
   runManager->SetUserAction(new SteppingActionDMG4(mkexp, myEA));
-  // Define UserStackingAction to skip non-DM events
-  runManager->SetUserAction(new StackingAction(mkexp));
 
   // User interactions
   G4UImanager * UI = G4UImanager::GetUIpointer();  
@@ -95,8 +79,7 @@ int main(int argc,char** argv) {
   // Batch mode
   { 
     G4String command = "/control/execute ";
-    G4String fileName = wCardFile;
-    //G4String fileName = argv[1];
+    G4String fileName = argv[1];
     UI->ApplyCommand(command+fileName);
   }
 
