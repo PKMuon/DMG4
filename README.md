@@ -1,0 +1,72 @@
+Dark Matter simulations for Geant4
+==================================
+
+The DMG4 package is intended for the simulation of Dark Matter production in the electron, positron and muon beams. ALP particles production
+by gamma can be also simulated, usually gammas are secondary particles produced in the above mentioned beams.
+
+The package structure
+----------------------
+
+1. Subdirectory /src - package codes
+   /DMG4 - DMG4 package codes
+   /DarkMatter - DarkMatter package codes
+   /UtilsDM - utility routines
+
+2. Subdirectory /include - headers, the DMG4 headers are in a separate subdirectory /DMG4
+
+3. Subdirectory DATA contains examples of files needed by Geant4 when some extension is used.
+
+4. Subdirectory /examples contains examples of package configuration and of turning on the extension in a Geant4 application
+
+5. Subdirectory /modules_cmake_standalone contains files to be used by CMake when CERN AFS is unavailable
+
+6. configure - CMake helper script (wrapper)
+
+7. runconfigure - example of using the configure script
+
+
+Steps to start work with the package DMG4
+----------------------
+
+I. Preparation
+
+  1. If you want to use your own compiler setup, find corresponding Geant4 and GSL packages
+  2. Alternatively, install Geant4 yourself
+
+II. Compilation of the library
+
+  1. On the CERN lxplus cluster it is possible to use the lcg setup scripts, for example on CERN default lxplus
+     source /cvmfs/sft.cern.ch/lcg/views/setupViews.csh LCG_104 x86_64-el9-gcc12-opt
+     (use the first commented out line in the script runconfigure_lcg* for information)
+     If you run this command with only one argument, you will see the list of availble platforms
+  2. Configure cmake if needed
+  3. For NA64 users: this is a tested release, should be compatible with precompiled Geant4 described in the NA64 package "simulation"
+     In this case in the NA64 package "simulation" simply use the corresponding script runconfigure_lcg* or modify it to use your precompiled Geant4.
+  4. Alternatively, manual configuration: configure the compiler, choose a script runconfigure* or edit script runconfigure* to use packages chosen by you.
+  5. Run script runconfigure*  (runconfigure_lcg* for the lcg setup) chosen by you it or run the configure script manually
+     (./configure --help for help). Note that the scripts runconfigure* create the file config.txt that can be used later when examples are compiled
+  6. make
+  7. make install
+
+III. Compilation of internal examples and user applications
+
+  1. `examples/DarkMatterCS/example1` is a test of DarkMatter subpackage only. Run script runconfigure, then make. The executable is mkgeant4.
+  2. `examples/Geant4/example1` is an example of building a Geant4 application. Run script runconfigure, then make. The executable is mkgeant4.
+  3. For your Geant4 application: compile it together with 3 libraries that are put in the subdirectory /lib when "make install" is executed
+     Example of Dark Matter physics inclusion can be found in `examples/Geant4/example1/mkgeant4.cc` denoted by "extension" part"
+     Example of DarkMatterPhysicsConfigure.cc to simulate ALP is in `examples/Geant4/example3`
+  5. The DM mass and the threshold are to be set set in the file `DarkMatterPhysicsConfigure.cc`.
+     You should tune `BiasSigmaFactor0` in `DarkMatterPhysicsConfigure.cc`.
+     In simulation, the cross section is biased by the factor BiasSigmaFactor. It is always
+     equal to `BiasSigmaFactor0` for the invisible mode (simulation performed for the benchmark epsilon $`10^{-4}`$). In the visible mode
+     simulation BiasSigmaFactor is automatically scaled if epsilon is different from $`10^{-4}`$, so that the average number of DM per event
+     is the same. The printed out Normalization is simply 1/BiasSigmaFactor.
+
+
+Contact and further information
+----------------------
+
+Additional information is available in the [wiki page](https://gitlab.cern.ch/P348/DMG4/-/wikis/home).
+Keep an eye on the [releases page](https://gitlab.cern.ch/P348/DMG4/-/releases) to stay up to date with the latest DMG4 version.
+
+In case of issues, don't hesitate to reach out to Mikhail Kirsanov (mikhail.kirsanov@cern.ch).
