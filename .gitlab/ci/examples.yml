@@ -99,6 +99,13 @@
   - *runconfigure-test-root
   - make
   - ./mkgeant4
+  - cd ..
+
+  # test DMG4 cross section stability for ALP
+  - cd testALP
+  - *runconfigure-test-root
+  - make
+  - ./mkgeant4
   - cd ../../../
 
 
