@@ -1,26 +1,12 @@
 #include "DarkMatterPhysics.hh"
-
-#include "DarkMatter.hh"
-#include "DarkPhotons.hh"
-#include "DarkScalars.hh"
-#include "DarkPseudoScalars.hh"
-#include "DarkAxials.hh"
-#include "ALP.hh"
-#include "DarkZ.hh"
-#include "DarkPhotonsAnnihilation.hh"
-#include "DarkScalarsAnnihilation.hh"
-#include "DarkPseudoScalarsAnnihilation.hh"
-#include "DarkAxialsAnnihilation.hh"
-
-
-#include "DarkMatterParametersFactory.hh"
+#include "DarkMatterParametersRegistry.hh"
 
 #include "G4SystemOfUnits.hh"
 
 
 // BiasSigmaFactor Invisible mode Vector EThresh=35
 // 900.  9.e12
-// 16.7  8.e8
+// 16.7  1.e9
 //  5.   1.75e8
 //  2.   3.5e7
 // 0.5   1.2e7
@@ -34,10 +20,20 @@
 // BiasSigmaFactor Visible mode Vector EThresh=18
 // 16.7  3.4e8
 
+/*
+ *
+ * SYSTEM OF UNITS
+ *
+ * All entered quantities must be accompained by their unit of measurement.
+ *
+ * (ANucl is the atomic number)
+ *
+ */
+
 bool DarkMatterPhysics::DarkMatterPhysicsConfigure() 
 {
   //call an instance of the class
-  DarkMatterParametersFactory* DMpar = DarkMatterParametersFactory::GetInstance();  
+  DarkMatterParametersRegistry* DMpar = DarkMatterParametersRegistry::GetInstance();
   
   DMpar->RegisterNewParam("BiasSigmaFactor0", 6.e9);
   DMpar->RegisterNewParam("EThresh", 18.*GeV); // for sensitivity calculations invisible mode

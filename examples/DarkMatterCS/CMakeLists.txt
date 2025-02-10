@@ -27,7 +27,7 @@ else()
 endif()
 
 list(APPEND CMAKE_MODULE_PATH /afs/cern.ch/sw/lcg/external/cmaketools/1.1/modules)
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../modules_cmake_standalone)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../../modules_cmake_standalone)
 
 #----------------------------------------------------------------------------
 # Find GSL
@@ -47,16 +47,16 @@ endif(ROOTSYS)
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include(${Geant4_USE_FILE})
 if(ROOTSYS)
-  include_directories(${PROJECT_SOURCE_DIR}/../include ${PROJECT_SOURCE_DIR}/../include/DMG4 ${PROJECT_SOURCE_DIR}/../include/UtilsDM ${GSL_INCLUDE_DIR} ${ROOTSYS}/include)
+  include_directories(${PROJECT_SOURCE_DIR}/../../include ${PROJECT_SOURCE_DIR}/../../include/DMG4 ${PROJECT_SOURCE_DIR}/../../include/UtilsDM ${GSL_INCLUDE_DIR} ${ROOTSYS}/include)
 else(ROOTSYS)
-  include_directories(${PROJECT_SOURCE_DIR}/../include ${PROJECT_SOURCE_DIR}/../include/DMG4 ${PROJECT_SOURCE_DIR}/../include/UtilsDM ${GSL_INCLUDE_DIR})
+  include_directories(${PROJECT_SOURCE_DIR}/../../include ${PROJECT_SOURCE_DIR}/../../include/DMG4 ${PROJECT_SOURCE_DIR}/../../include/UtilsDM ${GSL_INCLUDE_DIR})
 endif(ROOTSYS)
 
 #----------------------------------------------------------------------------
 # Locate sources and libraries for this project
 #
 file(GLOB sources ${PROJECT_BINARY_DIR}/*.cc)
-link_directories (${PROJECT_SOURCE_DIR}/../lib)
+link_directories (${PROJECT_SOURCE_DIR}/../../lib)
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 and other libraries

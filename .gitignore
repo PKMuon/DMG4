@@ -12,3 +12,10 @@ CMakeFiles/
 config.txt
 config.sh
 config.csh
+
+# files created in examples
+mkgeant4
+*.root
+# Ignore output files from examples
+examples/*/*.txt
+examples/*/*.d
