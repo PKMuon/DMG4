@@ -7,7 +7,7 @@ Usage: type the following commands:
   runconfigure
   make
   source config.csh     #  (or "source config.sh" for sh, bash shells, this is to be done only once)
-  mkgeant4 cardg.g4mac
+  ./mkgeant4 cardg.g4mac
 ```
 
 ## OUTPUT
