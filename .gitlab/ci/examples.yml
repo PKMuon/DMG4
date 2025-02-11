@@ -110,17 +110,6 @@
 
 
 # EXAMPLE COMPILATION AND TESTING
-test-example-geant4:
-  stage: test
-  dependencies:
-    - build-el9
-  extends:
-    - .compile-configuration
-    - .coverage-artifacts
-  script:
-    - *run-Geant4-examples
-    - *gcovr-script
-
 test-examples:
   stage: test
   dependencies:
@@ -130,4 +119,5 @@ test-examples:
     - .coverage-artifacts
   script:
     - *run-CS-examples
+    - *run-Geant4-examples
     - *gcovr-script

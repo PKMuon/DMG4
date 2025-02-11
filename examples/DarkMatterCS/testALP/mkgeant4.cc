@@ -11,7 +11,7 @@ int main() {
 
   double E0, massTested, EThresh, sigmaNorm, ANucl, ZNucl, Dens, Epsil;
   int DecayType = 1;
-  unsigned int nPoints = 10000;
+  unsigned int nPoints = 100;
 
   EThresh = 0.12; // for total CS testing applicable to mass range mA<1MeV
   massTested = 0.1; 
