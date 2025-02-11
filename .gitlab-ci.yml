@@ -51,6 +51,7 @@ build-el9:
   # Save executables for example testing
   artifacts:
     paths:
+      - CMakeFiles
       - lib
       - include
       - config.txt
