@@ -50,6 +50,11 @@ file(GLOB sources_DMProcesses ${PROJECT_SOURCE_DIR}/src/DMG4/DMProcesses/*.cc)
 file(GLOB sources_DarkMatter  ${PROJECT_SOURCE_DIR}/src/DarkMatter/*.cc)
 file(GLOB sources_UtilsDM     ${PROJECT_SOURCE_DIR}/src/UtilsDM/*.cc)
 
+#----------------------------------------------------------------------------
+# Cross compilation with PKMuon software framework
+#
+include_directories(../include)
+
 add_library(UtilsDM SHARED ${sources_UtilsDM})
 set_target_properties(UtilsDM PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
 

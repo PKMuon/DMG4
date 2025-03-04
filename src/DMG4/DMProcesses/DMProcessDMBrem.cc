@@ -17,6 +17,9 @@
 #include "G4EmProcessSubType.hh"
 #include "G4SystemOfUnits.hh"
 
+#include "Object.hh"
+#include "Run.hh"
+
 
 DMProcessDMBrem::DMProcessDMBrem(DarkMatter* DarkMatterPointerIn, G4ParticleDefinition* theDMParticlePtrIn,
                                  G4double BiasSigmaFactorIn)
@@ -136,6 +139,18 @@ G4VParticleChange* DMProcessDMBrem::PostStepDoIt( const G4Track& aTrack,
   std::cout << "DM PDG ID = " << theDMParticlePtr->GetPDGEncoding() 
             << " emitted by " << aTrack.GetDefinition()->GetParticleName()
             << " with energy = " << incidentE/GeV << " DM kinetic energy = " << DMKinE/GeV << std::endl;
+
+  DMPInfo &dmpInfo = Run::GetInstance()->AddDMPInfo();
+  dmpInfo.Pid = theDMParticlePtr->GetPDGEncoding();
+  dmpInfo.PidMother = aTrack.GetDefinition()->GetPDGEncoding();
+  dmpInfo.Px = movingDM->GetMomentum().x();
+  dmpInfo.Py = movingDM->GetMomentum().y();
+  dmpInfo.Pz = movingDM->GetMomentum().z();
+  dmpInfo.E = movingDM->GetTotalEnergy();
+  dmpInfo.PxMother = aTrack.GetMomentum().x();
+  dmpInfo.PyMother = aTrack.GetMomentum().y();
+  dmpInfo.PzMother = aTrack.GetMomentum().z();
+  dmpInfo.EMother = aTrack.GetTotalEnergy();
 
   return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
 }
