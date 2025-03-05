@@ -151,6 +151,10 @@ G4VParticleChange* DMProcessDMBrem::PostStepDoIt( const G4Track& aTrack,
   dmpInfo.PyMother = aTrack.GetMomentum().y();
   dmpInfo.PzMother = aTrack.GetMomentum().z();
   dmpInfo.EMother = aTrack.GetTotalEnergy();
+  dmpInfo.X = aTrack.GetPosition().x();
+  dmpInfo.Y = aTrack.GetPosition().y();
+  dmpInfo.Z = aTrack.GetPosition().z();
+  dmpInfo.T = aTrack.GetGlobalTime();
 
   return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
 }
